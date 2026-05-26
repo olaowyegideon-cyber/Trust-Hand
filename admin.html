@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Trusted Hands — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f172a;--navy2:#1e293b;--slate:#334155;--slate2:#475569;--slate3:#64748b;
+  --blue:#1d4ed8;--blue2:#2563eb;--blue3:#eff6ff;
+  --emerald:#059669;--emerald2:#d1fae5;
+  --amber:#d97706;--amber2:#fef3c7;
+  --red:#dc2626;--red2:#fee2e2;
+  --bg:#f8fafc;--white:#fff;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --shadow2:0 4px 20px rgba(0,0,0,.10);
+  --r:12px;--r2:16px;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--navy);font-size:14px;min-height:100vh}
+.hidden{display:none!important}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy2);color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+.btn{padding:10px 20px;border-radius:var(--r);font-weight:700;font-size:14px;cursor:pointer;border:none;font-family:inherit;transition:.2s}
+.btn-primary{background:var(--blue2);color:#fff}
+.btn-primary:hover{background:var(--blue)}
+.btn-success{background:var(--emerald);color:#fff}
+.btn-danger{background:var(--red);color:#fff}
+.btn-outline{background:var(--white);color:var(--blue2);border:1.5px solid var(--blue2)}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:20px}
+.inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;font-family:inherit;color:var(--navy);outline:none;transition:.2s}
+.inp:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.card{background:var(--white);border-radius:var(--r2);padding:20px;box-shadow:var(--shadow);margin-bottom:14px}
+.card h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.info-row:last-child{border-bottom:none}
+.lbl{color:var(--slate3)}
+.pill{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block}
+.pill-active{background:var(--emerald2);color:var(--emerald)}
+.pill-pending{background:var(--amber2);color:var(--amber)}
+.pill-unsub{background:#f1f5f9;color:var(--slate3)}
+.pill-banned{background:var(--red2);color:var(--red)}
+.pending-card{background:var(--white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid var(--amber)}
+.receipt-img{width:100%;border-radius:var(--r);max-height:200px;object-fit:cover;margin:10px 0;border:1px solid var(--border)}
+.tab-bar{display:flex;background:#f1f5f9;border-radius:var(--r);padding:3px;gap:3px;margin-bottom:16px}
+.tab{flex:1;padding:8px 4px;text-align:center;border-radius:9px;font-size:12px;font-weight:600;color:var(--slate2);cursor:pointer;transition:.2s}
+.tab.active{background:var(--white);color:var(--navy);box-shadow:var(--shadow)}
+.user-row{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer}
+.user-row:hover{background:#f8fafc}
+.avatar{width:40px;height:40px;border-radius:50%;background:#eff6ff;color:#1e40af;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-box{background:var(--white);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);text-align:center}
+.stat-num{font-size:24px;font-weight:800;color:var(--navy)}
+.stat-lbl{font-size:11px;color:var(--slate3);margin-top:2px}
+.manage-row{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #f8fafc;flex-wrap:wrap}
+.manage-row:last-child{border-bottom:none}
+.empty{text-align:center;padding:40px 20px;color:var(--slate3)}
+.empty .icon{font-size:36px;margin-bottom:10px}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#f0f4ff,#f8fafc)}
+.login-card{background:var(--white);border-radius:24px;padding:32px 24px;box-shadow:var(--shadow2);width:100%;max-width:380px}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .icon-wrap{width:60px;height:60px;background:var(--blue2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.login-logo h1{font-size:22px;font-weight:800;color:var(--navy)}
+.login-logo p{font-size:13px;color:var(--slate3);margin-top:4px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.alert{border-radius:var(--r);padding:11px 14px;font-size:13px;margin-bottom:12px}
+.alert-warn{background:var(--amber2);color:#92400e}
+
+/* MAIN */
+#mainScreen{display:none}
+.header{background:var(--navy2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.header-logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:16px}
+.header-logo .logo-box{width:32px;height:32px;background:var(--blue2);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.signout-btn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.content{padding:16px;max-width:600px;margin:0 auto;padding-bottom:80px}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon-wrap">
+        <svg width="28" height="28" viewBox="0 0 56 56" fill="none"><rect width="56" height="56" rx="14" fill="#1d4ed8"/><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/><rect x="17" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(-12 19 28)"/><rect x="34" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(12 37 28)"/></svg>
+      </div>
+      <h1>Admin Console</h1>
+      <p>Trusted Hands — Gideon's Command Centre</p>
+    </div>
+    <div class="form-group">
+      <label>Admin Email</label>
+      <input class="inp" type="email" id="adminEmail" placeholder="example@gmail.com"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input class="inp" type="password" id="adminPass" placeholder="••••••••"/>
+    </div>
+    <div id="loginErr" style="display:none" class="alert alert-warn"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Access Admin Console</button>
+  </div>
+</div>
+
+<!-- MAIN ADMIN -->
+<div id="mainScreen">
+  <div class="header">
+    <div class="header-logo">
+      <div class="logo-box">
+        <svg width="20" height="20" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/><rect x="17" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(-12 19 28)"/><rect x="34" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(12 37 28)"/></svg>
+      </div>
+      Trusted Hands Admin
+    </div>
+    <button class="signout-btn" onclick="doLogout()">Sign Out</button>
+  </div>
+
+  <div class="content">
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('approvals')">Approvals</div>
+      <div class="tab" onclick="switchTab('users')">Users</div>
+      <div class="tab" onclick="switchTab('broadcast')">Broadcast</div>
+      <div class="tab" onclick="switchTab('support')">Support</div>
+    </div>
+    <div id="tabContent"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, updateDoc, addDoc,
+  setDoc, query, where, orderBy, limit, runTransaction, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",
+  authDomain: "trust-hands-5c299.firebaseapp.com",
+  projectId: "trust-hands-5c299",
+  storageBucket: "trust-hands-5c299.firebasestorage.app",
+  messagingSenderId: "481016620760",
+  appId: "1:481016620760:web:092f40a5b74a6bc55f59ad"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const ADMIN_EMAIL = 'olaowyegideon@gmail.com';
+let currentTab = 'approvals';
+
+function $(id){return document.getElementById(id)}
+function toast(msg,dur=3000){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
+function initials(n){return String(n||'').split(' ').map(x=>x[0]||'').join('').substring(0,2).toUpperCase()||'?'}
+function sanitize(s){return String(s||'').replace(/[<>"'&]/g,c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c])).trim()}
+
+// AUTH STATE
+onAuthStateChanged(auth, user=>{
+  if(user && user.email.toLowerCase()===ADMIN_EMAIL){
+    $('loginScreen').style.display='none';
+    $('mainScreen').style.display='block';
+    loadTab('approvals');
+  } else if(user){
+    signOut(auth);
+    showLoginErr('Access denied. This console is for admin only.');
+  }
+});
+
+// LOGIN
+window.doLogin=async function(){
+  const email=$('adminEmail').value.trim().toLowerCase();
+  const pass=$('adminPass').value;
+  hideLoginErr();
+  if(!email||!pass){showLoginErr('Please enter email and password.');return}
+  if(email!==ADMIN_EMAIL){showLoginErr('Access denied.');return}
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+  }catch(err){
+    if(err.code==='auth/invalid-credential'||err.code==='auth/wrong-password')
+      showLoginErr('Incorrect password. Try again.');
+    else showLoginErr('Login failed: '+err.message);
+  }
+};
+
+window.doLogout=async function(){
+  await signOut(auth);
+  $('mainScreen').style.display='none';
+  $('loginScreen').style.display='flex';
+  toast('Signed out.');
+};
+
+function showLoginErr(msg){$('loginErr').textContent=msg;$('loginErr').style.display='block'}
+function hideLoginErr(){$('loginErr').style.display='none'}
+
+// Enter key on password
+document.addEventListener('DOMContentLoaded',()=>{
+  $('adminPass')?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+});
+
+// TABS
+window.switchTab=function(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach((t,i)=>
+    t.classList.toggle('active',['approvals','users','broadcast','support'][i]===tab)
+  );
+  loadTab(tab);
+};
+
+async function loadTab(tab){
+  const body=$('tabContent');
+  body.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner"></div></div>`;
+  try{
+    if(tab==='approvals') await renderApprovals();
+    else if(tab==='users') await renderUsers();
+    else if(tab==='broadcast') renderBroadcast();
+    else if(tab==='support') await renderSupport();
+  }catch(err){
+    body.innerHTML=`<div class="empty"><div class="icon">⚠️</div>Error loading: ${err.message}<br/><br/><button class="btn btn-outline btn-sm" onclick="loadTab('${tab}')">Retry</button></div>`;
+  }
+}
+
+// APPROVALS
+async function renderApprovals(){
+  const body=$('tabContent');
+  const snap=await getDocs(query(collection(db,'pendingApprovals'),where('reviewed','==',false)));
+  if(snap.empty){body.innerHTML=`<div class="empty"><div class="icon">✅</div>No pending approvals right now.</div>`;return}
+  body.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px">${snap.docs.length} pending</div>`+
+  snap.docs.map(d=>{
+    const p=d.data();
+    return`<div class="pending-card">
+      <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sanitize(p.name)}</div>
+      <div style="font-size:12px;color:var(--slate3);line-height:1.8">
+        Trade: <strong>${sanitize(p.trade)}</strong><br/>
+        Zone: ${sanitize(p.zone)}<br/>
+        Tier: <strong style="color:var(--blue2)">${sanitize(p.tier)}</strong><br/>
+        Sender: ${sanitize(p.senderBank)}
+      </div>
+      ${p.receiptBase64?`<img src="${p.receiptBase64}" class="receipt-img"/>`:`<div style="background:#f1f5f9;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--slate3);margin:10px 0">🧾 Receipt on file</div>`}
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-success btn-sm" onclick="approveArtisan('${p.artisanUid}','${d.id}','${p.tier}')">✓ Approve & Activate</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectArtisan('${d.id}')">✕ Reject</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.approveArtisan=async function(uid,docId,tierLabel){
+  try{
+    const tier=tierLabel.toLowerCase().includes('premium')?'premium':'standard';
+    const expiry=new Date(Date.now()+2592000000);
+    await runTransaction(db,async txn=>{
+      txn.update(doc(db,'users',uid),{status:'active',tier,expiry,activatedAt:serverTimestamp()});
+      txn.update(doc(db,'pendingApprovals',docId),{reviewed:true,approvedAt:serverTimestamp()});
+    });
+    toast('✅ Artisan approved and activated for 30 days!');
+    loadTab('approvals');
+  }catch(e){toast('Error: '+e.message)}
+};
+
+window.rejectArtisan=async function(docId){
+  if(!confirm('Reject this submission?'))return;
+  await updateDoc(doc(db,'pendingApprovals',docId),{reviewed:true,rejected:true});
+  toast('Submission rejected.');loadTab('approvals');
+};
+
+// USERS
+async function renderUsers(){
+  const body=$('tabContent');
+  const snap=await getDocs(query(collection(db,'users'),where('type','!=','admin')));
+  const users=snap.docs.map(d=>d.data());
+  const customers=users.filter(u=>u.type==='customer');
+  const artisans=users.filter(u=>u.type==='artisan');
+  if(!users.length){body.innerHTML=`<div class="empty"><div class="icon">👥</div>No users registered yet.</div>`;return}
+  body.innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-num">${users.length}</div><div class="stat-lbl">Total</div></div>
+      <div class="stat-box"><div class="stat-num">${customers.length}</div><div class="stat-lbl">Customers</div></div>
+      <div class="stat-box"><div class="stat-num">${artisans.length}</div><div class="stat-lbl">Artisans</div></div>
+    </div>
+    <input class="inp" type="text" placeholder="Search name or email…" oninput="filterUsers(this.value)" style="margin-bottom:14px"/>
+    <div id="usersList">`+
+    users.map(u=>`
+      <div class="user-row" onclick="showUserDetail('${u.uid}')">
+        <div class="avatar">${initials(u.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px">${sanitize(u.name||'—')}</div>
+          <div style="font-size:12px;color:var(--slate3)">${sanitize(u.email||'—')}</div>
+          <div style="font-size:11px;color:var(--slate3)">${u.type==='artisan'?'🔧 '+sanitize(u.trade||''):'👤 Customer'} · 📍 ${sanitize(u.zone||'—')}</div>
+        </div>
+        <span class="pill pill-${u.type==='artisan'?(u.status||'unsub'):'active'}" style="font-size:11px">${u.type==='artisan'?(u.status||'—'):'Active'}</span>
+      </div>`).join('')+
+    `</div>`;
+  window._allUsers=users;
+}
+
+window.filterUsers=function(q){
+  const filtered=(window._allUsers||[]).filter(u=>
+    (u.name||'').toLowerCase().includes(q.toLowerCase())||
+    (u.email||'').toLowerCase().includes(q.toLowerCase())
+  );
+  const list=document.getElementById('usersList');
+  if(!list)return;
+  list.innerHTML=filtered.map(u=>`
+    <div class="user-row" onclick="showUserDetail('${u.uid}')">
+      <div class="avatar">${initials(u.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px">${sanitize(u.name||'—')}</div>
+        <div style="font-size:12px;color:var(--slate3)">${sanitize(u.email||'—')}</div>
+      </div>
+      <span class="pill pill-${u.type==='artisan'?(u.status||'unsub'):'active'}" style="font-size:11px">${u.type==='artisan'?(u.status||'—'):'Active'}</span>
+    </div>`).join('');
+};
+
+window.showUserDetail=async function(uid){
+  const body=$('tabContent');
+  body.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner"></div></div>`;
+  const snap=await getDoc(doc(db,'users',uid));
+  if(!snap.exists()){body.innerHTML='User not found.';return}
+  const u=snap.data();
+  const joined=u.createdAt?.toDate?u.createdAt.toDate().toLocaleDateString():'—';
+  const expiry=u.expiry?.toDate?u.expiry.toDate().toLocaleDateString():u.expiry?new Date(u.expiry).toLocaleDateString():'—';
+  body.innerHTML=`
+    <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="loadTab('users')">← Back to Users</button>
+    <div class="card">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div class="avatar" style="width:52px;height:52px;font-size:18px">${initials(u.name)}</div>
+        <div><div style="font-weight:800;font-size:17px">${sanitize(u.name||'—')}</div>
+        <span class="pill pill-${u.type==='artisan'?(u.status||'unsub'):'active'}" style="font-size:11px;margin-top:4px;display:inline-block">${u.type==='artisan'?(u.status||'—'):'Customer'}</span></div>
+      </div>
+      <div class="info-row"><span class="lbl">Email</span><span>${sanitize(u.email||'—')}</span></div>
+      <div class="info-row"><span class="lbl">Phone</span><span>${sanitize(u.phone||'—')}</span></div>
+      <div class="info-row"><span class="lbl">Zone</span><span>📍 ${sanitize(u.zone||'—')}</span></div>
+      <div class="info-row"><span class="lbl">Joined</span><span>${joined}</span></div>
+      ${u.type==='artisan'?`
+      <div class="info-row"><span class="lbl">Trade</span><span>${sanitize(u.trade||'—')}</span></div>
+      <div class="info-row"><span class="lbl">Tier</span><span style="text-transform:capitalize;font-weight:600">${u.tier||'None'}</span></div>
+      <div class="info-row"><span class="lbl">Rating</span><span>${u.rating?u.rating.toFixed(1)+' ⭐ ('+u.reviews+' reviews)':'No reviews'}</span></div>
+      <div class="info-row"><span class="lbl">Expiry</span><span>${expiry}</span></div>
+      <div class="info-row"><span class="lbl">Booked Today</span><span>${u.daily_booked?'🔴 Yes':'🟢 No'}</span></div>`:''}
+    </div>
+    ${u.type==='artisan'?`
+    <div class="card">
+      <h3>Admin Actions</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="forceActivate('${u.uid}')">✓ Force Activate</button>
+        <button class="btn btn-outline btn-sm" onclick="resetBooking('${u.uid}')">🔄 Reset Booking</button>
+        <select class="inp" style="width:auto;padding:6px 10px;font-size:12px" onchange="changeTier('${u.uid}',this.value)">
+          <option value="">Change Tier</option>
+          <option value="standard">→ Standard</option>
+          <option value="premium">→ Premium</option>
+        </select>
+        <button class="btn btn-danger btn-sm" onclick="banUser('${u.uid}')">🚫 Ban</button>
+      </div>
+    </div>`:''}
+    <div class="card">
+      <h3>Send Support Note</h3>
+      <textarea class="inp" id="noteText" placeholder="Type a message to this user…" style="min-height:80px;margin-bottom:10px"></textarea>
+      <button class="btn btn-primary btn-sm" onclick="sendNote('${u.uid}','${sanitize(u.name)}')">Send Note</button>
+    </div>`;
+};
+
+window.forceActivate=async function(uid){
+  const expiry=new Date(Date.now()+2592000000);
+  await updateDoc(doc(db,'users',uid),{status:'active',expiry,activatedAt:serverTimestamp()});
+  toast('✅ Account activated for 30 days!');showUserDetail(uid);
+};
+
+window.resetBooking=async function(uid){
+  await updateDoc(doc(db,'users',uid),{daily_booked:false});
+  toast('✅ Booking status reset!');showUserDetail(uid);
+};
+
+window.changeTier=async function(uid,tier){
+  if(!tier)return;
+  await updateDoc(doc(db,'users',uid),{tier});
+  toast('Tier updated to '+tier);
+};
+
+window.banUser=async function(uid){
+  if(!confirm('Permanently ban this user?'))return;
+  await updateDoc(doc(db,'users',uid),{status:'banned'});
+  toast('User banned.');loadTab('users');
+};
+
+window.sendNote=async function(uid,name){
+  const txt=document.getElementById('noteText')?.value?.trim();
+  if(!txt){toast('Please type a message first.');return}
+  await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:name,message:txt,sentAt:serverTimestamp(),sentBy:'Admin'});
+  toast('Note sent to '+name+' ✅');
+  document.getElementById('noteText').value='';
+};
+
+// BROADCAST
+function renderBroadcast(){
+  const body=$('tabContent');
+  body.innerHTML=`
+    <div class="card">
+      <h3>📢 Broadcast Message</h3>
+      <p style="font-size:13px;color:var(--slate3);margin-bottom:14px">This message appears as a scrolling banner on all user screens.</p>
+      <textarea class="inp" id="broadcastText" placeholder="Type your announcement…" style="min-height:90px;margin-bottom:12px"></textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="sendBroadcast()">📢 Send to All Users</button>
+        <button class="btn btn-outline" onclick="clearBroadcast()">Clear</button>
+      </div>
+    </div>`;
+  // Load current broadcast
+  getDoc(doc(db,'config','broadcast')).then(snap=>{
+    if(snap.exists()&&snap.data().text){
+      document.getElementById('broadcastText').value=snap.data().text;
+    }
+  }).catch(()=>{});
+}
+
+window.sendBroadcast=async function(){
+  const msg=document.getElementById('broadcastText')?.value?.trim();
+  if(!msg){toast('Please type a message.');return}
+  await setDoc(doc(db,'config','broadcast'),{text:msg,updatedAt:serverTimestamp()});
+  toast('📢 Broadcast sent to all users!');
+};
+
+window.clearBroadcast=async function(){
+  await setDoc(doc(db,'config','broadcast'),{text:'',updatedAt:serverTimestamp()});
+  document.getElementById('broadcastText').value='';
+  toast('Broadcast cleared.');
+};
+
+// SUPPORT
+async function renderSupport(){
+  const body=$('tabContent');
+  const snap=await getDocs(query(collection(db,'supportTickets'),orderBy('createdAt','desc'),limit(50)));
+  if(snap.empty){body.innerHTML=`<div class="empty"><div class="icon">🎉</div>No support tickets yet.</div>`;return}
+  body.innerHTML=snap.docs.map(d=>{
+    const t=d.data();
+    const date=t.createdAt?.toDate?t.createdAt.toDate().toLocaleDateString():'—';
+    return`<div class="card" style="border-left:4px solid ${t.resolved?'var(--emerald)':'var(--red)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-weight:700;font-size:14px">${sanitize(t.userName||'Unknown')}</div>
+          <div style="font-size:12px;color:var(--slate3)">${sanitize(t.userEmail||'—')} · ${date}</div>
+        </div>
+        <span class="pill ${t.resolved?'pill-active':'pill-pending'}" style="font-size:11px">${t.resolved?'Resolved':'Open'}</span>
+      </div>
+      <div style="font-size:13px;color:var(--slate);line-height:1.6;margin-bottom:10px">${sanitize(t.message||'—')}</div>
+      ${!t.resolved?`<button class="btn btn-success btn-sm" onclick="resolveTicket('${d.id}')">✓ Mark Resolved</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+window.resolveTicket=async function(docId){
+  await updateDoc(doc(db,'supportTickets',docId),{resolved:true,resolvedAt:serverTimestamp()});
+  toast('Ticket resolved ✅');loadTab('support');
+};
+
+</script>
+</body>
+</html>
