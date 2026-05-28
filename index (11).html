@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0f172a"/>
+<meta name="description" content="Trusted Hands — Ekpoma's trusted local artisan marketplace"/>
+<title>Trusted Hands — Ekpoma Artisan Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0f172a;--navy2:#1e293b;--slate:#334155;--slate2:#475569;--slate3:#64748b;
+  --blue:#1d4ed8;--blue2:#2563eb;--blue3:#eff6ff;--blue4:#dbeafe;
+  --emerald:#059669;--emerald2:#d1fae5;--emerald3:#ecfdf5;
+  --amber:#d97706;--amber2:#fef3c7;--amber3:#fffbeb;
+  --red:#dc2626;--red2:#fee2e2;
+  --gold:#b45309;--gold2:#fef9c3;
+  --bg:#f8fafc;--white:#fff;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow2:0 4px 20px rgba(0,0,0,.10);
+  --shadow3:0 8px 40px rgba(0,0,0,.14);
+  --r:12px;--r2:16px;--r3:20px;--r4:24px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--navy);font-size:15px;line-height:1.6}
+#app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;overflow:hidden;background:var(--bg)}
+.screen{display:none;height:100%;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll-body::-webkit-scrollbar{width:3px}
+.scroll-body::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.marquee-bar{background:var(--navy2);color:#fff;font-size:12px;padding:7px 0;overflow:hidden;white-space:nowrap;flex-shrink:0}
+.marquee-inner{display:inline-block;animation:marquee 20s linear infinite;padding-left:100%}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:21px;color:var(--navy);letter-spacing:-.3px;text-decoration:none;display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--blue2)}
+.th-logo-icon{width:34px;height:34px;flex-shrink:0}
+.th-logo-icon-lg{width:56px;height:56px;flex-shrink:0;margin:0 auto 10px}
+.nav-actions{display:flex;gap:6px;align-items:center}
+.icon-btn{background:none;border:none;padding:7px;border-radius:10px;color:var(--slate);cursor:pointer;position:relative;transition:.15s}
+.icon-btn:hover{background:#f1f5f9}
+.icon-btn svg{display:block}
+.notif-dot{position:absolute;top:5px;right:5px;width:9px;height:9px;background:var(--red);border-radius:50%;border:2px solid var(--white);display:none}
+.auth-bg{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 20px;overflow-y:auto;background:linear-gradient(160deg,#f0f4ff 0%,#f8fafc 60%)}
+.auth-card{background:var(--white);border-radius:var(--r4);padding:30px 24px;box-shadow:var(--shadow3)}
+.auth-logo{text-align:center;margin-bottom:26px}
+.auth-logo h1{font-family:'DM Serif Display',serif;font-size:30px;color:var(--navy)}
+.auth-logo h1 span{color:var(--blue2)}
+.auth-logo p{font-size:13px;color:var(--slate3);margin-top:5px}
+.auth-badge{display:inline-block;background:var(--emerald2);color:var(--emerald);font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;margin-top:6px}
+.tab-bar{display:flex;background:#f1f5f9;border-radius:var(--r);padding:3px;margin-bottom:22px;gap:3px}
+.tab{flex:1;padding:9px;text-align:center;border-radius:10px;font-size:13px;font-weight:600;color:var(--slate2);cursor:pointer;transition:.2s;user-select:none}
+.tab.active{background:var(--white);color:var(--navy);box-shadow:var(--shadow)}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:7px}
+.form-group label .req{color:var(--red);margin-left:2px}
+.form-group label .hint{color:var(--slate3);font-weight:400;font-size:11px;margin-left:4px}
+.inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;color:var(--navy);background:var(--white);transition:.2s;font-family:inherit}
+.inp:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,.1);outline:none}
+.inp::placeholder{color:#94a3b8}
+select.inp{cursor:pointer}
+textarea.inp{resize:vertical;min-height:80px}
+.btn{width:100%;padding:13px;border-radius:var(--r);font-weight:700;font-size:15px;cursor:pointer;transition:.2s;border:none;font-family:inherit;letter-spacing:.1px}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--blue2);color:#fff}
+.btn-primary:hover{background:var(--blue)}
+.btn-primary:disabled{background:#94a3b8;cursor:not-allowed;transform:none}
+.btn-outline{background:var(--white);color:var(--blue2);border:1.5px solid var(--blue2)}
+.btn-outline:hover{background:var(--blue3)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-success{background:var(--emerald);color:#fff}
+.btn-sm{padding:8px 16px;font-size:13px;width:auto;border-radius:20px}
+.auth-link{text-align:center;margin-top:18px;font-size:13px;color:var(--slate3)}
+.auth-link a{color:var(--blue2);font-weight:600;text-decoration:none}
+hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.pw-wrap{position:relative}
+.pw-wrap .inp{padding-right:44px}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--slate3);padding:4px;display:flex;align-items:center;justify-content:center}
+.pw-toggle:hover{color:var(--slate)};border-radius:var(--r);padding:20px 16px;text-align:center;cursor:pointer;transition:.2s;background:#fafbfc}
+.upload-zone:hover{border-color:var(--blue2);background:var(--blue3)}
+.upload-zone .uz-icon{font-size:30px;margin-bottom:8px}
+.upload-zone p{font-size:13px;color:var(--slate3);line-height:1.5}
+.upload-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.preview-img{width:68px;height:68px;border-radius:10px;object-fit:cover;border:2.5px solid var(--emerald)}
+.upload-count{font-size:12px;color:var(--emerald);font-weight:700;margin-top:8px}
+.agreement-scroll{border:1.5px solid var(--border);border-radius:var(--r);padding:14px;max-height:150px;overflow-y:auto;font-size:12px;color:var(--slate);line-height:1.8;background:#fafbfc;margin-bottom:12px}
+.agreement-scroll h4{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.agreement-scroll ul{padding-left:16px;margin:4px 0 10px}
+.check-row{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--slate)}
+.check-row input[type=checkbox]{width:17px;height:17px;margin-top:2px;accent-color:var(--blue2);flex-shrink:0;cursor:pointer}
+.tier-card{border:2px solid var(--border);border-radius:var(--r2);padding:18px;cursor:pointer;transition:.2s;margin-bottom:14px;position:relative;overflow:hidden}
+.tier-card:hover{border-color:var(--border2)}
+.tier-card.selected-std{border-color:var(--blue2);background:var(--blue3)}
+.tier-card.selected-prem{border-color:var(--amber);background:var(--amber3)}
+.tier-card.premium-card{border-color:rgba(217,119,6,.4)}
+.tier-hot-badge{position:absolute;top:-1px;right:14px;background:var(--amber);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:0 0 10px 10px}
+.tier-name{font-weight:700;font-size:16px;color:var(--navy);margin-bottom:4px}
+.tier-price{font-size:24px;font-weight:800;margin:4px 0}
+.tier-desc{font-size:13px;color:var(--slate2);line-height:1.5}
+.bank-panel{background:var(--navy2);border-radius:var(--r2);padding:22px;color:#fff;margin:18px 0}
+.bank-panel .lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.bank-panel .val{font-size:15px;font-weight:700;margin-bottom:14px}
+.bank-panel .acct{font-size:24px;font-weight:800;letter-spacing:4px;margin:6px 0 14px}
+.copy-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.filters-strip{background:var(--white);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;flex-shrink:0}
+.pill-select{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;color:var(--navy);background:var(--white);font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.pill-select:focus{border-color:var(--blue2);outline:none}
+.feed-list{padding:14px 16px;display:flex;flex-direction:column;gap:12px;padding-bottom:80px}
+.feed-section-label{font-size:12px;font-weight:700;color:var(--slate3);text-transform:uppercase;letter-spacing:.8px;padding:4px 0 2px}
+.a-card{background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:.2s;border:1.5px solid transparent;position:relative;overflow:hidden}
+.a-card:active{transform:scale(.99)}
+.a-card.tier-premium{border-color:var(--amber)}
+.a-card.tier-active{border-color:rgba(5,150,105,.25)}
+.a-card.tier-inactive{opacity:.7;cursor:pointer}
+.a-card-header{display:flex;gap:13px;align-items:flex-start;margin-bottom:11px}
+.avatar-circle{width:54px;height:54px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;letter-spacing:-.5px}
+.av-premium{background:#fef3c7;color:#92400e}
+.av-active{background:#eff6ff;color:#1e40af}
+.av-inactive{background:#f1f5f9;color:#94a3b8}
+.a-name{font-weight:700;font-size:15px;color:var(--navy);margin-bottom:1px}
+.a-trade{font-size:13px;color:var(--blue2);font-weight:600;margin-bottom:2px}
+.a-zone{font-size:12px;color:var(--slate3)}
+.tier-pill{display:inline-flex;align-items:center;gap:3px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:4px}
+.tp-premium{background:var(--gold2);color:var(--gold)}
+.tp-active{background:var(--emerald2);color:var(--emerald)}
+.tp-inactive{background:#f1f5f9;color:var(--slate3)}
+.stars-row{display:flex;align-items:center;gap:5px;font-size:13px}
+.star-val{color:var(--amber);font-size:14px}
+.a-card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:11px;padding-top:11px;border-top:1px solid #f1f5f9}
+.avail-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--emerald)}
+.dot-amber{background:var(--amber)}
+.dot-gray{background:#94a3b8}
+.inactive-msg{font-size:12px;color:#94a3b8;font-style:italic;margin-top:8px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;opacity:0;pointer-events:none;transition:.3s}
+.overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:var(--white);border-radius:22px 22px 0 0;z-index:201;transition:.38s cubic-bezier(.4,0,.2,1);max-height:85vh;overflow-y:auto;padding:20px 20px 40px}
+.drawer.open{transform:translateX(-50%) translateY(0)}
+.drawer-handle{width:42px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 18px}
+.portfolio-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.portfolio-thumb{width:105px;height:82px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.portfolio-ph{width:105px;height:82px;border-radius:10px;background:#f1f5f9;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;color:var(--slate3);font-weight:600}
+.chat-header{background:var(--white);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-av{width:38px;height:38px;border-radius:50%;background:#eff6ff;color:#1e40af;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.chat-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.msg-bubble{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5;word-break:break-word}
+.msg-sent{align-self:flex-end;background:var(--blue2);color:#fff;border-radius:16px 16px 3px 16px}
+.msg-recv{align-self:flex-start;background:var(--white);border:1px solid var(--border);color:var(--navy);border-radius:16px 16px 16px 3px}
+.msg-time{font-size:10px;margin-top:3px;opacity:.65}
+.msg-system{text-align:center;font-size:11px;color:var(--slate3);padding:2px 0}
+.chat-input-wrap{background:var(--white);border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.chat-inp{flex:1;border:1.5px solid var(--border);border-radius:20px;padding:9px 14px;font-size:14px;resize:none;max-height:100px;font-family:inherit;outline:none;transition:.2s}
+.chat-inp:focus{border-color:var(--blue2)}
+.send-btn{width:40px;height:40px;border-radius:50%;background:var(--blue2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.send-btn:active{transform:scale(.93)}
+.chat-list-item{display:flex;gap:13px;align-items:center;padding:14px 16px;border-bottom:1px solid #f8fafc;cursor:pointer;transition:.15s}
+.chat-list-item:hover{background:#f8fafc}
+.dash-hero{padding:22px 18px 16px;background:var(--white);border-bottom:1px solid var(--border)}
+.dash-greeting{font-family:'DM Serif Display',serif;font-size:23px;color:var(--navy);margin-bottom:3px}
+.dash-sub{font-size:13px;color:var(--slate3)}
+.dash-body{padding:16px 16px 80px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-box{background:var(--white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);text-align:center}
+.stat-num{font-size:26px;font-weight:800;color:var(--navy)}
+.stat-lbl{font-size:12px;color:var(--slate3);margin-top:3px}
+.info-card{background:var(--white);border-radius:var(--r2);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.info-card h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f8fafc;font-size:14px}
+.info-row:last-child{border-bottom:none}
+.info-lbl{color:var(--slate3);font-size:13px}
+.status-pill{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.sp-active{background:var(--emerald2);color:var(--emerald)}
+.sp-pending{background:var(--amber2);color:var(--amber)}
+.sp-unsubscribed{background:#f1f5f9;color:var(--slate3)}
+.sp-banned{background:var(--red2);color:var(--red)}
+.renew-banner{background:var(--navy2);border-radius:var(--r2);padding:20px;margin-bottom:16px;cursor:pointer;position:relative;overflow:hidden}
+.renew-banner::after{content:'→';position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:22px;color:rgba(255,255,255,.3)}
+.renew-banner h4{color:#fff;font-weight:700;font-size:15px;margin-bottom:5px}
+.renew-banner p{color:rgba(255,255,255,.7);font-size:13px;line-height:1.5}
+.job-complete-card{background:var(--amber3);border:1.5px solid var(--amber2);border-radius:var(--r2);padding:18px;margin-bottom:16px}
+.job-complete-card h4{font-weight:700;font-size:15px;color:var(--navy);margin-bottom:8px}
+.days-left{font-weight:800;font-size:15px}
+.days-ok{color:var(--emerald)}
+.days-warn{color:var(--amber)}
+.days-crit{color:var(--red)}
+.admin-hero{padding:18px;background:var(--navy2);color:#fff}
+.admin-hero h2{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:3px}
+.admin-hero p{font-size:13px;color:#94a3b8}
+.admin-tabs{display:flex;background:#f1f5f9;border-radius:var(--r);padding:3px;margin:14px 0;gap:3px}
+.admin-tab{flex:1;padding:8px 4px;text-align:center;border-radius:9px;font-size:12px;font-weight:600;color:var(--slate2);cursor:pointer;transition:.2s}
+.admin-tab.active{background:var(--white);color:var(--navy);box-shadow:var(--shadow)}
+.pending-item{background:var(--white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid var(--amber)}
+.pending-name{font-weight:700;font-size:14px;color:var(--navy)}
+.pending-meta{font-size:12px;color:var(--slate3);margin-top:3px;line-height:1.6}
+.receipt-preview{width:100%;border-radius:var(--r);max-height:180px;object-fit:cover;margin:10px 0;border:1px solid var(--border)}
+.manage-row{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc}
+.manage-row:last-child{border-bottom:none}
+.pending-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;text-align:center}
+.big-icon{font-size:60px;margin-bottom:18px}
+.pending-steps{background:var(--white);border-radius:var(--r2);padding:18px 20px;margin-top:22px;width:100%;text-align:left;box-shadow:var(--shadow)}
+.step-row{display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:13px;color:var(--slate);line-height:1.5}
+.not-found-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.nf-code{font-size:80px;font-weight:800;color:var(--border2);line-height:1;font-family:'DM Serif Display',serif}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy2);color:#fff;padding:11px 22px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.loading-overlay{position:fixed;inset:0;background:var(--white);z-index:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay.hidden{display:none}
+.alert{border-radius:var(--r);padding:12px 14px;font-size:13px;margin-bottom:14px}
+.alert-warn{background:var(--amber2);color:#92400e}
+.alert-success{background:var(--emerald2);color:var(--emerald)}
+.empty-state{text-align:center;padding:48px 24px;color:var(--slate3);font-size:14px}
+.empty-state .es-icon{font-size:40px;margin-bottom:10px}
+.badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div style="font-size:13px;color:var(--slate3)">Loading Trusted Hands…</div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+  <div class="drawer" id="artisanDrawer"><div class="drawer-handle"></div><div id="drawerContent"></div></div>
+
+  <!-- AUTH -->
+  <div class="screen" id="screen-auth">
+    <div class="auth-bg scroll-body">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div id="authLogoIcon"></div>
+          <h1>Trusted <span>Hands</span></h1>
+          <p>Ekpoma's local artisan marketplace</p>
+          <span class="auth-badge">✦ Secure &amp; Verified Platform</span>
+        </div>
+        <div class="tab-bar" id="authTabBar">
+          <div class="tab active" onclick="switchAuthTab('signin')">Sign In</div>
+          <div class="tab" onclick="switchAuthTab('register')">Create Account</div>
+        </div>
+        <div id="signinSection">
+          <div class="form-group"><label>Email Address</label><input class="inp" type="email" id="loginEmail" placeholder="example@gmail.com" autocomplete="email"/></div>
+          <div class="form-group"><label>Password</label><div class="pw-wrap"><input class="inp" type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/><button type="button" class="pw-toggle" onclick="togglePw('loginPass',this)" title="Show/hide password"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+          <div id="loginError" style="display:none" class="alert alert-warn"></div>
+          <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Sign In Securely</button>
+          <div style="text-align:right;margin-top:8px;margin-bottom:4px">
+            <a href="#" onclick="showForgotPassword();return false" style="font-size:13px;color:var(--blue2);font-weight:600;text-decoration:none">Forgot password?</a>
+          </div>
+          <div class="auth-link"><a href="#" onclick="switchAuthTab('register');return false">New user? Create a secure credentials account</a></div>
+        </div>
+        <div id="registerSection" style="display:none">
+          <div class="tab-bar" id="regTypeBar">
+            <div class="tab active" onclick="switchRegType('customer')">I Need a Worker</div>
+            <div class="tab" onclick="switchRegType('artisan')">I'm an Artisan</div>
+          </div>
+          <div class="form-group"><label>Full Name <span class="req">*</span></label><input class="inp" type="text" id="regName" placeholder="Your full name" oninput="validateRegForm()"/></div>
+          <div class="form-group"><label>Email Address <span class="req">*</span></label><input class="inp" type="email" id="regEmail" placeholder="example@gmail.com" oninput="validateRegForm()"/></div>
+          <div class="form-group"><label>Phone Number <span class="req">*</span></label><input class="inp" type="tel" id="regPhone" placeholder="08012345678" oninput="validateRegForm()"/></div>
+          <div class="form-group"><label>Password <span class="req">*</span></label><div class="pw-wrap"><input class="inp" type="password" id="regPass" placeholder="Min. 6 characters" oninput="validateRegForm()"/><button type="button" class="pw-toggle" onclick="togglePw('regPass',this)" title="Show/hide password"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+          <div class="form-group">
+            <label>Location Zone <span class="req">*</span></label>
+            <select class="inp" id="regZone" onchange="validateRegForm()">
+              <option value="">Select your area in Ekpoma</option>
+              <option>Market Square Area</option><option>Ojo Street</option><option>School Gate Area</option>
+              <option>Igor / Uhumudumu</option><option>Alli Square</option><option>Abelmen Area</option>
+              <option>GT Extension</option><option>Ujemen</option><option>Ujuenle</option><option>Emado</option>
+            </select>
+          </div>
+          <div id="artisanExtras" style="display:none">
+            <div class="form-group">
+              <label>Trade Category <span class="req">*</span></label>
+              <select class="inp" id="regTrade">
+                <option value="">Select your trade</option>
+                <option>Cleaners</option><option>Electricians</option><option>Plumbers</option>
+                <option>Tailors/Hairdressers</option><option>Mechanics</option><option>Dry Cleaners</option>
+                <option>Bricklayer / Construction Manager</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Bio / Experience</label><textarea class="inp" id="regBio" placeholder="Describe your skills and years of experience…"></textarea></div>
+            <div class="form-group">
+              <label>Portfolio Photos <span class="req">*</span> <span class="hint">Min. 2 photos of past work</span></label>
+              <div class="upload-zone" onclick="document.getElementById('portfolioFiles').click()">
+                <div class="uz-icon">📷</div>
+                <p>Tap to upload past work photos<br/><span style="font-size:11px;color:#94a3b8">JPEG or PNG • Max 5MB each</span></p>
+              </div>
+              <input type="file" id="portfolioFiles" accept="image/*" multiple style="display:none" onchange="handlePortfolioUpload(event)"/>
+              <div class="upload-previews" id="portfolioPreviews"></div>
+              <div class="upload-count" id="portfolioCountText"></div>
+            </div>
+            <div class="form-group">
+              <div class="agreement-scroll">
+                <h4>📋 Trusted Hands — Artisan Safety Agreement</h4>
+                <p style="font-weight:600;margin-bottom:4px">✅ You MUST:</p>
+                <ul>
+                  <li>Carry valid ID and present it when requested by a client</li>
+                  <li>Communicate clearly about pricing before starting any job</li>
+                  <li>Arrive on time and maintain professional conduct always</li>
+                  <li>Report disputes through the in-app chat system</li>
+                  <li>Complete agreed work to the specified standard</li>
+                  <li>Respect client property, privacy, and personal space</li>
+                </ul>
+                <p style="font-weight:600;margin-bottom:4px;margin-top:8px">❌ You MUST NOT:</p>
+                <ul>
+                  <li>Share client contact details outside the platform</li>
+                  <li>Request cash payments outside the agreed system</li>
+                  <li>Misrepresent your qualifications or experience</li>
+                  <li>Engage in harassment, abuse, or misconduct</li>
+                  <li>Abandon an active job without formal notice</li>
+                  <li>Create duplicate accounts or falsify your identity</li>
+                </ul>
+                <p style="margin-top:8px;font-style:italic">Violation may result in immediate permanent account suspension.</p>
+              </div>
+              <label class="check-row">
+                <input type="checkbox" id="agreementCheck" onchange="validateRegForm()"/>
+                <span>I have read and agree to the Trusted Hands Safety Agreement. I understand this is permanently recorded on my profile.</span>
+              </label>
+            </div>
+          </div>
+          <div id="regError" style="display:none;margin-bottom:12px" class="alert alert-warn"></div>
+          <button class="btn btn-primary" id="registerBtn" onclick="handleRegister()" disabled>Create Account</button>
+          <div class="auth-link"><a href="#" onclick="switchAuthTab('signin');return false">Already have an account? Sign in</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYWALL -->
+  <div class="screen" id="screen-paywall">
+    <div class="scroll-body"><div style="padding:24px 20px 40px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:40px;margin-bottom:10px">🚀</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy);margin-bottom:6px">Activate Your Profile</h2>
+        <p style="font-size:13px;color:var(--slate3)">Choose a plan to go live on the marketplace</p>
+      </div>
+      <div class="tier-card" id="tierStandard" onclick="selectTier('standard')">
+        <div class="tier-name">Standard Listing</div>
+        <div class="tier-price" style="color:var(--blue2)">₦2,000</div>
+        <div class="tier-desc">Active visibility on the marketplace for 30 days</div>
+      </div>
+      <div class="tier-card premium-card" id="tierPremium" onclick="selectTier('premium')">
+        <div class="tier-hot-badge">⭐ BEST VALUE</div>
+        <div class="tier-name">Premium Front-Row</div>
+        <div class="tier-price" style="color:var(--amber)">₦5,000</div>
+        <div class="tier-desc">Top placement in your trade category for 30 days. Appear first when clients search your trade.</div>
+      </div>
+      <div class="bank-panel">
+        <div class="lbl">Bank</div><div class="val">Opay</div>
+        <div class="lbl">Account Number</div>
+        <div class="acct">9071268570</div>
+        <div class="lbl">Account Name</div>
+        <div class="val" style="margin-bottom:8px">Olawoye Gideon Ayomide</div>
+        <button class="copy-btn" onclick="copyAcct()">📋 Copy Account Number</button>
+      </div>
+      <div class="form-group"><label>Sender Bank &amp; Account Name <span class="req">*</span></label><input class="inp" type="text" id="senderBank" placeholder="e.g. First Bank — John Doe"/></div>
+      <div class="form-group">
+        <label>Payment Receipt Screenshot <span class="req">*</span></label>
+        <div class="upload-zone" onclick="document.getElementById('receiptFile').click()">
+          <div class="uz-icon">🧾</div><p>Tap to upload your payment receipt</p>
+        </div>
+        <input type="file" id="receiptFile" accept="image/*" style="display:none" onchange="handleReceiptUpload(event)"/>
+        <div id="receiptPreview" style="margin-top:10px"></div>
+      </div>
+      <div id="paywallError" style="display:none;margin-bottom:12px" class="alert alert-warn"></div>
+      <button class="btn btn-primary" onclick="submitPaymentProof()">Submit Proof for Admin Approval</button>
+      <p style="text-align:center;font-size:12px;color:var(--slate3);margin-top:12px">Reviewed and activated within 24 hours</p>
+    </div></div>
+  </div>
+
+  <!-- PENDING -->
+  <div class="screen" id="screen-pending">
+    <div class="pending-screen">
+      <div class="big-icon">⏳</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy)">Under Review</h2>
+      <p style="color:var(--slate3);font-size:14px;margin-top:10px;line-height:1.8;max-width:300px">Your payment proof has been submitted. Admin will verify and activate your account shortly.</p>
+      <div class="pending-steps">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">What happens next:</div>
+        <div class="step-row">✅ <span>Admin reviews your payment receipt</span></div>
+        <div class="step-row">✅ <span>Your account is activated with a 30-day timer</span></div>
+        <div class="step-row">✅ <span>Your profile goes live on the marketplace</span></div>
+        <div class="step-row">✅ <span>Clients in your zone start finding you</span></div>
+      </div>
+      <button class="btn btn-outline" style="margin-top:24px" onclick="checkPendingStatus()">🔄 Check Status</button>
+      <button class="btn btn-outline" style="margin-top:10px;border-color:var(--border2);color:var(--slate2)" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- MARKETPLACE -->
+  <div class="screen" id="screen-market">
+    <div id="marqueeBar" style="display:none" class="marquee-bar"><span class="marquee-inner" id="marqueeText"></span></div>
+    <div class="nav">
+      <a class="nav-logo"><span id="navLogoMarket"></span>Trusted <span>Hands</span></a>>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span class="notif-dot" id="chatDot"></span>
+        </button>
+        <button class="icon-btn" onclick="goTo('dashboard')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="filters-strip">
+      <select class="pill-select" id="catFilter" onchange="renderFeed()">
+        <option value="">All Categories</option>
+        <option>Cleaners</option><option>Electricians</option><option>Plumbers</option>
+        <option>Tailors/Hairdressers</option><option>Mechanics</option><option>Dry Cleaners</option>
+        <option>Bricklayer / Construction Manager</option>
+      </select>
+      <select class="pill-select" id="zoneFilter" onchange="renderFeed()">
+        <option value="">All Zones</option>
+        <option>Market Square Area</option><option>Ojo Street</option><option>School Gate Area</option>
+        <option>Igor / Uhumudumu</option><option>Alli Square</option><option>Abelmen Area</option>
+        <option>GT Extension</option><option>Ujemen</option><option>Ujuenle</option><option>Emado</option>
+      </select>
+    </div>
+    <div class="scroll-body"><div class="feed-list" id="feedList"></div></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="screen" id="screen-chat">
+    <div class="chat-header">
+      <button class="icon-btn" onclick="goBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="chat-av" id="chatAv"></div>
+      <div style="flex:1"><div style="font-weight:700;font-size:15px" id="chatName">Chat</div><div style="font-size:12px;color:var(--slate3)" id="chatTrade"></div></div>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-input-wrap">
+      <textarea class="chat-inp" id="chatInput" placeholder="Type your message…" rows="1"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+      <button class="send-btn" onclick="sendMessage()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+
+  <!-- CHAT LIST -->
+  <div class="screen" id="screen-chat-list">
+    <div class="nav">
+      <button class="icon-btn" onclick="goBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span style="font-weight:700;font-size:16px">Messages</span>
+      <div style="width:34px"></div>
+    </div>
+    <div class="scroll-body" id="chatListBody"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="screen" id="screen-dashboard">
+    <div class="nav">
+      <a class="nav-logo"><span id="navLogoDash"></span>Trusted <span>Hands</span></a>
+    </div>
+    <div class="scroll-body"><div id="dashboardBody"></div></div>
+  </div>
+
+  <!-- ADMIN LOGIN -->
+  <div class="screen" id="screen-admin-login">
+    <div class="auth-bg scroll-body"><div class="auth-card">
+      <div class="auth-logo"><h1 style="font-size:22px">🔐 Admin Console</h1><p>Authorized personnel only</p></div>
+      <div class="form-group"><label>Admin Email</label><input class="inp" type="email" id="adminEmail" placeholder="example@gmail.com"/></div>
+      <div class="form-group"><label>Admin Password</label><div class="pw-wrap"><input class="inp" type="password" id="adminPass" placeholder="••••••••"/><button type="button" class="pw-toggle" onclick="togglePw('adminPass',this)" title="Show/hide password"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div id="adminLoginError" style="display:none;margin-bottom:12px" class="alert alert-warn"></div>
+      <button class="btn btn-primary" onclick="handleAdminLogin()">Access Admin Console</button>
+      <div class="auth-link"><a href="#" onclick="showScreen('screen-auth');return false">← Back to main site</a></div>
+    </div></div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div class="screen" id="screen-admin">
+    <div class="admin-hero"><h2>Admin Console</h2><p>Trusted Hands — Command Terminal</p></div>
+    <div style="padding:0 16px">
+      <div class="admin-tabs">
+        <div class="admin-tab active" onclick="adminTab('approvals')">Approvals</div>
+        <div class="admin-tab" onclick="adminTab('broadcast')">Broadcast</div>
+        <div class="admin-tab" onclick="adminTab('artisans')">Artisans</div>
+        <div class="admin-tab" onclick="openUsersPanel()">Users</div>
+        <div class="admin-tab" onclick="openSupportPanel()">Support</div>
+      </div>
+    </div>
+    <div class="scroll-body"><div style="padding:0 16px 80px" id="adminBody">
+      <div style="text-align:center;padding:40px 20px">
+        <div style="font-size:40px;margin-bottom:12px">⚙️</div>
+        <div style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:6px">Admin Console Ready</div>
+        <div style="font-size:13px;color:var(--slate3);margin-bottom:20px">Welcome Gideon. Tap a tab above to manage your platform.</div>
+        <button class="btn btn-primary" style="max-width:200px;margin:0 auto" onclick="adminTab('approvals')">View Pending Approvals</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- FORGOT PASSWORD -->
+  <div class="screen" id="screen-forgot">
+    <div class="auth-bg scroll-body"><div class="auth-card">
+      <div class="auth-logo">
+        <h1 style="font-size:22px">🔑 Reset Password</h1>
+        <p>We'll send a verification code to your email</p>
+      </div>
+      <div id="forgotStep1">
+        <div class="form-group"><label>Your Email Address</label><input class="inp" type="email" id="forgotEmail" placeholder="example@gmail.com"/></div>
+        <div id="forgotError" style="display:none;margin-bottom:12px" class="alert alert-warn"></div>
+        <div id="forgotSuccess" style="display:none;margin-bottom:12px" class="alert alert-success"></div>
+        <button class="btn btn-primary" id="sendResetBtn" onclick="sendResetEmail()">Send Verification Code</button>
+        <div class="auth-link"><a href="#" onclick="showScreen('screen-auth');return false">← Back to Sign In</a></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ADMIN USERS SCREEN -->
+  <div class="screen" id="screen-admin-users">
+    <div class="nav">
+      <button class="icon-btn" onclick="showScreen('screen-admin');adminTab('approvals')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span style="font-weight:700;font-size:16px">All Users</span>
+      <div style="width:34px"></div>
+    </div>
+    <div style="padding:12px 16px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0">
+      <input class="inp" type="text" id="userSearchInput" placeholder="Search by name or email…" oninput="filterUsers()" style="margin:0"/>
+    </div>
+    <div class="scroll-body"><div style="padding:12px 16px 80px" id="usersListBody"></div></div>
+  </div>
+
+  <!-- USER DETAIL SCREEN -->
+  <div class="screen" id="screen-user-detail">
+    <div class="nav">
+      <button class="icon-btn" onclick="showScreen('screen-admin-users')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span style="font-weight:700;font-size:15px">User Profile</span>
+      <div style="width:34px"></div>
+    </div>
+    <div class="scroll-body"><div style="padding:16px 16px 80px" id="userDetailBody"></div></div>
+  </div>
+
+  <!-- SUPPORT TICKETS SCREEN -->
+  <div class="screen" id="screen-support">
+    <div class="nav">
+      <button class="icon-btn" onclick="showScreen('screen-admin');adminTab('approvals')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span style="font-weight:700;font-size:16px">Support Tickets</span>
+      <div style="width:34px"></div>
+    </div>
+    <div class="scroll-body"><div style="padding:16px 16px 80px" id="supportBody"></div></div>
+  </div>
+
+  <!-- 404 -->
+  <div class="screen" id="screen-404">
+    <div class="not-found-wrap">
+      <div class="nf-code">404</div>
+      <h2 style="font-size:20px;font-weight:700;color:var(--navy);margin-top:10px">Page Not Found</h2>
+      <p style="color:var(--slate3);font-size:14px;margin-top:8px">The page you're looking for doesn't exist.</p>
+      <button class="btn btn-primary" style="max-width:220px;margin-top:28px" onclick="showScreen('screen-auth')">Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy,
+  getDocs, onSnapshot, addDoc, serverTimestamp, runTransaction, limit }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",
+  authDomain: "trust-hands-5c299.firebaseapp.com",
+  projectId: "trust-hands-5c299",
+  storageBucket: "trust-hands-5c299.firebasestorage.app",
+  messagingSenderId: "481016620760",
+  appId: "1:481016620760:web:092f40a5b74a6bc55f59ad"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth  = getAuth(fbApp);
+const db    = getFirestore(fbApp);
+
+const LOGO_SM=`<svg class="th-logo-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="56" height="56" rx="14" fill="#1d4ed8"/><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" rx="0" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/><rect x="17" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(-12 19 28)"/><rect x="34" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(12 37 28)"/></svg>`;
+const LOGO_LG=`<svg class="th-logo-icon-lg" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="56" height="56" rx="14" fill="#1d4ed8"/><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" rx="0" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/><rect x="17" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(-12 19 28)"/><rect x="34" y="23" width="5" height="11" rx="2.5" fill="white" transform="rotate(12 37 28)"/></svg>`;
+
+// Inject logos into all placements immediately
+const el=id=>document.getElementById(id);
+if(el('authLogoIcon')) el('authLogoIcon').innerHTML=LOGO_LG;
+if(el('navLogoMarket')) el('navLogoMarket').innerHTML=LOGO_SM;
+if(el('navLogoDash')) el('navLogoDash').innerHTML=LOGO_SM;
+
+// Password show/hide toggle
+window.togglePw=function(fieldId,btn){
+  const inp=document.getElementById(fieldId);
+  if(!inp)return;
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.innerHTML=show
+    ?`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    :`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  btn.style.color=show?'var(--blue2)':'var(--slate3)';
+};
+
+const S = {
+  user:null, profile:null, portfolioURLs:[], receiptURL:null,
+  selectedTier:null, prevScreen:null, chatTargetId:null,
+  chatUnsub:null, feedCache:[], marqueeText:'', adminTab:'approvals'
+};
+
+const ZONES=['Market Square Area','Ojo Street','School Gate Area','Igor / Uhumudumu',
+  'Alli Square','Abelmen Area','GT Extension','Ujemen','Ujuenle','Emado'];
+const ADMIN_EMAIL='Olaowyegideon@gmail.com';
+
+function $(id){return document.getElementById(id)}
+function sanitize(s){return String(s||'').replace(/[<>"'&]/g,c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c])).trim()}
+function fmt(ts){if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
+function initials(n){return String(n||'').split(' ').map(x=>x[0]||'').join('').substring(0,2).toUpperCase()||'?'}
+function neighborZones(z){const i=ZONES.indexOf(z);return i<0?[]:[ZONES[i-1],ZONES[i+1]].filter(Boolean)}
+function toast(msg,dur=3000){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+function hideLoading(){$('loadingOverlay').classList.add('hidden')}
+function showLoading(){$('loadingOverlay').classList.remove('hidden')}
+
+async function compress(file,maxPx=900,q=0.78){
+  return new Promise(res=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        if(w>maxPx){h=Math.round(h*maxPx/w);w=maxPx}
+        if(h>maxPx){w=Math.round(w*maxPx/h);h=maxPx}
+        c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg',q));
+      };
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+window.goAdminRoute=function(){S.prevScreen=document.querySelector('.screen.active')?.id||'screen-auth';showScreen('screen-admin-login')};
+window.goBack=function(){showScreen(S.prevScreen||'screen-market')};
+window.goTo=function(page){
+  S.prevScreen=document.querySelector('.screen.active')?.id;
+  if(page==='chat-list'){showScreen('screen-chat-list');renderChatList()}
+  else if(page==='dashboard'){showScreen('screen-dashboard');renderDashboard()}
+  else if(page==='market'){showScreen('screen-market');renderFeed()}
+};
+
+// Safety timeout — show login after 4 seconds no matter what
+const loadTimeout=setTimeout(()=>{
+  hideLoading();showScreen('screen-auth');
+},4000);
+
+onAuthStateChanged(auth,async user=>{
+  clearTimeout(loadTimeout);
+  try{
+    if(user){
+      S.user=user;
+      const userEmail=(user.email||'').toLowerCase().trim();
+      const adminEmail=ADMIN_EMAIL.toLowerCase().trim();
+      // ADMIN — bypass everything, go straight to console
+      if(userEmail===adminEmail){
+        S.profile={uid:user.uid,type:'admin',email:user.email,name:'Gideon Admin'};
+        hideLoading();
+        showScreen('screen-admin');
+        setTimeout(()=>adminTab('approvals'),100);
+        listenMarquee();
+        return;
+      }
+      // REGULAR USER
+      try{
+        const snap=await getDoc(doc(db,'users',user.uid));
+        if(snap.exists()){
+          S.profile=snap.data();
+          routeAfterLogin();
+        } else {
+          // New user with no profile yet
+          await signOut(auth);
+          showScreen('screen-auth');
+          hideLoading();
+        }
+      }catch(firestoreErr){
+        console.error('Firestore error:',firestoreErr);
+        showScreen('screen-auth');
+        hideLoading();
+      }
+    } else {
+      S.user=null;S.profile=null;
+      showScreen('screen-auth');
+      hideLoading();
+    }
+    listenMarquee();
+    if(user) listenUnreadDot();
+  }catch(err){
+    hideLoading();showScreen('screen-auth');
+    console.error('Auth error:',err);
+  }
+});
+
+function routeAfterLogin(){
+  hideLoading();
+  const p=S.profile;
+  // Check by email for admin access
+  if(S.user&&S.user.email&&S.user.email.toLowerCase()===ADMIN_EMAIL.toLowerCase()){
+    S.profile={...p,type:'admin'};
+    showScreen('screen-admin');adminTab('approvals');return;
+  }
+  if(p.type==='customer'){showScreen('screen-market');renderFeed();}
+  else if(p.type==='artisan'){
+    if(p.status==='pending') showScreen('screen-pending');
+    else if(p.status==='active'||p.status==='unsubscribed'){showScreen('screen-dashboard');renderDashboard();}
+    else showScreen('screen-paywall');
+  } else if(p.type==='admin'){showScreen('screen-admin');adminTab('approvals');}
+}
+
+window.switchAuthTab=function(tab){
+  $('authTabBar').querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='signin'?0:1)));
+  $('signinSection').style.display=tab==='signin'?'block':'none';
+  $('registerSection').style.display=tab==='signin'?'none':'block';
+};
+
+let regType='customer';
+window.switchRegType=function(t){
+  regType=t;
+  $('regTypeBar').querySelectorAll('.tab').forEach((tab,i)=>tab.classList.toggle('active',i===(t==='customer'?0:1)));
+  $('artisanExtras').style.display=t==='artisan'?'block':'none';
+  validateRegForm();
+};
+
+window.validateRegForm=function(){
+  const name=$('regName').value.trim(),email=$('regEmail').value.trim();
+  const phone=$('regPhone').value.trim(),pass=$('regPass').value,zone=$('regZone').value;
+  let ok=name&&email&&phone&&pass.length>=6&&zone;
+  if(regType==='artisan'){
+    ok=ok&&$('regTrade').value&&$('agreementCheck').checked&&S.portfolioURLs.length>=2;
+  }
+  $('registerBtn').disabled=!ok;
+};
+
+window.handlePortfolioUpload=async function(e){
+  const files=Array.from(e.target.files).slice(0,8);
+  for(const f of files){const url=await compress(f);S.portfolioURLs.push(url)}
+  $('portfolioPreviews').innerHTML=S.portfolioURLs.map(u=>`<img src="${u}" class="preview-img"/>`).join('');
+  $('portfolioCountText').textContent=`${S.portfolioURLs.length} photo${S.portfolioURLs.length!==1?'s':''} uploaded${S.portfolioURLs.length>=2?' ✓':''}`;
+  validateRegForm();
+};
+
+window.handleReceiptUpload=async function(e){
+  const f=e.target.files[0];if(!f)return;
+  S.receiptURL=await compress(f,1200,0.85);
+  $('receiptPreview').innerHTML=`<img src="${S.receiptURL}" style="width:100%;border-radius:var(--r);border:2px solid var(--emerald);max-height:200px;object-fit:cover"/>`;
+};
+
+window.handleRegister=async function(){
+  const name=sanitize($('regName').value),email=sanitize($('regEmail').value.trim().toLowerCase());
+  const phone=sanitize($('regPhone').value.trim()),pass=$('regPass').value,zone=$('regZone').value;
+  const errEl=$('regError');errEl.style.display='none';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Enter a valid email.';errEl.style.display='block';return}
+  if(pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return}
+  $('registerBtn').disabled=true;$('registerBtn').textContent='Creating account…';
+  showLoading();
+  try{
+    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    const uid=cred.user.uid;
+    if(regType==='customer'){
+      const pd={uid,name,email,phone,type:'customer',zone,createdAt:serverTimestamp()};
+      await setDoc(doc(db,'users',uid),pd);
+      S.profile=pd;hideLoading();
+      toast('Welcome to Trusted Hands, '+name.split(' ')[0]+'! 🎉');
+      showScreen('screen-market');renderFeed();
+    } else {
+      const trade=$('regTrade').value,bio=sanitize($('regBio').value);
+      const pd={uid,name,email,phone,type:'artisan',zone,trade,bio,
+        status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,
+        contract_signed_date:serverTimestamp(),portfolios:S.portfolioURLs.slice(),createdAt:serverTimestamp()};
+      await setDoc(doc(db,'users',uid),pd);
+      S.profile=pd;hideLoading();showScreen('screen-paywall');
+    }
+  }catch(err){
+    hideLoading();$('registerBtn').disabled=false;$('registerBtn').textContent='Create Account';
+    errEl.textContent=err.code==='auth/email-already-in-use'?'Email already registered. Please sign in.':'Error: '+err.message;
+    errEl.style.display='block';
+  }
+};
+
+window.handleLogin=async function(){
+  const email=$('loginEmail').value.trim().toLowerCase(),pass=$('loginPass').value;
+  const errEl=$('loginError');errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='Please enter your email and password.';errEl.style.display='block';return}
+  $('loginBtn').disabled=true;$('loginBtn').textContent='Signing in…';showLoading();
+  try{await signInWithEmailAndPassword(auth,email,pass)}
+  catch(err){
+    hideLoading();$('loginBtn').disabled=false;$('loginBtn').textContent='Sign In Securely';
+    errEl.textContent=err.code==='auth/invalid-credential'||err.code==='auth/wrong-password'?'Incorrect email or password.':'Sign in failed: '+err.message;
+    errEl.style.display='block';
+  }
+};
+
+window.handleLogout=async function(){
+  await signOut(auth);S.portfolioURLs=[];S.receiptURL=null;S.selectedTier=null;
+  toast('Signed out successfully.');showScreen('screen-auth');
+};
+
+window.selectTier=function(t){
+  S.selectedTier=t;
+  $('tierStandard').className='tier-card'+(t==='standard'?' selected-std':'');
+  $('tierPremium').className='tier-card premium-card'+(t==='premium'?' selected-prem':'');
+};
+
+window.copyAcct=function(){
+  navigator.clipboard?.writeText('9071268570').then(()=>toast('Account number copied!')).catch(()=>toast('9071268570 — copy manually'));
+};
+
+window.submitPaymentProof=async function(){
+  const errEl=$('paywallError');errEl.style.display='none';
+  if(!S.selectedTier){errEl.textContent='Please select a subscription plan.';errEl.style.display='block';return}
+  const sender=sanitize($('senderBank').value.trim());
+  if(!sender){errEl.textContent='Please enter your sender bank/account name.';errEl.style.display='block';return}
+  if(!S.receiptURL){errEl.textContent='Please upload your payment receipt.';errEl.style.display='block';return}
+  if(!S.user){toast('Session expired. Please sign in again.');showScreen('screen-auth');return}
+  showLoading();
+  try{
+    await updateDoc(doc(db,'users',S.user.uid),{status:'pending',tier:S.selectedTier,senderBank:sender});
+    await addDoc(collection(db,'pendingApprovals'),{
+      artisanUid:S.user.uid,name:S.profile?.name||'',trade:S.profile?.trade||'',
+      zone:S.profile?.zone||'',tier:S.selectedTier==='premium'?'Premium (₦5,000)':'Standard (₦2,000)',
+      senderBank:sender,receiptBase64:S.receiptURL,submittedAt:serverTimestamp(),reviewed:false
+    });
+    S.profile={...S.profile,status:'pending'};
+    hideLoading();showScreen('screen-pending');toast('Submitted! Admin will review shortly.');
+  }catch(err){hideLoading();errEl.textContent='Error: '+err.message;errEl.style.display='block'}
+};
+
+window.checkPendingStatus=async function(){
+  if(!S.user)return;showLoading();
+  const snap=await getDoc(doc(db,'users',S.user.uid));hideLoading();
+  if(snap.exists()){S.profile=snap.data();
+    if(S.profile.status==='active'){toast('🎉 Account is now active!');routeAfterLogin()}
+    else toast('Still under review. Check back soon!')}
+};
+
+window.renderFeed=async function(){
+  const feedEl=$('feedList');
+  feedEl.innerHTML=`<div style="text-align:center;padding:32px;color:var(--slate3)"><div class="spinner" style="margin:0 auto 12px"></div>Loading artisans…</div>`;
+  const cat=$('catFilter').value,zone=$('zoneFilter').value;
+  try{
+    let q=query(collection(db,'users'),where('type','==','artisan'));
+    if(cat) q=query(q,where('trade','==',cat));
+    const snap=await getDocs(q);
+    let artisans=snap.docs.map(d=>d.data()).filter(a=>a.status!=='pending'&&a.status!=='banned');
+    const filterZone=zone||S.profile?.zone||ZONES[0];
+    const sortTier=arr=>arr.sort((a,b)=>{
+      const w={premium:0,standard:1,unsubscribed:2};
+      const ta=w[a.status==='unsubscribed'?'unsubscribed':(a.tier||'standard')]??2;
+      const tb=w[b.status==='unsubscribed'?'unsubscribed':(b.tier||'standard')]??2;
+      return ta!==tb?ta-tb:(b.rating||0)-(a.rating||0);
+    });
+    const same=artisans.filter(a=>a.zone===filterZone);
+    const near=artisans.filter(a=>a.zone!==filterZone&&neighborZones(filterZone).includes(a.zone));
+    const rest=artisans.filter(a=>a.zone!==filterZone&&!neighborZones(filterZone).includes(a.zone));
+    S.feedCache=[...sortTier(same),...sortTier(near),...sortTier(rest)];
+    if(!S.feedCache.length){feedEl.innerHTML=`<div class="empty-state"><div class="es-icon">🔍</div>No artisans found. Try a different filter.</div>`;return}
+    let html='';
+    if(zone){
+      if(same.length) html+=`<div class="feed-section-label">📍 In ${zone}</div>`;
+      html+=sortTier(same).map(a=>artisanCardHTML(a)).join('');
+      if(near.length){html+=`<div class="feed-section-label" style="margin-top:8px">🗺️ Nearby zones</div>`;html+=sortTier(near).map(a=>artisanCardHTML(a)).join('')}
+      if(rest.length){html+=`<div class="feed-section-label" style="margin-top:8px">🌍 Other zones</div>`;html+=sortTier(rest).slice(0,5).map(a=>artisanCardHTML(a)).join('')}
+    } else html=S.feedCache.slice(0,15).map(a=>artisanCardHTML(a)).join('');
+    feedEl.innerHTML=html;
+  }catch(err){feedEl.innerHTML=`<div class="empty-state"><div class="es-icon">⚠️</div>Failed to load.<br/><br/><button class="btn btn-outline" style="width:auto;padding:10px 20px" onclick="renderFeed()">Retry</button></div>`}
+};
+
+function artisanCardHTML(u){
+  const isUnsub=u.status==='unsubscribed';
+  const isPrem=u.tier==='premium'&&u.status==='active'&&(u.rating||0)>=3.5;
+  const isBooked=u.daily_booked;
+  const ini=initials(u.name);
+  const avCls=isPrem?'av-premium':isUnsub?'av-inactive':'av-active';
+  const cardCls=isUnsub?'tier-inactive':isPrem?'tier-premium':'tier-active';
+  const pillHTML=isPrem?`<span class="tier-pill tp-premium">⭐ Premium Verified</span>`:
+    isUnsub?`<span class="tier-pill tp-inactive">Inactive</span>`:
+    `<span class="tier-pill tp-active">✓ Active</span>`;
+  const starsHTML=u.rating?`<span class="star-val">${'★'.repeat(Math.round(u.rating))}</span><span style="font-size:13px;color:var(--slate3)">${(u.rating).toFixed(1)} (${u.reviews})</span>`:
+    `<span style="font-size:12px;color:var(--slate3)">No reviews yet</span>`;
+  const onclickFn = isUnsub ? "showLockedProfile('"+u.uid+"','"+sanitize(u.name)+"','"+sanitize(u.trade)+"')" : "openArtisanDrawer('"+u.uid+"')";
+  return `<div class="a-card ${cardCls}" onclick="${onclickFn}">
+    <div class="a-card-header">
+      <div class="avatar-circle ${avCls}">${ini}</div>
+      <div style="flex:1">
+        <div class="a-name">${sanitize(u.name)}</div>
+        <div class="a-trade">${sanitize(u.trade)}</div>
+        <div class="a-zone">📍 ${sanitize(u.zone)}</div>
+        <div class="badge-row">${pillHTML}</div>
+      </div>
+    </div>
+    <div class="a-card-footer">
+      <div class="stars-row">${isUnsub?'<span style="font-size:12px;color:#94a3b8">🔒 Details hidden</span>':starsHTML}</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate3)">
+        <div class="avail-dot ${isUnsub?'dot-gray':isBooked?'dot-amber':'dot-green'}"></div>
+        ${isUnsub?'Inactive':isBooked?'Booked today':'Available'}
+      </div>
+    </div>
+    ${isUnsub?'<div class="inactive-msg">🔒 Subscribe to unlock full profile &amp; contact</div>':''}
+  </div>`;
+}
+
+// Show locked profile for unsubscribed artisans
+window.showLockedProfile=function(uid,name,trade){
+  const ini=initials(name);
+  $('drawerContent').innerHTML=`
+    <div style="text-align:center;padding:10px 0 20px">
+      <div class="avatar-circle av-inactive" style="width:64px;height:64px;font-size:22px;margin:0 auto 12px">${ini}</div>
+      <div style="font-weight:700;font-size:18px;color:var(--navy)">${sanitize(name)}</div>
+      <div style="color:var(--blue2);font-weight:600;font-size:14px;margin-top:4px">${sanitize(trade)}</div>
+    </div>
+    <div style="background:#f8fafc;border:2px dashed var(--border2);border-radius:var(--r2);padding:24px 20px;text-align:center;margin:8px 0 20px">
+      <div style="font-size:36px;margin-bottom:12px">🔒</div>
+      <div style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:8px">Profile Locked</div>
+      <div style="font-size:13px;color:var(--slate3);line-height:1.7">This artisan's contact details, phone number, portfolio, and booking feature are locked.<br/><br/>They need to <strong>subscribe to a plan</strong> before you can contact them.</div>
+    </div>
+    <div style="background:var(--amber2);border-radius:var(--r);padding:14px;text-align:center;font-size:13px;color:var(--amber);font-weight:600">
+      ⏳ Not available at the moment / Inactive
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--slate3);margin-top:16px;line-height:1.6">Looking for this type of worker?<br/>Use the filters above to find an active artisan in your zone.</p>`;
+  $('overlay').classList.add('open');
+  $('artisanDrawer').classList.add('open');
+};
+
+window.openArtisanDrawer=async function(uid){
+  let u=S.feedCache.find(a=>a.uid===uid);
+  if(!u){const snap=await getDoc(doc(db,'users',uid));if(snap.exists())u=snap.data()}
+  if(!u)return;
+  const ini=initials(u.name);const isPrem=u.tier==='premium'&&u.status==='active';
+  const portHTML=(u.portfolios||[]).length
+    ?u.portfolios.map(p=>`<img src="${p}" class="portfolio-thumb"/>`).join('')
+    :`<div class="portfolio-ph">📷<span>No portfolio yet</span></div>`;
+  $('drawerContent').innerHTML=`
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">
+      <div class="avatar-circle ${isPrem?'av-premium':'av-active'}" style="width:60px;height:60px;font-size:21px;flex-shrink:0">${ini}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:17px;color:var(--navy)">${sanitize(u.name)}</div>
+        <div style="color:var(--blue2);font-weight:600;font-size:14px">${sanitize(u.trade)}</div>
+        <div style="font-size:12px;color:var(--slate3);margin-top:2px">📍 ${sanitize(u.zone)}</div>
+        <div style="margin-top:6px;font-size:13px;color:var(--slate3)">${u.rating?'★'.repeat(Math.round(u.rating))+' '+u.rating.toFixed(1)+' ('+u.reviews+' reviews)':'No reviews yet'}</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--slate);margin-bottom:16px;line-height:1.6">${sanitize(u.bio||'Professional artisan based in Ekpoma.')}</p>
+    <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">Past Work Portfolio</div>
+    <div class="portfolio-row">${portHTML}</div>
+    ${u.daily_booked?`<div class="alert alert-warn" style="margin:14px 0">🔴 Currently on a job today</div>`:''}
+    <button class="btn btn-primary" style="margin-top:18px" onclick="openChatWith('${u.uid}','${sanitize(u.name)}','${sanitize(u.trade)}')">💬 Open Chat &amp; Secure Booking</button>`;
+  $('overlay').classList.add('open');$('artisanDrawer').classList.add('open');
+};
+
+window.closeDrawer=function(){$('overlay').classList.remove('open');$('artisanDrawer').classList.remove('open')};
+
+function chatRoomId(a,b){return[a,b].sort().join('_')}
+
+window.openChatWith=function(targetUid,targetName,targetTrade){
+  closeDrawer();S.chatTargetId=targetUid;S.prevScreen='screen-market';
+  $('chatAv').textContent=initials(targetName);
+  $('chatName').textContent=targetName;$('chatTrade').textContent=targetTrade;
+  showScreen('screen-chat');listenChat(targetUid);
+};
+
+function listenChat(targetUid){
+  if(S.chatUnsub){S.chatUnsub();S.chatUnsub=null}
+  if(!S.user)return;
+  const roomId=chatRoomId(S.user.uid,targetUid);
+  const q=query(collection(db,'chats',roomId,'messages'),orderBy('sentAt','asc'),limit(100));
+  S.chatUnsub=onSnapshot(q,snap=>{
+    const body=$('chatBody');body.innerHTML='';
+    if(snap.empty){body.innerHTML=`<div class="msg-system">Start the conversation — describe your job and discuss rates.</div>`;return}
+    snap.docs.forEach(d=>{
+      const m=d.data();const sent=m.senderId===S.user.uid;
+      body.innerHTML+=`<div class="msg-bubble ${sent?'msg-sent':'msg-recv'}">${sanitize(m.text)}<div class="msg-time">${fmt(m.sentAt)}</div></div>`;
+    });
+    setTimeout(()=>{body.scrollTop=body.scrollHeight},50);
+  });
+}
+
+window.sendMessage=async function(){
+  const inp=$('chatInput');const txt=inp.value.trim();if(!txt||!S.user||!S.chatTargetId)return;
+  inp.value='';inp.style.height='auto';
+  const roomId=chatRoomId(S.user.uid,S.chatTargetId);
+  await addDoc(collection(db,'chats',roomId,'messages'),{senderId:S.user.uid,receiverId:S.chatTargetId,text:txt,sentAt:serverTimestamp(),read:false});
+  await setDoc(doc(db,'chats',roomId),{participants:[S.user.uid,S.chatTargetId],lastMessage:txt,lastAt:serverTimestamp(),[`unread_${S.chatTargetId}`]:true},{merge:true});
+};
+
+window.renderChatList=async function(){
+  if(!S.user)return;
+  const body=$('chatListBody');body.innerHTML=`<div style="padding:20px;text-align:center;color:var(--slate3)">Loading…</div>`;
+  const q=query(collection(db,'chats'),where('participants','array-contains',S.user.uid));
+  const snap=await getDocs(q);
+  if(snap.empty){body.innerHTML=`<div class="empty-state"><div class="es-icon">💬</div>No conversations yet.</div>`;return}
+  let html='';
+  for(const d of snap.docs){
+    const room=d.data();const otherId=room.participants.find(p=>p!==S.user.uid);
+    const os=await getDoc(doc(db,'users',otherId));if(!os.exists())continue;
+    const other=os.data();const unread=room[`unread_${S.user.uid}`];const ini=initials(other.name);
+    html+=`<div class="chat-list-item" onclick="openChatWith('${other.uid}','${sanitize(other.name)}','${sanitize(other.trade||'Customer')}')">
+      <div style="width:46px;height:46px;border-radius:50%;background:#eff6ff;color:#1e40af;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;position:relative">
+        ${ini}${unread?`<span style="position:absolute;top:0;right:0;width:10px;height:10px;background:var(--red);border-radius:50%;border:2px solid var(--white)"></span>`:''}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:${unread?700:600};font-size:14px;color:var(--navy)">${sanitize(other.name)}</div>
+        <div style="font-size:12px;color:var(--slate3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sanitize(room.lastMessage||'')}</div>
+      </div>
+    </div>`;
+  }
+  body.innerHTML=html||`<div class="empty-state">No conversations found.</div>`;
+};
+
+function listenUnreadDot(){
+  if(!S.user)return;
+  onSnapshot(query(collection(db,'chats'),where('participants','array-contains',S.user.uid)),snap=>{
+    const hasUnread=snap.docs.some(d=>d.data()[`unread_${S.user.uid}`]);
+    $('chatDot').style.display=hasUnread?'block':'none';
+  });
+}
+
+window.renderDashboard=async function(){
+  if(!S.user||!S.profile){showScreen('screen-auth');return}
+  const snap=await getDoc(doc(db,'users',S.user.uid));
+  if(snap.exists())S.profile=snap.data();
+  const p=S.profile;const body=$('dashboardBody');
+  const firstName=sanitize(p.name||'').split(' ')[0];
+  const expiry=p.expiry?.toDate?p.expiry.toDate():p.expiry?new Date(p.expiry):null;
+  const daysLeft=expiry?Math.max(0,Math.round((expiry-Date.now())/86400000)):0;
+  const daysCls=daysLeft<=3?'days-crit':daysLeft<=7?'days-warn':'days-ok';
+  if(p.type==='customer'){
+    body.innerHTML=`
+      <div class="dash-hero"><div class="dash-greeting">Hello, ${firstName} 👋</div><div class="dash-sub">Your Trusted Hands account</div></div>
+      <div class="dash-body">
+        <div class="info-card"><h3>My Account</h3>
+          <div class="info-row"><span class="info-lbl">Name</span><strong>${sanitize(p.name)}</strong></div>
+          <div class="info-row"><span class="info-lbl">Email</span><span>${sanitize(p.email)}</span></div>
+          <div class="info-row"><span class="info-lbl">Phone</span><span>${sanitize(p.phone||'—')}</span></div>
+          <div class="info-row"><span class="info-lbl">Zone</span><span>📍 ${sanitize(p.zone)}</span></div>
+        </div>
+        <button class="btn btn-primary" onclick="goTo('market')">Browse Artisans</button>
+        <button class="btn btn-outline" style="margin-top:10px" onclick="goTo('chat-list')">💬 My Messages</button>
+        <button class="btn btn-outline" style="margin-top:10px;border-color:var(--slate2);color:var(--slate2)" onclick="showSupportForm('${p.uid}','${sanitize(p.name)}','${sanitize(p.email)}')">🆘 Contact Support</button>
+      </div>`;
+  } else {
+    const isUnsub=p.status==='unsubscribed';const isBooked=p.daily_booked;
+    body.innerHTML=`
+      <div class="dash-hero"><div class="dash-greeting">Hello, ${firstName} 👋</div><div class="dash-sub">${sanitize(p.trade||'Artisan')} · ${sanitize(p.zone)}</div></div>
+      <div class="dash-body">
+        ${isUnsub?`<div class="renew-banner" onclick="showScreen('screen-paywall')"><h4>⚡ Renew Your Active Status</h4><p>Your subscription has expired. Renew to get back on the marketplace.</p></div>`:''}
+        ${isBooked?`<div class="job-complete-card"><h4>📋 You're Currently Marked as Booked</h4>
+          <p style="font-size:13px;color:var(--slate);margin-bottom:14px">Submit a completion report to return to the marketplace feed.</p>
+          <div class="form-group"><label>Job Summary *</label><textarea class="inp" id="feedbackTxt" placeholder="Describe the work completed…" style="min-height:70px"></textarea></div>
+          <button class="btn btn-success" onclick="submitJobFeedback()">✓ Submit Job Completion</button>
+        </div>`:''}
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-num">${p.reviews||0}</div><div class="stat-lbl">Reviews</div></div>
+          <div class="stat-box"><div class="stat-num">${p.rating?(p.rating).toFixed(1):'—'}</div><div class="stat-lbl">Rating</div></div>
+        </div>
+        <div class="info-card"><h3>My Profile</h3>
+          <div class="info-row"><span class="info-lbl">Status</span><span class="status-pill sp-${p.status||'unsubscribed'}">${p.status==='active'?'Active':p.status==='pending'?'Pending':p.status==='unsubscribed'?'Unsubscribed':'—'}</span></div>
+          <div class="info-row"><span class="info-lbl">Subscription</span><span style="font-weight:600;text-transform:capitalize">${p.tier||'None'}</span></div>
+          <div class="info-row"><span class="info-lbl">Trade</span><span>${sanitize(p.trade||'—')}</span></div>
+          <div class="info-row"><span class="info-lbl">Zone</span><span>📍 ${sanitize(p.zone)}</span></div>
+          ${p.status==='active'?`<div class="info-row"><span class="info-lbl">Days Left</span><span class="${daysCls} days-left">${daysLeft} days</span></div>`:''}
+          <div class="info-row"><span class="info-lbl">Availability</span><span style="font-size:13px;color:${isBooked?'var(--amber)':'var(--emerald)'}">${isBooked?'🔴 Booked today':'🟢 Available'}</span></div>
+        </div>
+        ${!isUnsub&&p.status==='active'?`<button class="btn btn-outline" style="margin-bottom:10px" onclick="toggleBookingStatus()">${isBooked?'✓ Mark as Available':'🔴 Mark as Booked Today'}</button>`:''}
+        <button class="btn btn-outline" style="margin-top:4px" onclick="goTo('chat-list')">💬 Messages</button>
+        <button class="btn btn-outline" style="margin-top:10px;border-color:var(--red2);color:var(--red)" onclick="handleLogout()">Sign Out</button>
+      </div>`;
+  }
+};
+
+window.submitJobFeedback=async function(){
+  const txt=$('feedbackTxt')?.value?.trim();
+  if(!txt||txt.length<10){toast('Please describe the job (at least 10 characters).');return}
+  showLoading();
+  try{
+    await runTransaction(db,async txn=>{
+      const r=doc(db,'users',S.user.uid);const snap=await txn.get(r);
+      if(!snap.exists())throw new Error('Profile not found');
+      txn.update(r,{daily_booked:false,lastFeedback:txt,lastFeedbackAt:serverTimestamp()});
+    });
+    S.profile={...S.profile,daily_booked:false};hideLoading();
+    toast('Feedback submitted! You are back on the marketplace. ✅');renderDashboard();
+  }catch(e){hideLoading();toast('Failed: '+e.message)}
+};
+
+window.toggleBookingStatus=async function(){
+  if(!S.user||!S.profile)return;
+  const newVal=!S.profile.daily_booked;
+  await updateDoc(doc(db,'users',S.user.uid),{daily_booked:newVal});
+  S.profile.daily_booked=newVal;toast(newVal?'Marked as booked.':'Back to available! 🟢');renderDashboard();
+};
+
+window.handleAdminLogin=async function(){
+  const email=$('adminEmail').value.trim(),pass=$('adminPass').value;
+  const errEl=$('adminLoginError');errEl.style.display='none';
+  if(email!==ADMIN_EMAIL){errEl.textContent='Access denied.';errEl.style.display='block';return}
+  showLoading();
+  try{
+    try{await signInWithEmailAndPassword(auth,email,pass)}
+    catch(e){
+      if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'){
+        await createUserWithEmailAndPassword(auth,email,pass);
+      } else throw e;
+    }
+    const uid=auth.currentUser.uid;
+    const snap=await getDoc(doc(db,'users',uid));
+    if(!snap.exists())await setDoc(doc(db,'users',uid),{uid,type:'admin',email,name:'Gideon Admin',createdAt:serverTimestamp()});
+    S.profile={...(snap.data()||{}),type:'admin'};
+    hideLoading();showScreen('screen-admin');adminTab('approvals');
+  }catch(err){hideLoading();errEl.textContent='Login failed: '+err.message;errEl.style.display='block'}
+};
+
+window.adminTab=function(tab){
+  S.adminTab=tab;
+  document.querySelectorAll('.admin-tab').forEach((t,i)=>
+    t.classList.toggle('active',['approvals','broadcast','artisans','settings'][i]===tab)
+  );
+  const body=$('adminBody');
+  if(!body){console.error('adminBody not found');return;}
+  body.innerHTML=`<div style="text-align:center;padding:20px;color:var(--slate3)"><div class="spinner" style="margin:0 auto 10px"></div>Loading...</div>`;
+  setTimeout(()=>renderAdminContent(),50);
+};
+
+window.renderAdminContent=async function(){
+  const body=$('adminBody');body.innerHTML=`<div style="padding:20px;text-align:center;color:var(--slate3)">Loading…</div>`;
+  if(S.adminTab==='approvals'){
+    const snap=await getDocs(query(collection(db,'pendingApprovals'),where('reviewed','==',false)));
+    if(snap.empty){body.innerHTML=`<div class="empty-state"><div class="es-icon">✅</div>No pending approvals.</div>`;return}
+    body.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px">${snap.docs.length} pending</div>`+
+    snap.docs.map(d=>{const p=d.data();return`<div class="pending-item">
+      <div class="pending-name">${sanitize(p.name)}</div>
+      <div class="pending-meta">${sanitize(p.trade)} · 📍 ${sanitize(p.zone)}<br/>Tier: <strong>${sanitize(p.tier)}</strong><br/>Sender: ${sanitize(p.senderBank)}</div>
+      ${p.receiptBase64?`<img src="${p.receiptBase64}" class="receipt-preview"/>`:`<div style="background:#f1f5f9;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--slate3);margin:10px 0">🧾 Receipt submitted</div>`}
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-success btn-sm" onclick="approveArtisan('${p.artisanUid}','${d.id}','${p.tier}')">✓ Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectSubmission('${d.id}')">✕ Reject</button>
+      </div>
+    </div>`}).join('');
+  } else if(S.adminTab==='broadcast'){
+    body.innerHTML=`<div class="info-card"><h3>📢 Broadcast to All Users</h3>
+      <p style="font-size:13px;color:var(--slate3);margin-bottom:14px">Message appears as a scrolling banner on all marketplace screens.</p>
+      <div class="form-group"><textarea class="inp" id="broadcastMsg" placeholder="Type your announcement…" style="min-height:90px">${S.marqueeText||''}</textarea></div>
+      <button class="btn btn-primary" onclick="sendBroadcast()">Send Broadcast</button>
+      ${S.marqueeText?`<button class="btn btn-outline" style="margin-top:8px" onclick="clearBroadcast()">Clear Broadcast</button>`:''}
+    </div>`;
+  } else if(S.adminTab==='artisans'){
+    const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));
+    if(snap.empty){body.innerHTML=`<div class="empty-state">No artisans yet.</div>`;return}
+    body.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px">${snap.docs.length} artisans</div>
+    <div class="info-card">${snap.docs.map(d=>{const a=d.data();return`<div class="manage-row">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px">${sanitize(a.name)}</div>
+        <div style="font-size:11px;color:var(--slate3)">${sanitize(a.trade)} · ${sanitize(a.zone)}</div>
+      </div>
+      <span class="status-pill sp-${a.status||'unsubscribed'}" style="font-size:11px;padding:3px 9px">${a.status||'—'}</span>
+      <select style="font-size:11px;padding:5px;border:1px solid var(--border);border-radius:8px;font-family:inherit" onchange="adminChangeTier('${a.uid}',this.value)">
+        <option value="">Tier</option>
+        <option value="standard" ${a.tier==='standard'?'selected':''}>Standard</option>
+        <option value="premium" ${a.tier==='premium'?'selected':''}>Premium</option>
+      </select>
+      <button class="btn btn-danger btn-sm" style="font-size:11px;padding:5px 10px" onclick="adminBan('${a.uid}')">Ban</button>
+    </div>`}).join('')}</div>`;
+  } else {
+    body.innerHTML=`<div class="info-card"><h3>Settings</h3>
+      <div class="info-row"><span class="info-lbl">Admin</span><span>${ADMIN_EMAIL}</span></div>
+      <div class="info-row"><span class="info-lbl">Payment</span><span>Opay · 9071268570</span></div>
+      <div class="info-row"><span class="info-lbl">Platform</span><span>Trusted Hands · Ekpoma</span></div>
+    </div>
+    <button class="btn btn-outline" style="border-color:var(--red2);color:var(--red)" onclick="handleLogout()">Exit Admin Console</button>`;
+  }
+};
+
+window.approveArtisan=async function(uid,docId,tierLabel){
+  showLoading();
+  try{
+    const tier=tierLabel.toLowerCase().includes('premium')?'premium':'standard';
+    const expiry=new Date(Date.now()+2592000000);
+    await runTransaction(db,async txn=>{
+      txn.update(doc(db,'users',uid),{status:'active',tier,expiry,activatedAt:serverTimestamp()});
+      txn.update(doc(db,'pendingApprovals',docId),{reviewed:true,approvedAt:serverTimestamp()});
+    });
+    hideLoading();toast('Artisan approved and activated! ✅');renderAdminContent();
+  }catch(e){hideLoading();toast('Error: '+e.message)}
+};
+
+window.rejectSubmission=async function(docId){
+  await updateDoc(doc(db,'pendingApprovals',docId),{reviewed:true,rejected:true});
+  toast('Submission rejected.');renderAdminContent();
+};
+
+window.adminChangeTier=async function(uid,tier){
+  if(!tier)return;await updateDoc(doc(db,'users',uid),{tier});toast('Tier updated to '+tier);
+};
+
+window.adminBan=async function(uid){
+  if(!confirm('Permanently ban this artisan?'))return;
+  await updateDoc(doc(db,'users',uid),{status:'banned'});
+  toast('Artisan banned.');renderAdminContent();
+};
+
+window.sendBroadcast=async function(){
+  const msg=sanitize($('broadcastMsg')?.value?.trim());
+  if(!msg){toast('Enter a message first.');return}
+  await setDoc(doc(db,'config','broadcast'),{text:msg,updatedAt:serverTimestamp()});
+  S.marqueeText=msg;updateMarquee();toast('Broadcast sent! 📢');renderAdminContent();
+};
+
+window.clearBroadcast=async function(){
+  await setDoc(doc(db,'config','broadcast'),{text:'',updatedAt:serverTimestamp()});
+  S.marqueeText='';updateMarquee();toast('Broadcast cleared.');renderAdminContent();
+};
+
+function listenMarquee(){
+  onSnapshot(doc(db,'config','broadcast'),snap=>{
+    if(snap.exists()){S.marqueeText=snap.data().text||'';updateMarquee()}
+  });
+}
+
+function updateMarquee(){
+  const bar=$('marqueeBar'),txt=$('marqueeText');
+  if(S.marqueeText){bar.style.display='block';txt.textContent='📢 '+S.marqueeText+' '}
+  else bar.style.display='none';
+}
+
+
+// ─── SUPPORT FORM (USER SIDE) ─────────────────────────────────────────────────
+window.showSupportForm=function(uid,name,email){
+  const existing=document.getElementById('supportFormModal');
+  if(existing) existing.remove();
+  const modal=document.createElement('div');
+  modal.id='supportFormModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:flex-end;justify-content:center';
+  modal.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div>
+    <h3 style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:6px">🆘 Contact Support</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:14px">Describe your issue and our team will help you manually.</p>
+    <div class="form-group"><textarea class="inp" id="supportMsgText" placeholder="Describe your issue in detail…" style="min-height:100px"></textarea></div>
+    <button class="btn btn-primary" onclick="submitSupportTicket('${uid}','${name}','${email}')">Submit to Support Team</button>
+    <button class="btn btn-outline" style="margin-top:8px" onclick="document.getElementById('supportFormModal').remove()">Cancel</button>
+  </div>`;
+  document.body.appendChild(modal);
+};
+
+window.submitSupportTicket=async function(uid,name,email){
+  const txt=document.getElementById('supportMsgText')?.value?.trim();
+  if(!txt||txt.length<10){toast('Please describe your issue (min 10 characters).');return}
+  await addDoc(collection(db,'supportTickets'),{
+    userId:uid,userName:name,userEmail:email,
+    message:txt,createdAt:serverTimestamp(),resolved:false
+  });
+  document.getElementById('supportFormModal')?.remove();
+  toast('Support ticket submitted! We will review and help you shortly. ✅');
+};
+
+// ─── FORGOT PASSWORD ──────────────────────────────────────────────────────────
+window.showForgotPassword=function(){
+  showScreen('screen-forgot');
+  document.getElementById('forgotError').style.display='none';
+  document.getElementById('forgotSuccess').style.display='none';
+  document.getElementById('forgotEmail').value='';
+};
+
+window.sendResetEmail=async function(){
+  const email=document.getElementById('forgotEmail').value.trim().toLowerCase();
+  const errEl=document.getElementById('forgotError');
+  const sucEl=document.getElementById('forgotSuccess');
+  errEl.style.display='none';sucEl.style.display='none';
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;
+  }
+  document.getElementById('sendResetBtn').disabled=true;
+  document.getElementById('sendResetBtn').textContent='Sending…';
+  try{
+    const {sendPasswordResetEmail}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    await sendPasswordResetEmail(auth,email,{
+      url: window.location.origin,
+      handleCodeInApp:false
+    });
+    sucEl.textContent='✅ A password reset link has been sent to '+email+'. Check your inbox and spam folder. Click the link in the email to set a new password.';
+    sucEl.style.display='block';
+    document.getElementById('sendResetBtn').textContent='Email Sent ✓';
+  }catch(err){
+    document.getElementById('sendResetBtn').disabled=false;
+    document.getElementById('sendResetBtn').textContent='Send Verification Code';
+    if(err.code==='auth/user-not-found')
+      errEl.textContent='No account found with this email address.';
+    else errEl.textContent='Failed to send email: '+err.message;
+    errEl.style.display='block';
+  }
+};
+
+// ─── ADMIN USERS DASHBOARD ────────────────────────────────────────────────────
+let allUsersCache=[];
+
+window.openUsersPanel=async function(){
+  showScreen('screen-admin-users');
+  const body=document.getElementById('usersListBody');
+  body.innerHTML=`<div style="text-align:center;padding:32px;color:var(--slate3)"><div class="spinner" style="margin:0 auto 12px"></div>Loading all users…</div>`;
+  const snap=await getDocs(collection(db,'users'));
+  allUsersCache=snap.docs.map(d=>d.data()).filter(u=>u.type!=='admin');
+  allUsersCache.sort((a,b)=>(a.createdAt?.seconds||0)>(b.createdAt?.seconds||0)?-1:1);
+  renderUsersList(allUsersCache);
+};
+
+window.filterUsers=function(){
+  const q=document.getElementById('userSearchInput').value.toLowerCase();
+  const filtered=allUsersCache.filter(u=>
+    (u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)||(u.phone||'').includes(q)
+  );
+  renderUsersList(filtered);
+};
+
+function renderUsersList(users){
+  const body=document.getElementById('usersListBody');
+  if(!users.length){body.innerHTML=`<div class="empty-state"><div class="es-icon">👥</div>No users found.</div>`;return}
+  const customers=users.filter(u=>u.type==='customer');
+  const artisans=users.filter(u=>u.type==='artisan');
+  let html=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+    <div class="stat-box"><div class="stat-num">${users.length}</div><div class="stat-lbl">Total Users</div></div>
+    <div class="stat-box"><div class="stat-num">${customers.length}</div><div class="stat-lbl">Customers</div></div>
+    <div class="stat-box"><div class="stat-num">${artisans.length}</div><div class="stat-lbl">Artisans</div></div>
+  </div>`;
+  html+=users.map(u=>{
+    const ini=initials(u.name);
+    const joined=u.createdAt?.toDate?u.createdAt.toDate().toLocaleDateString():'—';
+    return`<div class="info-card" style="margin-bottom:10px;cursor:pointer" onclick="openUserDetail('${u.uid}')">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="avatar-circle ${u.type==='artisan'?'av-active':'av-inactive'}" style="width:44px;height:44px;font-size:15px;flex-shrink:0">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14px;color:var(--navy)">${sanitize(u.name||'—')}</div>
+          <div style="font-size:12px;color:var(--slate3)">${sanitize(u.email||'—')}</div>
+          <div style="font-size:11px;color:var(--slate3);margin-top:2px">${u.type==='artisan'?'🔧 '+sanitize(u.trade||''):'👤 Customer'} · 📍 ${sanitize(u.zone||'—')}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <span class="status-pill sp-${u.status||'active'}" style="font-size:11px;padding:3px 8px">${u.type==='artisan'?(u.status||'—'):'Active'}</span>
+          <div style="font-size:10px;color:var(--slate3);margin-top:4px">${joined}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('usersListBody').innerHTML=html;
+}
+
+window.openUserDetail=async function(uid){
+  showScreen('screen-user-detail');
+  const body=document.getElementById('userDetailBody');
+  body.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>`;
+  const snap=await getDoc(doc(db,'users',uid));
+  if(!snap.exists()){body.innerHTML='User not found.';return}
+  const u=snap.data();
+  const ini=initials(u.name);
+  const joined=u.createdAt?.toDate?u.createdAt.toDate().toLocaleDateString():'—';
+  const expiry=u.expiry?.toDate?u.expiry.toDate().toLocaleDateString():'—';
+  const portHTML=(u.portfolios||[]).map(p=>`<img src="${p}" style="width:90px;height:72px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`).join('');
+  body.innerHTML=`
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:20px">
+      <div class="avatar-circle av-active" style="width:60px;height:60px;font-size:22px;flex-shrink:0">${ini}</div>
+      <div>
+        <div style="font-weight:800;font-size:18px;color:var(--navy)">${sanitize(u.name||'—')}</div>
+        <div style="font-size:13px;color:var(--slate3)">${u.type==='artisan'?'🔧 Artisan':'👤 Customer'}</div>
+        <span class="status-pill sp-${u.status||'active'}" style="font-size:11px;margin-top:4px;display:inline-block">${u.type==='artisan'?(u.status||'—'):'Active'}</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>Account Details</h3>
+      <div class="info-row"><span class="info-lbl">Full Name</span><span>${sanitize(u.name||'—')}</span></div>
+      <div class="info-row"><span class="info-lbl">Email</span><span style="font-size:13px">${sanitize(u.email||'—')}</span></div>
+      <div class="info-row"><span class="info-lbl">Phone</span><span>${sanitize(u.phone||'—')}</span></div>
+      <div class="info-row"><span class="info-lbl">Zone</span><span>📍 ${sanitize(u.zone||'—')}</span></div>
+      <div class="info-row"><span class="info-lbl">Joined</span><span>${joined}</span></div>
+      ${u.type==='artisan'?`
+      <div class="info-row"><span class="info-lbl">Trade</span><span>${sanitize(u.trade||'—')}</span></div>
+      <div class="info-row"><span class="info-lbl">Tier</span><span style="text-transform:capitalize;font-weight:600">${u.tier||'None'}</span></div>
+      <div class="info-row"><span class="info-lbl">Rating</span><span>${u.rating?u.rating.toFixed(1)+' ⭐ ('+u.reviews+' reviews)':'No reviews'}</span></div>
+      <div class="info-row"><span class="info-lbl">Expiry</span><span>${expiry}</span></div>
+      <div class="info-row"><span class="info-lbl">Daily Booked</span><span>${u.daily_booked?'🔴 Yes':'🟢 No'}</span></div>`:''}
+    </div>
+    ${u.type==='artisan'&&(u.portfolios||[]).length?`
+    <div class="info-card">
+      <h3>Portfolio</h3>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${portHTML}</div>
+    </div>`:''}
+    <div class="info-card">
+      <h3>Admin Actions</h3>
+      ${u.type==='artisan'?`
+      <button class="btn btn-success" style="margin-bottom:10px" onclick="adminForceActivate('${u.uid}')">✓ Force Activate Account</button>
+      <button class="btn btn-outline" style="margin-bottom:10px;border-color:var(--amber);color:var(--amber)" onclick="adminResetBooking('${u.uid}')">🔄 Reset Booked Status</button>`:''}
+      <button class="btn btn-outline" style="margin-bottom:10px" onclick="adminSendResetLink('${u.email}')">📧 Send Password Reset Email</button>
+      <button class="btn btn-danger" onclick="adminBan('${u.uid}')">🚫 Ban This Account</button>
+    </div>
+    <div class="info-card">
+      <h3>Support Note to User</h3>
+      <div class="form-group"><textarea class="inp" id="supportNoteText" placeholder="Type a support message to send to this user's account…" style="min-height:80px"></textarea></div>
+      <button class="btn btn-primary" onclick="sendSupportNote('${u.uid}','${sanitize(u.name)}')">Send Support Note</button>
+    </div>`;
+};
+
+window.adminForceActivate=async function(uid){
+  const expiry=new Date(Date.now()+2592000000);
+  await updateDoc(doc(db,'users',uid),{status:'active',expiry,activatedAt:serverTimestamp()});
+  toast('Account force activated for 30 days! ✅');openUserDetail(uid);
+};
+
+window.adminResetBooking=async function(uid){
+  await updateDoc(doc(db,'users',uid),{daily_booked:false});
+  toast('Booking status reset — user is now available. ✅');openUserDetail(uid);
+};
+
+window.adminSendResetLink=async function(email){
+  try{
+    const {sendPasswordResetEmail}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    await sendPasswordResetEmail(auth,email);
+    toast('Password reset email sent to '+email+' ✅');
+  }catch(e){toast('Failed: '+e.message)}
+};
+
+window.sendSupportNote=async function(uid,name){
+  const txt=document.getElementById('supportNoteText')?.value?.trim();
+  if(!txt){toast('Please type a support note first.');return}
+  await addDoc(collection(db,'supportNotes'),{
+    toUid:uid,toName:name,message:txt,sentAt:serverTimestamp(),sentBy:'Admin'
+  });
+  toast('Support note sent to '+name+' ✅');
+  document.getElementById('supportNoteText').value='';
+};
+
+// ─── SUPPORT TICKETS ──────────────────────────────────────────────────────────
+window.openSupportPanel=async function(){
+  showScreen('screen-support');
+  const body=document.getElementById('supportBody');
+  body.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>`;
+  const snap=await getDocs(query(collection(db,'supportTickets'),orderBy('createdAt','desc'),limit(50)));
+  if(snap.empty){
+    body.innerHTML=`<div class="empty-state"><div class="es-icon">🎉</div>No support tickets yet.</div>`;return;
+  }
+  body.innerHTML=snap.docs.map(d=>{
+    const t=d.data();
+    const date=t.createdAt?.toDate?t.createdAt.toDate().toLocaleDateString():'—';
+    return`<div class="pending-item" style="border-left-color:${t.resolved?'var(--emerald)':'var(--red)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="pending-name">${sanitize(t.userName||'Unknown')}</div>
+          <div class="pending-meta">${sanitize(t.userEmail||'—')} · ${date}</div>
+          <div style="font-size:13px;color:var(--slate);margin-top:8px;line-height:1.6">${sanitize(t.message||'—')}</div>
+        </div>
+        <span class="status-pill" style="${t.resolved?'background:var(--emerald2);color:var(--emerald)':'background:var(--red2);color:var(--red)'};font-size:11px">${t.resolved?'Resolved':'Open'}</span>
+      </div>
+      ${!t.resolved?`<button class="btn btn-success btn-sm" style="margin-top:10px" onclick="resolveTicket('${d.id}')">Mark Resolved</button>`:''}
+    </div>`;
+  }).join('');
+};
+
+window.resolveTicket=async function(docId){
+  await updateDoc(doc(db,'supportTickets',docId),{resolved:true,resolvedAt:serverTimestamp()});
+  toast('Ticket marked as resolved ✅');openSupportPanel();
+};
+
+window.showScreen=showScreen;
+</script>
+</body>
+</html>
