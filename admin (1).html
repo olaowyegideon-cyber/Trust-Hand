@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="DENY"/>
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Trusted Hands — Admin Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#0f172a;--navy2:#1e293b;--slate3:#64748b;--blue2:#2563eb;--blue3:#eff6ff;--emerald:#059669;--emerald2:#d1fae5;--amber:#d97706;--amber2:#fef3c7;--red:#dc2626;--red2:#fee2e2;--bg:#f8fafc;--white:#fff;--border:#e2e8f0;--border2:#cbd5e1;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 20px rgba(0,0,0,.10);--r:12px;--r2:16px}
+[data-theme="dark"]{--navy:#f1f5f9;--navy2:#1e293b;--slate3:#94a3b8;--blue2:#3b82f6;--blue3:#1e3a5f;--emerald:#10b981;--emerald2:#064e3b;--amber:#f59e0b;--amber2:#451a03;--red:#ef4444;--red2:#450a0a;--bg:#0a0e14;--white:#151b26;--border:#2a3441;--border2:#3a4654;--shadow:0 1px 3px rgba(0,0,0,.4);--shadow2:0 4px 20px rgba(0,0,0,.5)}
+[data-theme="dark"] body{background:var(--bg);color:var(--navy)}
+[data-theme="dark"] .inp{background:var(--white);color:var(--navy);border-color:var(--border)}
+[data-theme="dark"] .ic,[data-theme="dark"] .pi,[data-theme="dark"] .stat-card{background:var(--white);border-color:var(--border)}
+[data-theme="dark"] .atb{background:#0a0e14}
+[data-theme="dark"] .at.active{background:var(--white)}
+body{transition:background .3s ease,color .3s ease}
+.theme-toggle{position:fixed;bottom:20px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--navy2);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow2);z-index:150}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--navy);font-size:15px}
+#app{height:100vh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;background:var(--bg)}
+.screen{display:none;height:100%;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy2);color:#fff;padding:11px 22px;border-radius:24px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;color:var(--navy);background:var(--white);font-family:inherit;outline:none;transition:.2s}
+.inp:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.inp::placeholder{color:#94a3b8}
+textarea.inp{resize:vertical;min-height:80px}
+.btn{width:100%;padding:12px;border-radius:var(--r);font-weight:700;font-size:14px;cursor:pointer;border:none;font-family:inherit;transition:.2s}
+.btn:active{transform:scale(.98)}
+.bp{background:var(--blue2);color:#fff}
+.bo{background:var(--white);color:var(--blue2);border:1.5px solid var(--blue2)}
+.bs{background:var(--emerald);color:#fff}
+.bd{background:var(--red);color:#fff}
+.bsm{padding:7px 14px;font-size:12px;width:auto;border-radius:20px}
+.alert{border-radius:var(--r);padding:11px 14px;font-size:13px;margin-bottom:12px}
+.aw{background:var(--amber2);color:#92400e}
+.ic{background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.ic h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.ir{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f8fafc;font-size:14px}
+.ir:last-child{border-bottom:none}
+.il{color:var(--slate3);font-size:13px}
+.spa{background:var(--emerald2);color:var(--emerald);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.spp{background:var(--amber2);color:var(--amber);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.spu{background:#f1f5f9;color:#64748b;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.spb{background:var(--red2);color:var(--red);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.atb{display:flex;background:#f1f5f9;border-radius:var(--r);padding:3px;gap:3px;overflow-x:auto;flex-shrink:0}
+.at{flex-shrink:0;padding:7px 10px;border-radius:9px;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap;transition:.2s}
+.at.active{background:var(--white);color:var(--navy);box-shadow:var(--shadow)}
+.pi{background:var(--white);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid var(--amber)}
+.ri{width:100%;border-radius:var(--r);max-height:180px;object-fit:cover;margin:10px 0;border:1px solid var(--border)}
+.es{text-align:center;padding:48px 24px;color:var(--slate3);font-size:14px}
+.avc{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0;background:#eff6ff;color:#1e40af}
+.stat-card{background:var(--white);border-radius:var(--r2);padding:18px;box-shadow:var(--shadow);text-align:center}
+.stat-val{font-size:30px;font-weight:800;line-height:1.1}
+.stat-lbl{font-size:12px;color:var(--slate3);margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="toast" id="T"></div>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+
+<!-- LOGIN -->
+<div class="screen active" id="s-login">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:linear-gradient(160deg,#0f172a,#1e3a8a)">
+    <div style="background:rgba(255,255,255,.1);border-radius:20px;padding:32px 28px;width:100%;max-width:360px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="width:64px;height:64px;background:var(--blue2);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 24px rgba(37,99,235,.4)">
+          <svg width="34" height="34" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/></svg>
+        </div>
+        <h1 style="font-family:'DM Serif Display',serif;font-size:24px;color:#fff">Admin Console</h1>
+        <p style="font-size:13px;color:rgba(255,255,255,.6);margin-top:5px">Trusted Hands · Authorized Only</p>
+      </div>
+      <div style="margin-bottom:14px"><label style="display:block;font-size:13px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:7px">Email</label><input class="inp" type="email" id="le" placeholder="admin@email.com" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff"/></div>
+      <div style="margin-bottom:18px"><label style="display:block;font-size:13px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:7px">Password</label><input class="inp" type="password" id="lp" placeholder="••••••••" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff"/></div>
+      <div id="lerr" style="display:none" class="alert aw"></div>
+      <button class="btn bp" id="lbtn" onclick="doLogin()">Access Admin Console</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="screen" id="s-admin">
+  <div style="padding:14px 16px 12px;background:var(--navy2);color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-family:'DM Serif Display',serif;font-size:18px">Trusted Hands Admin</div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:1px" id="adminEmail"></div>
+    </div>
+    <button onclick="doLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Sign Out</button>
+  </div>
+  <div style="padding:10px 12px 0;flex-shrink:0">
+    <div class="atb" id="tabs">
+      <div class="at active" onclick="aTab('overview')">📊 Overview</div>
+      <div class="at" onclick="aTab('approvals')">✅ Approvals</div>
+      <div class="at" onclick="aTab('artisans')">🔧 Artisans</div>
+      <div class="at" onclick="aTab('customers')">👥 Customers</div>
+      <div class="at" onclick="aTab('analytics')">📈 Analytics</div>
+      <div class="at" onclick="aTab('disputes')">🚨 Disputes</div>
+      <div class="at" onclick="aTab('pauses')">⏸️ Pauses</div>
+      <div class="at" onclick="aTab('support')">🆘 Support</div>
+      <div class="at" onclick="aTab('staff')">🛡️ Staff</div>
+      <div class="at" onclick="aTab('broadcast')">📢 Broadcast</div>
+      <div class="at" onclick="aTab('settings')">⚙️ Settings</div>
+    </div>
+  </div>
+  <div class="sb"><div style="padding:14px 12px 80px" id="content"></div></div>
+</div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,browserSessionPersistence,setPersistence,createUserWithEmailAndPassword}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
+const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
+// Secondary app instance — used ONLY to create staff accounts without
+// signing the main admin out of their own session (Firebase Auth quirk)
+const secondaryApp=initializeApp(FC,'staffCreator');
+const secondaryAuth=getAuth(secondaryApp);
+setPersistence(auth,browserSessionPersistence).catch(()=>{});
+const AE='olaowyegideon@gmail.com';
+function locStr(st,lg,ar){if(ar&&lg&&st)return ar+', '+lg;if(ar&&st)return ar+', '+st;return ar||lg||st||'—';}
+let CUR_TAB='overview';
+const $=id=>document.getElementById(id);
+const sn=s=>String(s||'').replace(/[<>"'&]/g,c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c])).trim();
+const ini=n=>String(n||'').split(' ').map(x=>x[0]||'').join('').substring(0,2).toUpperCase()||'?';
+
+function toast(m,d=3000){const t=$('T');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
+
+// ── DARK MODE TOGGLE ──
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  const btn=$('themeToggle');
+  if(btn)btn.textContent=theme==='dark'?'☀️':'🌙';
+}
+window.toggleTheme=function(){
+  const cur=document.documentElement.getAttribute('data-theme')||'light';
+  const next=cur==='dark'?'light':'dark';
+  applyTheme(next);
+  try{localStorage.setItem('th_admin_theme',next);}catch(e){}
+};
+try{
+  const saved=localStorage.getItem('th_admin_theme');
+  if(saved==='dark')applyTheme('dark');
+}catch(e){}
+function SS(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id)?.classList.add('active');}
+
+onAuthStateChanged(auth,async user=>{
+  if(user&&user.email.toLowerCase()===AE){
+    $('adminEmail').textContent=user.email;
+    SS('s-admin');aTab('overview');
+  } else if(user){
+    await signOut(auth);SS('s-login');
+  } else {
+    SS('s-login');
+  }
+});
+
+window.doLogin=async function(){
+  const e=$('le').value.trim().toLowerCase(),pw=$('lp').value;
+  const err=$('lerr');err.style.display='none';
+  if(e!==AE){err.textContent='Access denied — not an admin account.';err.style.display='block';return;}
+  $('lbtn').disabled=true;$('lbtn').textContent='Signing in…';
+  try{
+    await signInWithEmailAndPassword(auth,e,pw);
+    const uid=auth.currentUser.uid;
+    const snap=await getDoc(doc(db,'users',uid));
+    if(!snap.exists())await setDoc(doc(db,'users',uid),{uid,type:'admin',email:e,name:'Admin',createdAt:serverTimestamp()});
+  }catch(e2){
+    $('lbtn').disabled=false;$('lbtn').textContent='Access Admin Console';
+    err.textContent='Login failed: '+e2.message;err.style.display='block';
+  }
+};
+window.doLogout=async function(){await signOut(auth);SS('s-login');$('lbtn').disabled=false;$('lbtn').textContent='Access Admin Console';};
+
+window.aTab=function(t){
+  CUR_TAB=t;
+  const keys=['overview','approvals','artisans','customers','analytics','disputes','pauses','support','staff','broadcast','settings'];
+  $('tabs').querySelectorAll('.at').forEach((el,i)=>el.classList.toggle('active',keys[i]===t));
+  renderTab();
+};
+
+window.renderTab=async function(){
+  const b=$('content');
+  b.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner"></div></div>`;
+  try{
+    if(CUR_TAB==='overview') await renderOverview();
+    else if(CUR_TAB==='approvals') await renderApprovals();
+    else if(CUR_TAB==='artisans') await renderArtisans();
+    else if(CUR_TAB==='customers') await renderCustomers();
+    else if(CUR_TAB==='analytics') await renderAnalytics();
+    else if(CUR_TAB==='disputes') await renderDisputes();
+    else if(CUR_TAB==='pauses') await renderPauses();
+    else if(CUR_TAB==='support') await renderSupport();
+    else if(CUR_TAB==='staff') await renderStaff();
+    else if(CUR_TAB==='broadcast') await renderBroadcast();
+    else if(CUR_TAB==='settings') renderSettings();
+  }catch(e){b.innerHTML=`<div class="es">⚠️ Error: ${sn(e.message)}<br/><button class="btn bo bsm" style="margin-top:12px" onclick="renderTab()">Retry</button></div>`;}
+};
+
+async function renderOverview(){
+  const b=$('content');
+  const[uSnap,apSnap,tkSnap,bkSnap]=await Promise.all([
+    getDocs(collection(db,'users')),
+    getDocs(query(collection(db,'pendingApprovals'),where('reviewed','==',false))),
+    getDocs(query(collection(db,'supportTickets'),where('resolved','==',false))),
+    getDocs(collection(db,'bookings'))
+  ]);
+  const users=uSnap.docs.map(d=>d.data());
+  const arts=users.filter(u=>u.type==='artisan');
+  const custs=users.filter(u=>u.type==='customer');
+  const active=arts.filter(u=>u.status==='active');
+  const prem=active.filter(u=>u.tier==='premium');
+  const std=active.filter(u=>u.tier==='standard');
+  const pending=arts.filter(u=>u.status==='pending');
+  const rev=(prem.length*10000)+(std.length*5000);
+  const pendingAp=apSnap.docs.length;
+  const openTk=tkSnap.docs.length;
+  const totalBk=bkSnap.docs.length;
+  const expiringSoon=active.filter(u=>{const ex=u.expiry?.toDate?u.expiry.toDate():u.expiry?new Date(u.expiry):null;return ex&&Math.round((ex-Date.now())/86400000)<=3;});
+  const graceArtisans=active.filter(u=>u.timerStarted===false);
+  const liveArtisans=active.filter(u=>u.timerStarted===true);
+  b.innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    <div class="stat-card"><div class="stat-val" style="color:var(--blue2)">${users.length}</div><div class="stat-lbl">Total Users</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--emerald)">${active.length}</div><div class="stat-lbl">Active Artisans</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--amber)">₦${(rev/1000).toFixed(1)}k</div><div class="stat-lbl">Est. Monthly Revenue</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--navy)">${totalBk}</div><div class="stat-lbl">Total Bookings</div></div>
+  </div>
+  <div style="background:linear-gradient(135deg,#4c1d95,#7c3aed);border-radius:var(--r2);padding:18px;margin-bottom:14px;color:#fff">
+    <div style="font-weight:700;font-size:15px;margin-bottom:4px">🚀 Launch Day Control</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.8);margin-bottom:14px;line-height:1.6"><strong style="color:#fde68a">${graceArtisans.length} artisan${graceArtisans.length!==1?'s':''}</strong> in grace period (timer not started)<br/><strong style="color:#4ade80">${liveArtisans.length} artisan${liveArtisans.length!==1?'s':''}</strong> already live with active timer</div>
+    <button onclick="startAllTimers()" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:10px 18px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">⏱️ START ALL TIMERS — Launch Day Action</button>
+    <p style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;text-align:center">Only tap this on your official customer launch day. It starts all 30-day subscriptions at once.</p>
+  </div>
+  ${pendingAp>0?`<div style="background:var(--amber2);border:1.5px solid #fde68a;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('approvals')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:#92400e">🕐 ${pendingAp} Pending Approval${pendingAp!==1?'s':''}</div><div style="font-size:12px;color:#b45309;margin-top:2px">Tap to review payment receipts</div></div><span style="font-size:20px">→</span></div></div>`:''}
+  ${openTk>0?`<div style="background:var(--red2);border:1.5px solid #fca5a5;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('support')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:var(--red)">🆘 ${openTk} Open Support Ticket${openTk!==1?'s':''}</div><div style="font-size:12px;color:#b91c1c;margin-top:2px">Tap to respond</div></div><span style="font-size:20px">→</span></div></div>`:''}
+  ${expiringSoon.length>0?`<div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:var(--r2);padding:14px;margin-bottom:12px"><div style="font-weight:700;font-size:14px;color:#c2410c;margin-bottom:8px">⏰ ${expiringSoon.length} Artisan${expiringSoon.length!==1?'s':''} Expiring Soon</div>${expiringSoon.map(a=>`<div style="font-size:13px;color:#7c2d12;padding:4px 0;border-bottom:1px solid #fed7aa">${sn(a.name)} — ${sn(a.trade)}</div>`).join('')}</div>`:''}
+  <div class="ic"><h3>📊 Platform Summary</h3>
+    <div class="ir"><span class="il">Total Artisans</span><span style="font-weight:700">${arts.length}</span></div>
+    <div class="ir"><span class="il">Active (Grace Period)</span><span class="spp">${graceArtisans.length}</span></div>
+    <div class="ir"><span class="il">Active (Timer Live)</span><span class="spa">${liveArtisans.length}</span></div>
+    <div class="ir"><span class="il">Premium</span><span class="spp">${prem.length}</span></div>
+    <div class="ir"><span class="il">Standard</span><span style="font-weight:700;color:var(--blue2)">${std.length}</span></div>
+    <div class="ir"><span class="il">Pending Review</span><span class="spp">${pending.length}</span></div>
+    <div class="ir"><span class="il">Total Customers</span><span style="font-weight:700">${custs.length}</span></div>
+    <div class="ir"><span class="il" style="font-weight:700">Est. Monthly Revenue</span><span style="font-weight:800;color:var(--emerald)">₦${rev.toLocaleString()}</span></div>
+  </div>`;
+}
+
+async function renderApprovals(){
+  const b=$('content');
+  const snap=await getDocs(query(collection(db,'pendingApprovals'),where('reviewed','==',false)));
+  if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No pending approvals.</div>`;return;}
+  b.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px;font-weight:600">${snap.docs.length} pending approval${snap.docs.length!==1?'s':''}</div>`+
+  snap.docs.map(d=>{const p=d.data();return`<div class="pi">
+    <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(p.name)}</div>
+    <div style="font-size:12px;color:var(--slate3);line-height:1.9">🔧 ${sn(p.trade)} · 📍 ${sn(p.zone)}<br/>Plan: <strong style="color:var(--blue2)">${sn(p.tier)}</strong><br/>Sender: ${sn(p.senderBank)}<br/>Date: ${p.submittedAt?.toDate?p.submittedAt.toDate().toLocaleDateString():'—'}</div>
+    ${p.receiptBase64?`<img src="${p.receiptBase64}" class="ri"/>`:'<div style="background:#f1f5f9;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--slate3);margin:10px 0">🧾 No receipt image</div>'}
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn bs bsm" onclick="apArt('${p.artisanUid}','${d.id}','${p.tier}')">✓ Approve & Show Profile</button>
+      <button class="btn bd bsm" onclick="rjArt('${d.id}')">✕ Reject</button>
+    </div>
+  </div>`;}).join('');
+}
+
+async function renderArtisans(filter=''){
+  const b=$('content');
+  const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));
+  if(snap.empty){b.innerHTML=`<div class="es">No artisans yet.</div>`;return;}
+  const arts=snap.docs.map(d=>d.data());window._arts=arts;
+  const filtered=filter?arts.filter(a=>(a.name||'').toLowerCase().includes(filter)||(a.trade||'').toLowerCase().includes(filter)||(a.zone||'').toLowerCase().includes(filter)):arts;
+  b.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--slate3);margin-bottom:12px">${arts.length} artisan${arts.length!==1?'s':''}</div>
+  <div style="margin-bottom:12px"><input class="inp" type="text" id="asrch" placeholder="Search name, trade, zone…" value="${sn(filter)}" oninput="renderArtisans(this.value.toLowerCase())" style="font-size:13px"/></div>
+  <div id="artList">`+filtered.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="artDetail('${a.uid}')">
+    <div class="avc">${ini(a.name)}</div>
+    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.fullLocation||a.zone||a.lga||'—')}</div></div>
+    <span class="sp${a.status==='active'?'a':a.status==='frozen'?'b':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${a.status||'—'}</span>
+  </div>`).join('')+'</div>';
+}
+window.renderArtisans=renderArtisans;
+
+async function renderCustomers(filter=''){
+  const b=$('content');
+  const snap=await getDocs(query(collection(db,'users'),where('type','==','customer')));
+  if(snap.empty){b.innerHTML=`<div class="es">No customers yet.</div>`;return;}
+  const cs=snap.docs.map(d=>d.data());window._custs=cs;
+  const filtered=filter?cs.filter(c=>(c.name||'').toLowerCase().includes(filter)||(c.email||'').toLowerCase().includes(filter)):cs;
+  $('content').innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--slate3);margin-bottom:12px">${cs.length} customer${cs.length!==1?'s':''}</div>
+  <div style="margin-bottom:12px"><input class="inp" type="text" id="csrch" placeholder="Search name or email…" value="${sn(filter)}" oninput="renderCustomers(this.value.toLowerCase())" style="font-size:13px"/></div>
+  <div id="custList">`+filtered.map(c=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc">
+    <div class="avc" style="background:#d1fae5;color:var(--emerald)">${ini(c.name)}</div>
+    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.fullLocation||c.zone||'—')}</div></div>
+    <div style="font-size:11px;color:var(--slate3)">${c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString():'—'}</div>
+  </div>`).join('')+'</div>';
+}
+window.renderCustomers=renderCustomers;
+
+async function renderAnalytics(){
+  const b=$('content');
+  b.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner"></div></div>`;
+
+  const[uSnap,bSnap,paySnap]=await Promise.all([
+    getDocs(collection(db,'users')),
+    getDocs(collection(db,'bookings')),
+    getDocs(collection(db,'payments'))
+  ]);
+
+  const users=uSnap.docs.map(d=>d.data());
+  const arts=users.filter(u=>u.type==='artisan');
+  const custs=users.filter(u=>u.type==='customer');
+  const active=arts.filter(u=>u.status==='active');
+  const prem=active.filter(u=>u.tier==='premium');
+  const std=active.filter(u=>u.tier==='standard');
+  const grantedFree=arts.filter(u=>u.grantedByAdmin===true).length;
+  const totalRev=(prem.length*10000)+(std.length*5000);
+  const bookings=bSnap.docs.length;
+
+  // ── SIGNUP CHART (last 6 months) ──
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const now=new Date();
+  const mA=Array(12).fill(0),mC=Array(12).fill(0),mR=Array(12).fill(0);
+  arts.forEach(a=>{
+    const d=a.createdAt?.toDate?a.createdAt.toDate():null;
+    if(d&&d.getFullYear()===now.getFullYear()){
+      mA[d.getMonth()]++;
+      mR[d.getMonth()]+=(a.tier==='premium'?10000:a.tier==='standard'?5000:0);
+    }
+  });
+  custs.forEach(c=>{const d=c.createdAt?.toDate?c.createdAt.toDate():null;if(d&&d.getFullYear()===now.getFullYear())mC[d.getMonth()]++;});
+  const last6=[];for(let i=5;i>=0;i--){const m=(now.getMonth()-i+12)%12;last6.push({label:months[m],a:mA[m],c:mC[m],r:mR[m]});}
+  const maxB=Math.max(...last6.map(m=>m.a+m.c),1);
+  const bars=last6.map(m=>{
+    const aH=Math.round((m.a/maxB)*110);const cH=Math.round((m.c/maxB)*110);
+    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div style="font-size:9px;color:var(--slate3)">${m.a+m.c||''}</div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:1px">
+        <div style="height:${aH}px;background:var(--blue2);border-radius:3px 3px 0 0;min-height:${m.a?3:0}px"></div>
+        <div style="height:${cH}px;background:#34d399;border-radius:0 0 3px 3px;min-height:${m.c?3:0}px"></div>
+      </div>
+      <div style="font-size:9px;color:var(--slate3)">${m.label}</div>
+    </div>`;
+  }).join('');
+
+  // Revenue bars per month
+  const maxR=Math.max(...last6.map(m=>m.r),1);
+  const revBars=last6.map(m=>{
+    const h=Math.round((m.r/maxR)*80);
+    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div style="font-size:9px;color:var(--amber);font-weight:600">${m.r?'₦'+(m.r/1000).toFixed(0)+'k':''}</div>
+      <div style="width:100%;height:${h}px;background:var(--amber);border-radius:3px 3px 0 0;min-height:${m.r?3:0}px"></div>
+      <div style="font-size:9px;color:var(--slate3)">${m.label}</div>
+    </div>`;
+  }).join('');
+
+  // ── TRADE BREAKDOWN ──
+  const tC={};arts.forEach(a=>{if(a.trade)tC[a.trade]=(tC[a.trade]||0)+1;});
+  const tRev={};active.forEach(a=>{if(a.trade)tRev[a.trade]=(tRev[a.trade]||0)+(a.tier==='premium'?10000:5000);});
+  const tS=Object.entries(tC).sort((a,bx)=>bx[1]-a[1]);
+  const maxT=Math.max(...tS.map(t=>t[1]),1);
+  const tRows=tS.map(([tr,ct])=>{
+    const r=tRev[tr]||0;
+    return`<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+        <span style="font-weight:600">${tr}</span>
+        <div style="text-align:right"><span style="color:var(--slate3)">${ct} artisan${ct!==1?'s':''}</span>${r?` · <span style="color:var(--emerald);font-weight:700">₦${r.toLocaleString()}</span>`:''}
+        </div>
+      </div>
+      <div style="height:9px;background:#f1f5f9;border-radius:20px;overflow:hidden">
+        <div style="height:100%;width:${Math.round((ct/maxT)*100)}%;background:var(--blue2);border-radius:20px"></div>
+      </div>
+    </div>`;
+  }).join('')||'<div style="font-size:13px;color:var(--slate3)">No artisans yet.</div>';
+
+  // ── GEOGRAPHIC REVENUE BREAKDOWN ──
+  // By State
+  const stateData={};
+  active.forEach(a=>{
+    const st=a.state||'Unknown';
+    if(!stateData[st])stateData[st]={artisans:0,premium:0,standard:0,revenue:0,lgas:{}};
+    stateData[st].artisans++;
+    if(a.tier==='premium'){stateData[st].premium++;stateData[st].revenue+=10000;}
+    else if(a.tier==='standard'){stateData[st].standard++;stateData[st].revenue+=5000;}
+    // By LGA
+    const lg=a.lga||'Unknown LGA';
+    if(!stateData[st].lgas[lg])stateData[st].lgas[lg]={artisans:0,premium:0,standard:0,revenue:0,areas:{}};
+    stateData[st].lgas[lg].artisans++;
+    if(a.tier==='premium'){stateData[st].lgas[lg].premium++;stateData[st].lgas[lg].revenue+=10000;}
+    else if(a.tier==='standard'){stateData[st].lgas[lg].standard++;stateData[st].lgas[lg].revenue+=5000;}
+    // By Area/Zone
+    const ar=a.zone||'Unknown Area';
+    if(!stateData[st].lgas[lg].areas[ar])stateData[st].lgas[lg].areas[ar]={artisans:0,premium:0,standard:0,revenue:0};
+    stateData[st].lgas[lg].areas[ar].artisans++;
+    if(a.tier==='premium'){stateData[st].lgas[lg].areas[ar].premium++;stateData[st].lgas[lg].areas[ar].revenue+=10000;}
+    else if(a.tier==='standard'){stateData[st].lgas[lg].areas[ar].standard++;stateData[st].lgas[lg].areas[ar].revenue+=5000;}
+  });
+
+  const maxStateRev=Math.max(...Object.values(stateData).map(s=>s.revenue),1);
+
+  const geoHTML=Object.entries(stateData).sort((a,bx)=>bx[1].revenue-a[1].revenue).map(([st,sd])=>{
+    const stPct=Math.round((sd.revenue/totalRev)*100)||0;
+    const barW=Math.round((sd.revenue/maxStateRev)*100);
+
+    // LGA rows
+    const lgaHTML=Object.entries(sd.lgas).sort((a,bx)=>bx[1].revenue-a[1].revenue).map(([lg,ld])=>{
+      const lgPct=sd.revenue?Math.round((ld.revenue/sd.revenue)*100):0;
+
+      // Area rows
+      const areaHTML=Object.entries(ld.areas).sort((a,bx)=>bx[1].revenue-a[1].revenue).map(([ar,ad])=>{
+        return`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0 5px 12px;border-bottom:1px solid #f8fafc">
+          <div style="font-size:12px;color:#475569">📍 ${ar}</div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:12px;font-weight:700;color:var(--emerald)">${ad.revenue?'₦'+ad.revenue.toLocaleString():'₦0'}</div>
+            <div style="font-size:10px;color:var(--slate3)">${ad.artisans} artisan${ad.artisans!==1?'s':''}${ad.premium?` · ${ad.premium}⭐`:''}${ad.standard?` · ${ad.standard} std`:''}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+      return`<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;cursor:pointer">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--navy)">${lg}</div>
+            <div style="font-size:11px;color:var(--slate3);margin-top:1px">${ld.artisans} artisan${ld.artisans!==1?'s':''} · ${lgPct}% of state revenue</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:14px;font-weight:800;color:var(--emerald)">${ld.revenue?'₦'+ld.revenue.toLocaleString():'₦0'}</div>
+            <div style="font-size:10px;color:var(--slate3)">${ld.premium?ld.premium+'⭐ ':''} ${ld.standard?ld.standard+' std':''}</div>
+          </div>
+        </div>
+        <div style="display:none">${areaHTML||'<div style="padding:10px 12px;font-size:12px;color:var(--slate3)">No area data</div>'}</div>
+      </div>`;
+    }).join('');
+
+    return`<div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--navy)">🗺️ ${st}</div>
+          <div style="font-size:12px;color:var(--slate3);margin-top:2px">${sd.artisans} active artisans · ${stPct}% of total revenue</div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            ${sd.premium?`<span style="background:var(--amber2);color:var(--amber);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">⭐ ${sd.premium} Premium</span>`:''}
+            ${sd.standard?`<span style="background:var(--blue3);color:var(--blue2);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${sd.standard} Standard</span>`:''}
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px">
+          <div style="font-size:20px;font-weight:800;color:var(--emerald)">₦${sd.revenue.toLocaleString()}</div>
+          <div style="font-size:11px;color:var(--slate3)">/month</div>
+        </div>
+      </div>
+      <div style="height:10px;background:#f1f5f9;border-radius:20px;overflow:hidden;margin-bottom:14px">
+        <div style="height:100%;width:${barW}%;background:linear-gradient(90deg,var(--emerald),#34d399);border-radius:20px;transition:.4s"></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--slate3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">LGA / City Breakdown (tap to expand areas)</div>
+      ${lgaHTML||'<div style="font-size:12px;color:var(--slate3)">No LGA data yet</div>'}
+    </div>`;
+  }).join('')||`<div class="es">No active artisans with location data yet.</div>`;
+
+  // ── AREA LEADERBOARD (top 10 earning areas across all states) ──
+  const allAreas={};
+  active.forEach(a=>{
+    const key=(a.zone||'Unknown')+(a.lga?', '+a.lga:'')+(a.state?', '+a.state:'');
+    if(!allAreas[key])allAreas[key]={name:a.zone||'Unknown',lga:a.lga||'',state:a.state||'',artisans:0,revenue:0,premium:0};
+    allAreas[key].artisans++;allAreas[key].revenue+=(a.tier==='premium'?10000:5000);
+    if(a.tier==='premium')allAreas[key].premium++;
+  });
+  const topAreas=Object.values(allAreas).sort((a,bx)=>bx.revenue-a.revenue).slice(0,10);
+  const maxAreaRev=Math.max(...topAreas.map(a=>a.revenue),1);
+  const areaLeaderboard=topAreas.map((a,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc">
+    <div style="width:22px;height:22px;border-radius:50%;background:${i===0?'var(--amber)':i===1?'#94a3b8':i===2?'#b45309':'var(--blue3)'};color:${i<3?'#fff':'var(--blue2)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">${i+1}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:700;color:var(--navy)">${a.name}</div>
+      <div style="font-size:11px;color:var(--slate3)">${a.lga}${a.state?', '+a.state:''}</div>
+      <div style="height:5px;background:#f1f5f9;border-radius:20px;overflow:hidden;margin-top:4px"><div style="height:100%;width:${Math.round((a.revenue/maxAreaRev)*100)}%;background:var(--emerald);border-radius:20px"></div></div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-size:13px;font-weight:800;color:var(--emerald)">₦${a.revenue.toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--slate3)">${a.artisans} artisan${a.artisans!==1?'s':''}${a.premium?' · '+a.premium+'⭐':''}</div>
+    </div>
+  </div>`).join('')||'<div style="font-size:13px;color:var(--slate3)">No data yet.</div>';
+
+  b.innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+    <div class="stat-card"><div class="stat-val" style="color:var(--blue2)">${arts.length}</div><div class="stat-lbl">Total Artisans</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--emerald)">${custs.length}</div><div class="stat-lbl">Customers</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--amber)">₦${(totalRev/1000).toFixed(1)}k</div><div class="stat-lbl">Monthly Revenue</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--navy)">${bookings}</div><div class="stat-lbl">Bookings</div></div>
+  </div>
+
+  <div class="ic"><h3>📈 Signups — Last 6 Months</h3>
+    <div style="display:flex;align-items:flex-end;gap:6px;height:140px;margin-bottom:10px">${bars}</div>
+    <div style="display:flex;gap:14px;font-size:12px">
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:var(--blue2);border-radius:2px"></div><span style="color:var(--slate3)">Artisans (${arts.length})</span></div>
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:#34d399;border-radius:2px"></div><span style="color:var(--slate3)">Customers (${custs.length})</span></div>
+    </div>
+  </div>
+
+  <div class="ic"><h3>💰 Monthly Revenue Trend</h3>
+    <div style="display:flex;align-items:flex-end;gap:6px;height:100px;margin-bottom:8px">${revBars}</div>
+    <div style="font-size:11px;color:var(--slate3)">Revenue generated from subscriptions each month this year</div>
+  </div>
+
+  <div class="ic"><h3>💰 Revenue Breakdown</h3>
+    <div class="ir"><span class="il">Premium ×${prem.length}</span><span style="font-weight:700;color:var(--amber)">₦${(prem.length*10000).toLocaleString()}</span></div>
+    <div class="ir"><span class="il">Standard ×${std.length}</span><span style="font-weight:700;color:var(--blue2)">₦${(std.length*5000).toLocaleString()}</span></div>
+    <div class="ir"><span class="il">Free Grants</span><span style="font-weight:700;color:var(--slate3)">${grantedFree} artisan${grantedFree!==1?'s':''} (₦0)</span></div>
+    <div class="ir"><span class="il" style="font-weight:700">Monthly Total</span><span style="font-weight:800;font-size:16px;color:var(--emerald)">₦${totalRev.toLocaleString()}</span></div>
+    ${totalRev>0?`<div style="margin-top:12px;height:18px;border-radius:20px;overflow:hidden;background:#f1f5f9;display:flex">
+      <div style="width:${Math.round(prem.length*10000/totalRev*100)}%;background:var(--amber);height:100%"></div>
+      <div style="width:${Math.round(std.length*5000/totalRev*100)}%;background:var(--blue2);height:100%"></div>
+    </div><div style="display:flex;gap:12px;font-size:11px;color:var(--slate3);margin-top:5px"><span>🟡 Premium</span><span>🔵 Standard</span></div>`:''}
+  </div>
+
+  <div class="ic"><h3>🏆 Top 10 Earning Areas</h3>
+    <p style="font-size:12px;color:var(--slate3);margin-bottom:10px">Areas ranked by total monthly subscription revenue</p>
+    ${areaLeaderboard}
+  </div>
+
+  <div style="margin-bottom:14px">
+    <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px">💵 Revenue by State → LGA → Area</div>
+    <p style="font-size:12px;color:var(--slate3);margin-bottom:12px">Tap any LGA to see individual area breakdown</p>
+    ${geoHTML}
+  </div>
+
+  <div class="ic"><h3>🔧 Artisans by Trade</h3>${tRows}</div>`;
+}
+
+
+async function renderSupport(){
+  const b=$('content');
+  const snap=await getDocs(query(collection(db,'supportTickets'),limit(100)));
+  if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">🎉</div>No support tickets.</div>`;return;}
+  const docs=snap.docs.sort((a,bx)=>{const at=a.data().createdAt?.toDate?a.data().createdAt.toDate():new Date(0);const bt=bx.data().createdAt?.toDate?bx.data().createdAt.toDate():new Date(0);return bt-at;});
+  const open=docs.filter(d=>!d.data().resolved).length;
+  b.innerHTML=`<div style="display:flex;gap:10px;margin-bottom:14px"><div style="background:var(--red2);color:var(--red);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700">${open} Open</div><div style="background:var(--emerald2);color:var(--emerald);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700">${docs.length-open} Resolved</div></div>`+
+  docs.map(d=>{const tk=d.data();const dt=tk.createdAt?.toDate?tk.createdAt.toDate().toLocaleDateString():'—';
+    return`<div style="background:var(--white);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid ${tk.resolved?'var(--emerald)':'var(--red)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div><div style="font-weight:700;font-size:14px">${sn(tk.userName||'Unknown')}</div><div style="font-size:12px;color:var(--slate3)">${sn(tk.userEmail||'—')} · ${dt}</div></div>
+        <span class="sp${tk.resolved?'a':'p'}" style="font-size:11px">${tk.resolved?'Resolved':'Open'}</span>
+      </div>
+      <div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap">${sn(tk.message)}</div>
+      ${!tk.resolved?`<textarea class="inp" id="rep_${d.id}" placeholder="Type reply to send to this user…" style="min-height:60px;font-size:13px;margin-bottom:8px"></textarea><div style="display:flex;gap:8px"><button class="btn bs bsm" onclick="rsTk('${d.id}')">✓ Resolve</button><button class="btn bp bsm" onclick="rpTk('${d.id}','${sn(tk.userId||'')}','${sn(tk.userName||'')}')">📩 Send Reply</button></div>`:'<div style="font-size:12px;color:var(--emerald);font-weight:600">✓ Resolved</div>'}
+    </div>`;
+  }).join('');
+}
+
+async function renderBroadcast(){
+  let curAll='',curArt='',curCust='';
+  try{
+    const[bAll,bArt,bCust]=await Promise.all([
+      getDoc(doc(db,'config','broadcast')),
+      getDoc(doc(db,'config','broadcast_artisan')),
+      getDoc(doc(db,'config','broadcast_customer'))
+    ]);
+    if(bAll.exists())curAll=bAll.data().text||'';
+    if(bArt.exists())curArt=bArt.data().text||'';
+    if(bCust.exists())curCust=bCust.data().text||'';
+  }catch(e){}
+  $('content').innerHTML=`
+  <div class="ic">
+    <h3>📢 Broadcast Messages</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:18px;line-height:1.6">Send targeted announcements to specific groups. Appears as scrolling banner only to the selected audience.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+      <div id="aud_all" onclick="selectAud('all')" style="border:2px solid var(--blue2);background:var(--blue3);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:.2s">
+        <div style="font-size:22px;margin-bottom:6px">🌍</div>
+        <div style="font-weight:700;font-size:13px;color:var(--blue2)">Everyone</div>
+        <div style="font-size:11px;color:var(--slate3);margin-top:2px">All users see it</div>
+      </div>
+      <div id="aud_artisan" onclick="selectAud('artisan')" style="border:2px solid var(--border);background:var(--white);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:.2s">
+        <div style="font-size:22px;margin-bottom:6px">🔧</div>
+        <div style="font-weight:700;font-size:13px;color:var(--navy)">Artisans Only</div>
+        <div style="font-size:11px;color:var(--slate3);margin-top:2px">Only artisans see it</div>
+      </div>
+      <div id="aud_customer" onclick="selectAud('customer')" style="border:2px solid var(--border);background:var(--white);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:.2s">
+        <div style="font-size:22px;margin-bottom:6px">👤</div>
+        <div style="font-weight:700;font-size:13px;color:var(--navy)">Customers Only</div>
+        <div style="font-size:11px;color:var(--slate3);margin-top:2px">Only customers see it</div>
+      </div>
+    </div>
+    <textarea class="inp" id="bctxt" placeholder="Type your announcement here…" style="min-height:90px;margin-bottom:8px"></textarea>
+    <div style="font-size:11px;color:var(--slate3);margin-bottom:14px">Will appear as a scrolling banner only to the selected audience.</div>
+    <div style="display:flex;gap:8px;margin-bottom:24px">
+      <button class="btn bp" style="flex:2" onclick="sdBC()">📢 Send to Selected Audience</button>
+      <button class="btn bo" style="flex:1" onclick="clBC()">✕ Clear Selected</button>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--slate3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Currently Active</div>
+    <div style="background:#f8fafc;border-radius:var(--r);padding:12px;margin-bottom:8px;border-left:3px solid var(--blue2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:12px;font-weight:700;color:var(--blue2)">🌍 Everyone</div>
+        ${curAll?`<button onclick="clBCTarget('broadcast')" style="background:var(--red2);color:var(--red);border:none;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Clear</button>`:''}
+      </div>
+      <div style="font-size:13px;color:${curAll?'var(--navy)':'var(--slate3)'};">${sn(curAll)||'No active message'}</div>
+    </div>
+    <div style="background:#f8fafc;border-radius:var(--r);padding:12px;margin-bottom:8px;border-left:3px solid var(--amber)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:12px;font-weight:700;color:var(--amber)">🔧 Artisans Only</div>
+        ${curArt?`<button onclick="clBCTarget('broadcast_artisan')" style="background:var(--red2);color:var(--red);border:none;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Clear</button>`:''}
+      </div>
+      <div style="font-size:13px;color:${curArt?'var(--navy)':'var(--slate3)'};">${sn(curArt)||'No active message'}</div>
+    </div>
+    <div style="background:#f8fafc;border-radius:var(--r);padding:12px;border-left:3px solid var(--emerald)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:12px;font-weight:700;color:var(--emerald)">👤 Customers Only</div>
+        ${curCust?`<button onclick="clBCTarget('broadcast_customer')" style="background:var(--red2);color:var(--red);border:none;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Clear</button>`:''}
+      </div>
+      <div style="font-size:13px;color:${curCust?'var(--navy)':'var(--slate3)'};">${sn(curCust)||'No active message'}</div>
+    </div>
+  </div>`;
+  window._bcAud='all';
+}
+
+window._bcAud='all';
+window.selectAud=function(aud){
+  window._bcAud=aud;
+  const cols={all:'var(--blue2)',artisan:'var(--amber)',customer:'var(--emerald)'};
+  const bgs={all:'var(--blue3)',artisan:'var(--amber2)',customer:'var(--emerald2)'};
+  ['all','artisan','customer'].forEach(a=>{
+    const el=document.getElementById('aud_'+a);if(!el)return;
+    if(a===aud){el.style.borderColor=cols[a];el.style.background=bgs[a];}
+    else{el.style.borderColor='var(--border)';el.style.background='var(--white)';}
+  });
+};
+
+async function renderStaff(){
+  const b=$('content');
+  const snap=await getDocs(collection(db,'staffAccounts'));
+  const staff=snap.docs.map(d=>({uid:d.id,...d.data()}));
+  staff.sort((a,bx)=>{
+    const at=a.createdAt?.toDate?a.createdAt.toDate():new Date(0);
+    const bt=bx.createdAt?.toDate?bx.createdAt.toDate():new Date(0);
+    return bt-at;
+  });
+  const activeCount=staff.filter(s=>s.active).length;
+
+  b.innerHTML=`
+  <div class="ic">
+    <h3>🛡️ Staff Management</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:16px;line-height:1.6">
+      Create accounts for your team. Staff can view and manage approvals, artisans, customers, analytics, disputes, pauses and support — but cannot access Broadcast, Settings, or grant free plans. Only you have full control.
+    </p>
+    <button class="btn bp" onclick="showCreateStaffModal()">➕ Create New Staff Account</button>
+  </div>
+
+  <div class="ic">
+    <h3>👥 Staff Accounts (${staff.length} total · ${activeCount} active)</h3>
+    ${staff.length===0?'<p style="font-size:13px;color:var(--slate3)">No staff accounts created yet.</p>':staff.map(s=>{
+      const lastLogin=s.lastLogin?.toDate?s.lastLogin.toDate().toLocaleString():'Never logged in';
+      const created=s.createdAt?.toDate?s.createdAt.toDate().toLocaleDateString():'—';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f8fafc">
+        <div>
+          <div style="font-weight:700;font-size:14px;color:var(--navy)">${sn(s.name||'Unnamed')}</div>
+          <div style="font-size:12px;color:var(--slate3)">${sn(s.email)}</div>
+          <div style="font-size:11px;color:var(--slate3);margin-top:2px">Created: ${created} · Last login: ${lastLogin}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <span class="sp${s.active?'a':'b'}" style="font-size:11px">${s.active?'Active':'Deactivated'}</span>
+          <button class="btn ${s.active?'bd':'bs'} bsm" onclick="${s.active?'deactivateStaff':'reactivateStaff'}('${s.uid}','${sn(s.name||s.email).replace(/'/g,"\\'")}')">${s.active?'🔒 Deactivate':'✅ Reactivate'}</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div class="ic"><h3>🔗 Staff Console Link</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:10px">Share this link with your staff for them to log in:</p>
+    <div style="background:#f8fafc;border-radius:var(--r);padding:12px;font-weight:700;font-size:13px;color:var(--blue2);word-break:break-all;margin-bottom:10px">https://trust-hand.vercel.app/staff.html</div>
+    <button class="btn bo bsm" onclick="navigator.clipboard?.writeText('https://trust-hand.vercel.app/staff.html').then(()=>toast('Link copied!'))">📋 Copy Staff Link</button>
+  </div>`;
+}
+
+window.showCreateStaffModal=function(){
+  document.getElementById('staffModal')?.remove();
+  const el=document.createElement('div');el.id='staffModal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div>
+    <h3 style="font-weight:700;font-size:17px;color:var(--navy);margin-bottom:6px">➕ Create Staff Account</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:16px;line-height:1.6">This staff member will get their own login for the Staff Console with restricted permissions.</p>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">Full Name *</label>
+      <input class="inp" id="staffName" type="text" placeholder="e.g. John Okafor" style="font-size:13px" maxlength="80"/>
+    </div>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">Email Address *</label>
+      <input class="inp" id="staffEmail" type="email" placeholder="staff@example.com" style="font-size:13px" maxlength="200"/>
+    </div>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">Temporary Password *</label>
+      <input class="inp" id="staffPass" type="text" placeholder="Min. 6 characters — share with staff securely" style="font-size:13px" maxlength="128"/>
+      <div style="font-size:11px;color:var(--slate3);margin-top:4px">Tell your staff to change this after first login (use Forgot Password on staff console... actually staff console has no password reset yet, so choose something they'll remember).</div>
+    </div>
+    <div id="staffErr" style="display:none;margin-bottom:10px" class="alert aw"></div>
+    <button class="btn bp" id="staffCreateBtn" onclick="createStaffAccount()">Create Staff Account</button>
+    <button class="btn bo" style="margin-top:8px" onclick="document.getElementById('staffModal').remove()">Cancel</button>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+};
+
+window.createStaffAccount=async function(){
+  const err=$('staffErr');err.style.display='none';
+  const name=sn($('staffName')?.value?.trim()||'');
+  const email=sn($('staffEmail')?.value?.trim()?.toLowerCase()||'');
+  const pass=$('staffPass')?.value||'';
+  // Validation
+  if(name.length<2){err.textContent="Please enter the staff member's full name.";err.style.display='block';return;}
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){err.textContent='Enter a valid email address.';err.style.display='block';return;}
+  if(email===AE){err.textContent='This email is reserved for the main administrator.';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+  const btn=$('staffCreateBtn');btn.disabled=true;btn.textContent='Creating…';
+  try{
+    // Use the SECONDARY auth instance so creating this account does not
+    // sign the main admin out of their current session
+    const cred=await createUserWithEmailAndPassword(secondaryAuth,email,pass);
+    const uid=cred.user.uid;
+    await setDoc(doc(db,'staffAccounts',uid),{
+      uid,name,email,active:true,
+      createdAt:serverTimestamp(),createdBy:AE,lastLogin:null
+    });
+    // Sign the secondary instance out immediately — it was only needed to create the account
+    await signOut(secondaryAuth);
+    document.getElementById('staffModal')?.remove();
+    toast('✅ Staff account created for '+name+'!');
+    renderStaff();
+  }catch(e){
+    btn.disabled=false;btn.textContent='Create Staff Account';
+    err.textContent=e.code==='auth/email-already-in-use'?'This email is already registered.':'Error: '+e.message;
+    err.style.display='block';
+  }
+};
+
+window.deactivateStaff=async function(uid,name){
+  if(!confirm('Deactivate '+name+"'s staff access? They will be signed out and unable to log in again until reactivated."))return;
+  await updateDoc(doc(db,'staffAccounts',uid),{active:false,deactivatedAt:serverTimestamp()});
+  toast(name+' has been deactivated.');renderStaff();
+};
+window.reactivateStaff=async function(uid,name){
+  await updateDoc(doc(db,'staffAccounts',uid),{active:true,deactivatedAt:null});
+  toast(name+' has been reactivated.');renderStaff();
+};
+
+function renderSettings(){
+  $('content').innerHTML=`<div class="ic"><h3>⚙️ Platform Settings</h3>
+    <div class="ir"><span class="il">Admin Email</span><span style="font-size:13px">${AE}</span></div>
+    <div class="ir"><span class="il">Payment Bank</span><span>Opay</span></div>
+    <div class="ir"><span class="il">Account Number</span><span style="font-weight:700;letter-spacing:2px">9071268570</span></div>
+    <div class="ir"><span class="il">Account Name</span><span>Olawoye Gideon Ayomide</span></div>
+    <div class="ir"><span class="il">Standard Plan</span><span style="font-weight:700;color:var(--blue2)">₦5,000 / 30 days</span></div>
+    <div class="ir"><span class="il">Premium Plan</span><span style="font-weight:700;color:var(--amber)">₦10,000 / 30 days</span></div>
+    <div class="ir"><span class="il">Launch Date</span><span style="font-weight:700;color:var(--emerald)">June 29, 2026</span></div>
+    <div class="ir"><span class="il">Coverage</span><span style="font-size:12px">2 states · 33 LGAs · 147 areas</span></div>
+    <div class="ir"><span class="il">Trade Categories</span><span style="font-size:12px">21 trades</span></div>
+  </div>
+  <div class="ic"><h3>📧 EmailJS Setup</h3>
+    <p style="font-size:13px;color:var(--slate3);line-height:1.8;margin-bottom:12px">To enable real email alerts to unsubscribed artisans:</p>
+    <div style="background:#f8fafc;border-radius:var(--r);padding:12px;border-left:3px solid var(--blue2);margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px">1. Create account at emailjs.com (free)</div><div style="font-size:12px;color:var(--slate3)">Connect Gmail → Create template with: to_name, to_email, trade, missed_count, subscribe_link</div></div>
+    <div style="background:#f8fafc;border-radius:var(--r);padding:12px;border-left:3px solid var(--emerald);margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px">2. Copy your 3 keys from EmailJS dashboard</div><div style="font-size:12px;color:var(--slate3)">Public Key · Service ID · Template ID</div></div>
+    <div style="background:#f8fafc;border-radius:var(--r);padding:12px;border-left:3px solid var(--amber)"><div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px">3. Replace in index.html</div><div style="font-size:12px;color:var(--slate3)">Search for YOUR_EMAILJS_PUBLIC_KEY, YOUR_SERVICE_ID, YOUR_TEMPLATE_ID and replace each with your real values</div></div>
+    <div style="background:var(--emerald2);border-radius:var(--r);padding:8px 12px;margin-top:10px;font-size:12px;color:var(--emerald);font-weight:600">✅ Free: 200 emails/month. Artisan emailed on 1st view, then every 5th view.</div>
+  </div>
+  <div class="ic"><h3>🔐 Firestore Security Rules</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:10px">Paste these into Firebase Console → Firestore → Rules tab:</p>
+    <div style="background:#0f172a;border-radius:var(--r);padding:12px;font-family:monospace;font-size:10px;color:#e2e8f0;line-height:1.8;overflow-x:auto" id="fbRules">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth.uid == userId;
+      // Artisans/customers can only update their own profile fields —
+      // never admin-controlled fields like status, tier, idVerified, etc.
+      allow update: if request.auth.uid == userId
+        && !request.resource.data.diff(resource.data)
+           .affectedKeys().hasAny(['type','status','tier',
+           'expiry','timerStarted','graceEnd','idVerified',
+           'idDocument','missedViews','avgResponseMin',
+           'responseCount','pauseDaysUsed','pauseUsed',
+           'grantedByAdmin','grantReason','daily_booked',
+           'rating','reviews']);
+      // Admin (matched by email) can update any field
+      allow update: if request.auth != null
+        && request.auth.token.email == 'olaowyegideon@gmail.com';
+    }
+    match /chats/{roomId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid in resource.data.participants;
+      match /messages/{msgId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+    match /bookings/{id} {
+      allow create: if request.auth != null;
+      allow read, update: if request.auth != null;
+    }
+    match /reviews/{id} {
+      // Only the signed-in reviewer can create their own review
+      allow create: if request.auth != null
+        && request.resource.data.reviewerUid == request.auth.uid;
+      allow read: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && request.auth.token.email == 'olaowyegideon@gmail.com';
+    }
+    match /completedJobs/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.artisanUid == request.auth.uid;
+      allow read: if request.auth != null;
+    }
+    match /disputes/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.reporterUid == request.auth.uid;
+      allow read, update: if request.auth != null;
+    }
+    match /payments/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.artisanUid == request.auth.uid;
+      allow read: if request.auth != null;
+    }
+    match /config/broadcast {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.token.email == 'olaowyegideon@gmail.com';
+    }
+    match /config/broadcast_artisan {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.token.email == 'olaowyegideon@gmail.com';
+    }
+    match /config/broadcast_customer {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.token.email == 'olaowyegideon@gmail.com';
+    }
+    match /staffAccounts/{staffUid} {
+      // Staff can read their OWN account (to verify they're active) and update their own lastLogin.
+      // Only the main admin can create, deactivate, or modify permissions.
+      allow read: if request.auth != null
+        && (request.auth.uid == staffUid
+            || request.auth.token.email == 'olaowyegideon@gmail.com');
+      allow update: if request.auth != null
+        && request.auth.uid == staffUid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin']);
+      allow create, delete: if request.auth != null
+        && request.auth.token.email == 'olaowyegideon@gmail.com';
+      allow update: if request.auth != null
+        && request.auth.token.email == 'olaowyegideon@gmail.com';
+    }
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</div>
+    <button class="btn bo bsm" style="margin-top:8px" onclick="navigator.clipboard?.writeText(document.getElementById('fbRules').textContent).then(()=>toast('Rules copied! Paste in Firebase Console.'))">📋 Copy Rules</button>
+    <div style="background:var(--red2);color:var(--red);border-radius:var(--r);padding:10px 12px;margin-top:10px;font-size:12px;font-weight:600">⚠️ Important: paste these into Firebase Console → Firestore → Rules → Publish. Without this, the app-level protection alone is not enough against a determined attacker.</div>
+  </div>
+  <div class="ic"><h3>🔗 Quick Links</h3>
+    <div class="ir"><span class="il">Customer App</span><a href="https://trust-hand.vercel.app" target="_blank" style="color:var(--blue2);font-weight:600;font-size:13px">trust-hand.vercel.app</a></div>
+    <div class="ir"><span class="il">Firebase Console</span><a href="https://console.firebase.google.com/project/trust-hands-5c299" target="_blank" style="color:var(--blue2);font-weight:600;font-size:13px">Open Console →</a></div>
+    <div class="ir"><span class="il">EmailJS Dashboard</span><a href="https://dashboard.emailjs.com" target="_blank" style="color:var(--blue2);font-weight:600;font-size:13px">dashboard.emailjs.com</a></div>
+    <div class="ir"><span class="il">Vercel Dashboard</span><a href="https://vercel.com/dashboard" target="_blank" style="color:var(--blue2);font-weight:600;font-size:13px">vercel.com/dashboard</a></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn bo bsm" onclick="navigator.clipboard?.writeText('9071268570').then(()=>toast('Copied!'))">📋 Copy Account Number</button>
+    <button class="btn bo bsm" onclick="navigator.clipboard?.writeText('https://trust-hand.vercel.app').then(()=>toast('Copied!'))">📋 Copy App Link</button>
+  </div>
+  <button class="btn bd" style="margin-top:10px" onclick="doLogout()">Exit Admin Console</button>`;
+}
+
+window.artDetail=async function(uid){
+  const snap=await getDoc(doc(db,'users',uid));if(!snap.exists())return;const a=snap.data();
+  const ex=a.expiry?.toDate?a.expiry.toDate():a.expiry?new Date(a.expiry):null;
+  const dl=ex?Math.max(0,Math.round((ex-Date.now())/86400000)):0;
+  $('content').innerHTML=`<button class="btn bo bsm" style="margin-bottom:14px" onclick="aTab('artisans')">← Back to Artisans</button>
+  <div class="ic"><h3>${sn(a.name)}</h3>
+    <div class="ir"><span class="il">Email</span><span style="font-size:13px">${sn(a.email)}</span></div>
+    <div class="ir"><span class="il">Phone</span><span>${sn(a.phone||'—')}</span></div>
+    <div class="ir"><span class="il">Trade</span><span>${sn(a.trade||'—')}</span></div>
+    <div class="ir"><span class="il">State</span><span>${sn(a.state||'—')}</span></div>
+    <div class="ir"><span class="il">LGA / City</span><span>${sn(a.lga||'—')}</span></div>
+    <div class="ir"><span class="il">Area / Zone</span><span>📍 ${sn(a.zone||'—')}</span></div>
+    <div class="ir"><span class="il">Status</span><span class="sp${a.status==='active'?'a':a.status==='frozen'?'b':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}">${a.status||'—'}</span></div>
+    <div class="ir"><span class="il">Tier</span><span style="font-weight:700;text-transform:capitalize;color:${a.tier==='premium'?'var(--amber)':'var(--blue2)'}">${a.tier||'None'}</span></div>
+    <div class="ir"><span class="il">Rating</span><span>${a.rating?a.rating.toFixed(1)+' ⭐ ('+a.reviews+' reviews)':'No reviews yet'}</span></div>
+    <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${a.status==='active'?dl+' days':'—'}</span></div>
+    <div class="ir"><span class="il">Booked Today</span><span>${a.daily_booked?'🔴 Yes':'🟢 No'}</span></div>
+    <div class="ir"><span class="il">Missed Views</span><span style="font-weight:700;color:${(a.missedViews||0)>0?'var(--red)':'var(--slate3)'}">${a.missedViews||0} customer${(a.missedViews||0)!==1?'s':''} turned away</span></div>
+    <div class="ir"><span class="il">Contract Signed</span><span style="font-size:12px">${a.contract_signed_date?.toDate?a.contract_signed_date.toDate().toLocaleDateString():'—'}</span></div>
+    <div class="ir"><span class="il">Joined</span><span style="font-size:12px">${a.createdAt?.toDate?a.createdAt.toDate().toLocaleDateString():'—'}</span></div>
+    <div class="ir"><span class="il">ID Verified</span><span class="sp${a.idVerified?'a':'p'}">${a.idVerified?'🪪 Verified':'Pending Review'}</span></div>
+    <div class="ir"><span class="il">Avg Response Time</span><span style="font-weight:700;color:${a.avgResponseMin!==undefined&&a.avgResponseMin<=60?'var(--emerald)':'var(--slate3)'}">${a.avgResponseMin!==undefined?a.avgResponseMin+' min':'No data yet'}</span></div>
+  </div>
+  ${a.idDocument?`<div class="ic"><h3>🪪 ID Document Review</h3>
+    <img src="${a.idDocument}" style="width:100%;border-radius:var(--r);max-height:220px;object-fit:cover;margin-bottom:12px;border:1px solid var(--border)"/>
+    ${a.idVerified?`<div style="background:var(--emerald2);color:var(--emerald);padding:10px;border-radius:var(--r);font-size:13px;font-weight:600;text-align:center">✅ ID Verified — Trust badge active on profile</div><button class="btn bo bsm" style="margin-top:8px" onclick="revokeIdVerification('${uid}')">Revoke Verification</button>`:`<div style="display:flex;gap:8px"><button class="btn bs" onclick="verifyArtisanId('${uid}')">✅ Approve ID — Grant Trust Badge</button><button class="btn bd bsm" onclick="rejectArtisanId('${uid}')">✕ Reject</button></div>`}
+  </div>`:`<div class="ic"><h3>🪪 ID Document</h3><p style="font-size:13px;color:var(--slate3)">No ID document uploaded by this artisan yet.</p></div>`}
+  ${(a.portfolios||[]).length?`<div class="ic"><h3>📷 Portfolio (${a.portfolios.length})</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${a.portfolios.map(p=>`<img src="${p}" style="width:90px;height:70px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`).join('')}</div></div>`:''}
+  <div class="ic"><h3>⚡ Actions</h3>
+    <div style="background:var(--emerald2);border-radius:var(--r);padding:12px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--emerald);margin-bottom:8px">🎁 GRANT FREE PLAN (No Payment Required)</div>
+      <button class="btn bs" onclick="grantPlan('${uid}','${sn(a.name).replace(/'/g,"\\'")}')" style="font-size:13px;padding:10px">🎁 Grant Standard or Premium Plan Free</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <button class="btn bs bsm" onclick="fAct('${uid}')">✓ Approve Profile</button>
+      ${!a.timerStarted&&a.status==='active'?`<button class="bsm btn" style="background:#7c3aed;color:#fff;border:none" onclick="startTimer('${uid}')">⏱️ Start Timer</button>`:''}
+      <button class="btn bo bsm" onclick="rBk('${uid}')">🔄 Reset Booking</button>
+      <button class="bsm btn" style="background:var(--amber);color:#fff;border:none" onclick="sPr('${uid}')">⭐ Set Premium</button>
+      <button class="btn bo bsm" onclick="sSt('${uid}')">Set Standard</button>
+      <button class="bsm btn" style="background:var(--red2);color:var(--red);border:none" onclick="sUs('${uid}')">Unsubscribe</button>
+      ${a.status==='frozen'?`<button class="btn bs bsm" onclick="unfreezeArtisan('${uid}')">🔓 Unfreeze</button>`:`<button class="btn bd bsm" onclick="bUser('${uid}')">🚫 Ban</button>`}
+    </div>
+    <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">EXTEND SUBSCRIPTION</label>
+    <div style="display:flex;gap:8px;margin-bottom:14px"><input class="inp" type="number" id="exd" placeholder="Days e.g. 30" style="font-size:13px"/><button class="btn bp bsm" onclick="extS('${uid}')">Extend</button></div>
+    <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">SEND NOTE TO ARTISAN</label>
+    <textarea class="inp" id="ntxt" placeholder="Message to send to artisan…" style="min-height:70px;margin-bottom:8px"></textarea>
+    <button class="btn bp bsm" onclick="sNote('${uid}','${sn(a.name).replace(/'/g,"\\'")}')">📩 Send Note</button>
+  </div>`;
+};
+
+
+async function renderDisputes(){
+  const b=$('content');
+  const snap=await getDocs(query(collection(db,'disputes'),limit(100)));
+  if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No disputes reported yet.</div>`;return;}
+  const docs=snap.docs.sort((a,bx)=>{const at=a.data().createdAt?.toDate?a.data().createdAt.toDate():new Date(0);const bt=bx.data().createdAt?.toDate?bx.data().createdAt.toDate():new Date(0);return bt-at;});
+  const open=docs.filter(d=>!d.data().resolved).length;
+  b.innerHTML=`<div style="display:flex;gap:10px;margin-bottom:14px"><div style="background:var(--red2);color:var(--red);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700">${open} Open</div><div style="background:var(--emerald2);color:var(--emerald);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700">${docs.length-open} Resolved</div></div>`+
+  docs.map(d=>{const tk=d.data();const dt=tk.createdAt?.toDate?tk.createdAt.toDate().toLocaleDateString():'—';
+    const typeLabels={poor_work:'Poor quality work',no_show:'Did not show up',overcharge:'Overcharged',damage:'Property damage',harassment:'Harassment',fraud:'Fraud',other:'Other'};
+    return`<div style="background:var(--white);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid ${tk.resolved?'var(--emerald)':'var(--red)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div><div style="font-weight:700;font-size:14px">Against: ${sn(tk.artisanName||'Unknown')}</div>
+        <div style="font-size:12px;color:var(--slate3)">By: ${sn(tk.reporterName||'—')} · ${dt}</div>
+        <div style="font-size:12px;color:var(--red);font-weight:600;margin-top:2px">${typeLabels[tk.type]||tk.type||'—'}${tk.amountInvolved?` · ₦${tk.amountInvolved.toLocaleString()}`:''}</div></div>
+        <span class="sp${tk.resolved?'a':'b'}" style="font-size:11px">${tk.resolved?'Resolved':'Open'}</span>
+      </div>
+      <div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap">${sn(tk.description)}</div>
+      ${!tk.resolved?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <button class="btn bd bsm" onclick="freezeArtisan('${tk.artisanUid}','${d.id}')">🔒 Freeze Artisan Profile</button>
+        <button class="btn bs bsm" onclick="resolveDispute('${d.id}')">✓ Mark Resolved</button>
+        <button class="btn bo bsm" onclick="warnArtisan('${tk.artisanUid}','${sn(tk.artisanName||'')}','${d.id}')">⚠️ Issue Warning</button>
+      </div><textarea class="inp" id="dnote_${d.id}" placeholder="Admin note (sent to both parties)…" style="min-height:55px;font-size:13px;margin-bottom:6px"></textarea>
+      <button class="btn bp bsm" onclick="sendDisputeNote('${d.id}','${tk.reporterUid||''}','${tk.artisanUid||''}')">📩 Send Note to Both Parties</button>`
+      :`<div style="font-size:12px;color:var(--emerald);font-weight:600">✓ Resolved ${tk.resolvedAt?.toDate?tk.resolvedAt.toDate().toLocaleDateString():''}</div>${tk.adminNote?`<div style="font-size:12px;color:var(--slate3);margin-top:4px">Note: ${sn(tk.adminNote)}</div>`:''}`}
+    </div>`;
+  }).join('');
+}
+
+async function renderPauses(){
+  const b=$('content');
+  const snap=await getDocs(query(collection(db,'pauseRequests'),where('reviewed','==',false)));
+  if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No pending pause requests.</div>`;return;}
+  b.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--slate3);margin-bottom:12px">${snap.docs.length} pending pause request${snap.docs.length!==1?'s':''}</div>`+
+  snap.docs.map(d=>{const p=d.data();return`<div class="pi" style="border-left-color:var(--blue2)">
+    <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(p.name)}</div>
+    <div style="font-size:12px;color:var(--slate3);margin-bottom:8px">🔧 ${sn(p.trade)} · Requesting <strong>${p.days} day${p.days!==1?'s':''} pause</strong></div>
+    <div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.6">${sn(p.reason)}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bs bsm" onclick="approvePause('${p.artisanUid}','${d.id}',${p.days})">✓ Approve Pause</button>
+      <button class="btn bd bsm" onclick="rejectPause('${p.artisanUid}','${d.id}')">✕ Reject</button>
+    </div>
+  </div>`;}).join('');
+}
+
+window.freezeArtisan=async function(uid,disputeId){
+  if(!confirm('Freeze this artisan profile? They will be hidden from marketplace pending investigation.'))return;
+  await updateDoc(doc(db,'users',uid),{status:'frozen',frozenAt:serverTimestamp(),frozenReason:'Dispute investigation'});
+  await updateDoc(doc(db,'disputes',disputeId),{artisanFrozen:true});
+  toast('🔒 Artisan profile frozen.');renderDisputes();
+};
+window.resolveDispute=async function(id){
+  const note=sn(document.getElementById('dnote_'+id)?.value||'');
+  await updateDoc(doc(db,'disputes',id),{resolved:true,resolvedAt:serverTimestamp(),adminNote:note});
+  toast('Dispute resolved ✅');renderDisputes();
+};
+window.warnArtisan=async function(uid,name,disputeId){
+  const note=sn(document.getElementById('dnote_'+disputeId)?.value||'Warning issued by admin following a customer dispute.');
+  await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:name,message:'⚠️ FORMAL WARNING: A customer dispute has been filed against your account. '+note+' Further violations may result in permanent ban.',sentAt:serverTimestamp(),sentBy:'Admin'});
+  await updateDoc(doc(db,'disputes',disputeId),{warningIssued:true,warningAt:serverTimestamp()});
+  toast('⚠️ Warning sent to '+name);renderDisputes();
+};
+window.sendDisputeNote=async function(id,reporterUid,artisanUid){
+  const note=sn(document.getElementById('dnote_'+id)?.value?.trim()||'');
+  if(!note){toast('Please type a note first.');return;}
+  const snap=await getDocs(query(collection(db,'disputes'),where('__name__','==',id)));
+  const data=snap.docs[0]?.data()||{};
+  if(reporterUid)await addDoc(collection(db,'supportNotes'),{toUid:reporterUid,toName:data.reporterName||'',message:'📋 Admin update on your dispute report: '+note,sentAt:serverTimestamp(),sentBy:'Admin'});
+  if(artisanUid)await addDoc(collection(db,'supportNotes'),{toUid:artisanUid,toName:data.artisanName||'',message:'📋 Admin note regarding dispute filed against you: '+note,sentAt:serverTimestamp(),sentBy:'Admin'});
+  await updateDoc(doc(db,'disputes',id),{adminNote:note});
+  toast('Notes sent to both parties ✅');
+};
+window.approvePause=async function(uid,docId,days){
+  const expSnap=await getDoc(doc(db,'users',uid));
+  const cur=expSnap.data();
+  const curExpiry=cur.expiry?.toDate?cur.expiry.toDate():cur.expiry?new Date(cur.expiry):new Date();
+  const newExpiry=new Date(curExpiry.getTime()+(days*86400000));
+  await updateDoc(doc(db,'users',uid),{expiry:newExpiry,pauseDaysUsed:(cur.pauseDaysUsed||0)+days,pauseUsed:true,pausePending:false,status:'active'});
+  await updateDoc(doc(db,'pauseRequests',docId),{reviewed:true,approved:true,approvedAt:serverTimestamp()});
+  toast(`✅ Pause approved. ${days} day${days!==1?'s':''} added to subscription.`);renderPauses();
+};
+window.rejectPause=async function(uid,docId){
+  await updateDoc(doc(db,'users',uid),{pausePending:false});
+  await updateDoc(doc(db,'pauseRequests',docId),{reviewed:true,approved:false,rejectedAt:serverTimestamp()});
+  toast('Pause request rejected.');renderPauses();
+};
+
+// ── GRANT FREE PLAN PERMISSION (Admin gives artisan Standard or Premium for free) ──
+window.grantPlan=async function(uid,name){
+  document.getElementById('grantModal')?.remove();
+  const el=document.createElement('div');el.id='grantModal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div>
+    <h3 style="font-weight:700;font-size:17px;color:var(--navy);margin-bottom:6px">🎁 Grant Free Plan to ${sn(name)}</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:16px;line-height:1.7">This gives the artisan a free subscription without payment. Use for early adopters, partnerships, or compensation.</p>
+    <div class="fg" style="margin-bottom:14px"><label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">SELECT PLAN</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div id="gp_std" onclick="selectGrantPlan('standard')" style="border:2px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;text-align:center;transition:.2s">
+          <div style="font-weight:700;font-size:14px;color:var(--navy)">Standard</div>
+          <div style="font-size:18px;font-weight:800;color:var(--blue2);margin:4px 0">FREE</div>
+          <div style="font-size:11px;color:var(--slate3)">(worth ₦5,000)</div>
+        </div>
+        <div id="gp_prem" onclick="selectGrantPlan('premium')" style="border:2px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;text-align:center;transition:.2s">
+          <div style="font-weight:700;font-size:14px;color:var(--navy)">Premium</div>
+          <div style="font-size:18px;font-weight:800;color:var(--amber);margin:4px 0">FREE</div>
+          <div style="font-size:11px;color:var(--slate3)">(worth ₦10,000)</div>
+        </div>
+      </div>
+    </div>
+    <div class="fg"><label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">DURATION (days)</label>
+      <select class="inp" id="grantDays" style="font-size:13px">
+        <option value="7">7 days</option>
+        <option value="14">14 days</option>
+        <option value="30" selected>30 days</option>
+        <option value="60">60 days</option>
+        <option value="90">90 days</option>
+      </select>
+    </div>
+    <div class="fg"><label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">REASON (internal record)</label>
+      <input class="inp" id="grantReason" type="text" placeholder="e.g. Early adopter reward, Partnership deal..." style="font-size:13px" maxlength="200"/>
+    </div>
+    <div id="grantErr" style="display:none;margin-bottom:10px" class="alert aw"></div>
+    <button class="btn bs" onclick="confirmGrantPlan('${uid}','${sn(name).replace(/'/g,"\\'")}')">🎁 Grant Free Plan</button>
+    <button class="btn bo" style="margin-top:8px" onclick="document.getElementById('grantModal').remove()">Cancel</button>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+};
+let _grantTier=null;
+window.selectGrantPlan=function(tier){
+  _grantTier=tier;
+  document.getElementById('gp_std').style.borderColor=tier==='standard'?'var(--blue2)':'var(--border)';
+  document.getElementById('gp_std').style.background=tier==='standard'?'var(--blue3)':'var(--white)';
+  document.getElementById('gp_prem').style.borderColor=tier==='premium'?'var(--amber)':'var(--border)';
+  document.getElementById('gp_prem').style.background=tier==='premium'?'var(--amber2)':'var(--white)';
+};
+window.confirmGrantPlan=async function(uid,name){
+  const err=document.getElementById('grantErr');err.style.display='none';
+  if(!_grantTier){err.textContent='Please select a plan.';err.style.display='block';return;}
+  const days=parseInt(document.getElementById('grantDays')?.value||30);
+  const reason=sn(document.getElementById('grantReason')?.value?.trim()||'');
+  if(!reason){err.textContent='Please enter a reason for the grant.';err.style.display='block';return;}
+  const expiry=new Date(Date.now()+(days*86400000));
+  try{
+    await updateDoc(doc(db,'users',uid),{status:'active',tier:_grantTier,expiry,timerStarted:true,grantedByAdmin:true,grantReason:reason,grantedAt:serverTimestamp()});
+    // Log the grant for audit trail
+    await addDoc(collection(db,'adminGrants'),{artisanUid:uid,artisanName:name,tier:_grantTier,days,reason,grantedAt:serverTimestamp(),grantedBy:AE});
+    // Send note to artisan
+    await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:name,message:`🎁 Great news! Admin has granted you a FREE ${_grantTier.toUpperCase()} plan for ${days} days. Your profile is now live on the marketplace. Enjoy!`,sentAt:serverTimestamp(),sentBy:'Admin'});
+    document.getElementById('grantModal')?.remove();
+    _grantTier=null;
+    toast(`🎁 ${_grantTier||'Plan'} granted to ${name} for ${days} days ✅`);
+    artDetail(uid);
+  }catch(e){err.textContent='Error: '+e.message;err.style.display='block';}
+};
+
+window.apArt=async function(uid,did,tl){
+  const tr=tl.toLowerCase().includes('premium')?'premium':'standard';
+  // Stage 1: Approve — profile goes live but timer NOT started yet (grace period)
+  const graceEnd=new Date(Date.now()+7*86400000); // 7-day grace from approval
+  await runTransaction(db,async txn=>{
+    txn.update(doc(db,'users',uid),{status:'active',tier:tr,timerStarted:false,graceEnd:graceEnd,activatedAt:serverTimestamp(),expiry:null});
+    txn.update(doc(db,'pendingApprovals',did),{reviewed:true,approvedAt:serverTimestamp()});
+  });
+  toast('✅ Approved! Profile is live. Timer not started yet (grace period).');renderTab();
+};
+window.startTimer=async function(uid){
+  if(!confirm('Start the 30-day subscription timer for this artisan? This cannot be undone.'))return;
+  const expiry=new Date(Date.now()+2592000000);
+  await updateDoc(doc(db,'users',uid),{timerStarted:true,expiry,timerStartedAt:serverTimestamp(),graceEnd:null});
+  toast('⏱️ 30-day timer started! Subscription is now live.');artDetail(uid);
+};
+window.startAllTimers=async function(){
+  if(!confirm('Start 30-day timers for ALL approved artisans who are still in grace period? This is your LAUNCH DAY action.'))return;
+  const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan'),where('status','==','active'),where('timerStarted','==',false)));
+  if(snap.empty){toast('No artisans in grace period found.');return;}
+  const expiry=new Date(Date.now()+2592000000);
+  const batch=snap.docs.map(d=>updateDoc(doc(db,'users',d.id),{timerStarted:true,expiry,timerStartedAt:serverTimestamp(),graceEnd:null}));
+  await Promise.all(batch);
+  toast('🚀 All '+snap.docs.length+' artisan timers started! Platform is now LIVE!');renderTab();
+};
+window.rjArt=async function(did){if(!confirm('Reject this payment?'))return;await updateDoc(doc(db,'pendingApprovals',did),{reviewed:true,rejected:true,rejectedAt:serverTimestamp()});toast('Rejected.');renderTab();};
+window.fAct=async function(u){await updateDoc(doc(db,'users',u),{status:'active',expiry:new Date(Date.now()+2592000000),activatedAt:serverTimestamp()});toast('✅ Activated 30 days!');artDetail(u);};
+window.rBk=async function(u){await updateDoc(doc(db,'users',u),{daily_booked:false});toast('✅ Booking reset!');artDetail(u);};
+window.sPr=async function(u){await updateDoc(doc(db,'users',u),{tier:'premium'});toast('⭐ Set Premium!');artDetail(u);};
+window.sSt=async function(u){await updateDoc(doc(db,'users',u),{tier:'standard'});toast('Set Standard.');artDetail(u);};
+window.sUs=async function(u){await updateDoc(doc(db,'users',u),{status:'unsubscribed'});toast('Set Unsubscribed.');artDetail(u);};
+window.bUser=async function(u){if(!confirm('Ban this account permanently?'))return;await updateDoc(doc(db,'users',u),{status:'banned'});toast('Account banned.');aTab('artisans');};
+window.unfreezeArtisan=async function(uid){await updateDoc(doc(db,'users',uid),{status:'active',frozenAt:null,frozenReason:null});toast('✅ Account unfrozen and restored.');artDetail(uid);};
+window.verifyArtisanId=async function(uid){
+  if(!confirm('Approve this ID document and grant the trust badge?'))return;
+  await updateDoc(doc(db,'users',uid),{idVerified:true,idVerifiedAt:serverTimestamp()});
+  await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:'',message:'🪪 Your ID has been verified! A trust badge now appears on your profile, helping you get more bookings.',sentAt:serverTimestamp(),sentBy:'Admin'});
+  toast('✅ ID verified — trust badge active.');artDetail(uid);
+};
+window.rejectArtisanId=async function(uid){
+  if(!confirm('Reject this ID document? The artisan will be asked to resubmit.'))return;
+  await updateDoc(doc(db,'users',uid),{idVerified:false,idDocument:null,idRejectedAt:serverTimestamp()});
+  await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:'',message:'⚠️ Your ID document could not be verified. Please go to your profile settings and upload a clearer photo of your ID.',sentAt:serverTimestamp(),sentBy:'Admin'});
+  toast('ID rejected — artisan notified.');artDetail(uid);
+};
+window.revokeIdVerification=async function(uid){
+  if(!confirm("Revoke this artisan's ID verification badge?"))return;
+  await updateDoc(doc(db,'users',uid),{idVerified:false});
+  toast('Verification revoked.');artDetail(uid);
+};
+window.extS=async function(u){
+  const d=parseInt($('exd')?.value||0);if(!d||d<1){toast('Enter valid number of days.');return;}
+  const snap=await getDoc(doc(db,'users',u));
+  const cur=snap.data().expiry?.toDate?snap.data().expiry.toDate():new Date(snap.data().expiry||Date.now());
+  const ne=new Date(Math.max(cur.getTime(),Date.now())+d*86400000);
+  await updateDoc(doc(db,'users',u),{expiry:ne,status:'active'});
+  toast(`Extended by ${d} days ✅`);artDetail(u);
+};
+window.sNote=async function(u,n){
+  const t=$('ntxt')?.value?.trim();if(!t){toast('Please type a message.');return;}
+  await addDoc(collection(db,'supportNotes'),{toUid:u,toName:n,message:t,sentAt:serverTimestamp(),sentBy:'Admin'});
+  toast('Note sent to '+n+' ✅');$('ntxt').value='';
+};
+window.sdBC=async function(){
+  const m=$('bctxt')?.value?.trim();if(!m){toast('Type a message first.');return;}
+  const aud=window._bcAud||'all';
+  const keyMap={all:'broadcast',artisan:'broadcast_artisan',customer:'broadcast_customer'};
+  const labelMap={all:'Everyone 🌍',artisan:'Artisans only 🔧',customer:'Customers only 👤'};
+  const key=keyMap[aud]||'broadcast';
+  await setDoc(doc(db,'config',key),{text:m,audience:aud,updatedAt:serverTimestamp()});
+  toast('📢 Sent to '+labelMap[aud]+'!');
+  renderBroadcast();
+};
+window.clBC=async function(){
+  const aud=window._bcAud||'all';
+  const keyMap={all:'broadcast',artisan:'broadcast_artisan',customer:'broadcast_customer'};
+  const key=keyMap[aud]||'broadcast';
+  await setDoc(doc(db,'config',key),{text:'',updatedAt:serverTimestamp()});
+  if($('bctxt'))$('bctxt').value='';
+  toast('Cleared for selected audience.');
+  renderBroadcast();
+};
+window.clBCTarget=async function(key){
+  await setDoc(doc(db,'config',key),{text:'',updatedAt:serverTimestamp()});
+  toast('Broadcast cleared.');
+  renderBroadcast();
+};
+window.rsTk=async function(id){await updateDoc(doc(db,'supportTickets',id),{resolved:true,resolvedAt:serverTimestamp()});toast('Ticket resolved ✅');renderTab();};
+window.rpTk=async function(id,uid,name){
+  const t=document.getElementById('rep_'+id)?.value?.trim();if(!t){toast('Type a reply first.');return;}
+  await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:name,message:t,sentAt:serverTimestamp(),sentBy:'Admin'});
+  await updateDoc(doc(db,'supportTickets',id),{resolved:true,resolvedAt:serverTimestamp(),adminReply:t});
+  toast('Reply sent & ticket resolved ✅');renderTab();
+};
+</script>
+</body>
+</html>
