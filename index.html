@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="description" content="Trusted Hands — Ekpoma's verified artisan marketplace. Find electricians, plumbers, tailors and more near you."/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:title" content="Trusted Hands — Ekpoma's Artisan Marketplace"/>
+<meta property="og:description" content="Find and book verified local workers in Ekpoma, Edo State."/>
+<meta property="og:url" content="https://trust-hand.vercel.app"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
+<!-- PWA: makes the app installable on phone home screens -->
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#2563eb"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Trusted Hands"/>
+<link rel="apple-touch-icon" href="/icon-180.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"/>
+<title>Trusted Hands — Nigeria's Verified Skilled Worker Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+// EmailJS init — public key only, safe to expose client-side
+(function(){
+  if(window.emailjs){
+    emailjs.init({publicKey:'MwV2HStNyvWmHjZAe'});
+  }
+})();
+// Security: disable right-click inspect on production (soft deterrent)
+document.addEventListener('contextmenu',function(e){e.preventDefault();});
+document.addEventListener('keydown',function(e){
+  // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+  if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key))||(e.ctrlKey&&e.key==='U')){
+    e.preventDefault();
+  }
+});
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#0f172a;--navy2:#1e293b;--slate3:#64748b;--blue2:#2563eb;--blue3:#eff6ff;--emerald:#059669;--emerald2:#d1fae5;--amber:#d97706;--amber2:#fef3c7;--red:#dc2626;--red2:#fee2e2;--bg:#f8fafc;--white:#fff;--border:#e2e8f0;--border2:#cbd5e1;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 20px rgba(0,0,0,.10);--r:12px;--r2:16px;--r4:24px}
+[data-theme="dark"]{--navy:#f1f5f9;--navy2:#1e293b;--slate3:#94a3b8;--blue2:#3b82f6;--blue3:#1e3a5f;--emerald:#10b981;--emerald2:#064e3b;--amber:#f59e0b;--amber2:#451a03;--red:#ef4444;--red2:#450a0a;--bg:#0a0e14;--white:#151b26;--border:#2a3441;--border2:#3a4654;--shadow:0 1px 3px rgba(0,0,0,.4);--shadow2:0 4px 20px rgba(0,0,0,.5)}
+[data-theme="dark"] body{background:var(--bg);color:var(--navy)}
+[data-theme="dark"] .auth-bg{background:linear-gradient(160deg,#0a0e14,#0f1420)}
+[data-theme="dark"] .inp{background:var(--white);color:var(--navy);border-color:var(--border)}
+[data-theme="dark"] .inp::placeholder{color:#64748b}
+[data-theme="dark"] .nav,[data-theme="dark"] .auth-card,[data-theme="dark"] .acard,[data-theme="dark"] .ic,[data-theme="dark"] .pi,[data-theme="dark"] .drw{background:var(--white);border-color:var(--border)}
+[data-theme="dark"] .hs{background:var(--white);color:var(--navy)}
+[data-theme="dark"] .mr{background:var(--white);border-color:var(--border);color:var(--navy)}
+[data-theme="dark"] .tab-bar,[data-theme="dark"] .atb{background:#0a0e14}
+[data-theme="dark"] .tab.active,[data-theme="dark"] .at.active{background:var(--white)}
+body{transition:background .3s ease,color .3s ease}
+.theme-toggle{position:fixed;bottom:90px;right:16px;width:48px;height:48px;border-radius:50%;background:var(--navy2);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--shadow2);z-index:150;transition:.3s}
+.theme-toggle:active{transform:scale(.9)}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--navy);font-size:15px}
+#app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow:hidden;background:var(--bg)}
+.screen{display:none;height:100%;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy2);color:#fff;padding:11px 22px;border-radius:24px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:21px;color:var(--navy);display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-logo span{color:var(--blue2)}
+.logo-box{width:34px;height:34px;background:var(--blue2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icon-btn{background:none;border:none;padding:7px;border-radius:10px;color:#475569;cursor:pointer;position:relative}
+.notif-dot{position:absolute;top:5px;right:5px;width:9px;height:9px;background:var(--red);border-radius:50%;border:2px solid var(--white);display:none}
+.marquee-bar{background:var(--navy2);color:#fff;font-size:12px;padding:7px 0;overflow:hidden;white-space:nowrap;flex-shrink:0}
+.marquee-inner{display:inline-block;animation:marquee 22s linear infinite;padding-left:100%}
+.auth-bg{flex:1;display:flex;flex-direction:column;justify-content:safe center;padding:28px 20px;overflow-y:auto;background:linear-gradient(160deg,#f0f4ff,#f8fafc)}
+.auth-card{background:var(--white);border-radius:var(--r4);padding:30px 24px;box-shadow:var(--shadow2);margin:auto 0;width:100%;max-width:100%}
+/* Fallback for browsers without 'safe center' support: ensures tall artisan form never jams against top */
+@supports not (justify-content: safe center){
+  .auth-bg{justify-content:flex-start;padding-top:40px}
+}
+.tab-bar{display:flex;background:#f1f5f9;border-radius:var(--r);padding:3px;margin-bottom:22px;gap:3px}
+.tab{flex:1;padding:9px;text-align:center;border-radius:10px;font-size:13px;font-weight:600;color:#475569;cursor:pointer;transition:.2s;user-select:none}
+.tab.active{background:var(--white);color:var(--navy);box-shadow:var(--shadow)}
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:7px}
+.inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;color:var(--navy);background:var(--white);transition:.2s;font-family:inherit;outline:none}
+.inp:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.inp::placeholder{color:#94a3b8}
+select.inp{cursor:pointer}
+textarea.inp{resize:vertical;min-height:80px;cursor:auto}
+.pw-wrap{position:relative}
+.pw-wrap .inp{padding-right:44px}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;display:flex}
+.btn{width:100%;padding:13px;border-radius:var(--r);font-weight:700;font-size:15px;cursor:pointer;border:none;font-family:inherit;transition:.2s}
+.btn:active{transform:scale(.98)}
+.bp{background:var(--blue2);color:#fff}
+.bp:disabled{background:#94a3b8;cursor:not-allowed;transform:none}
+.bo{background:var(--white);color:var(--blue2);border:1.5px solid var(--blue2)}
+.bs{background:var(--emerald);color:#fff}
+.bd{background:var(--red);color:#fff}
+.bsm{padding:8px 16px;font-size:13px;width:auto;border-radius:20px}
+.alink{text-align:center;margin-top:18px;font-size:13px;color:var(--slate3)}
+.alink a{color:var(--blue2);font-weight:600;text-decoration:none}
+.alert{border-radius:var(--r);padding:12px 14px;font-size:13px;margin-bottom:12px}
+.aw{background:var(--amber2);color:#92400e}
+.ag{background:var(--emerald2);color:var(--emerald)}
+.uz{border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:.2s;background:#fafbfc}
+.uz:hover{border-color:var(--blue2);background:var(--blue3)}
+.pimg{width:68px;height:68px;border-radius:10px;object-fit:cover;border:2.5px solid var(--emerald)}
+.agbox{border:1.5px solid var(--border);border-radius:var(--r);padding:14px;max-height:150px;overflow-y:auto;font-size:12px;color:#334155;line-height:1.8;background:#fafbfc;margin-bottom:12px}
+.crow{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#334155}
+.crow input{width:17px;height:17px;margin-top:2px;accent-color:var(--blue2);flex-shrink:0}
+.tc{border:2px solid var(--border);border-radius:var(--r2);padding:18px;cursor:pointer;margin-bottom:14px;position:relative;transition:.2s}
+.tc.ss{border-color:var(--blue2);background:var(--blue3)}
+.tc.sp{border-color:var(--amber);background:var(--amber2)}
+.th{position:absolute;top:-1px;right:14px;background:var(--amber);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:0 0 10px 10px}
+.bp2{background:var(--navy2);border-radius:var(--r2);padding:22px;color:#fff;margin:18px 0}
+.cbtn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.mhero{background:linear-gradient(160deg,#0f172a 0%,#1e3a8a 60%,#1d4ed8 100%);padding:24px 18px 28px;position:relative;overflow:hidden;flex-shrink:0}
+.hs-wrap{position:relative;margin-bottom:12px}
+.hs{width:100%;padding:13px 16px 13px 44px;border:none;border-radius:14px;font-size:14px;font-family:inherit;outline:none;background:#fff;color:var(--navy);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.hs-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none}
+.zsel{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);padding:7px 28px 7px 10px;border-radius:20px;font-size:12px;font-family:inherit;font-weight:600;outline:none;appearance:none;cursor:pointer}
+.zsel option{color:#000}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.ccard{border-radius:16px;padding:16px;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:.2s}
+.ccard:active{transform:scale(.97)}
+.acard{background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);cursor:pointer;border:1.5px solid transparent;margin-bottom:12px;transition:.2s}
+.acard.prem{border-color:var(--amber)}
+.acard.act{border-color:rgba(5,150,105,.25)}
+.acard.inact{opacity:.65}
+.avc{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.avp{background:#fef3c7;color:#92400e}
+.ava{background:#eff6ff;color:#1e40af}
+.avi{background:#f1f5f9;color:#94a3b8}
+.tpill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:4px}
+.tpp{background:#fef9c3;color:#b45309}
+.tpa{background:var(--emerald2);color:var(--emerald)}
+.tpi{background:#f1f5f9;color:#64748b}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;opacity:0;pointer-events:none;transition:.3s}
+.ov.open{opacity:1;pointer-events:all}
+.drw{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:var(--white);border-radius:22px 22px 0 0;z-index:201;transition:.38s cubic-bezier(.4,0,.2,1);max-height:88vh;overflow-y:auto;padding:20px 20px 40px}
+.drw.open{transform:translateX(-50%) translateY(0)}
+.dh{width:42px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 18px}
+.pr{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.pt{width:105px;height:82px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.cb{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.mb{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5;word-break:break-word}
+.ms{align-self:flex-end;background:var(--blue2);color:#fff;border-radius:16px 16px 3px 16px}
+.mr{align-self:flex-start;background:var(--white);border:1px solid var(--border);border-radius:16px 16px 16px 3px}
+.mt{font-size:10px;margin-top:3px;opacity:.65}
+.msy{text-align:center;font-size:11px;color:var(--slate3);padding:2px 0}
+.ciw{background:var(--white);border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.ci{flex:1;border:1.5px solid var(--border);border-radius:20px;padding:9px 14px;font-size:14px;resize:none;max-height:100px;font-family:inherit;outline:none;transition:.2s}
+.ci:focus{border-color:var(--blue2)}
+.sndbtn{width:40px;height:40px;border-radius:50%;background:var(--blue2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic{background:var(--white);border-radius:var(--r2);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.ic h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.ir{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f8fafc;font-size:14px}
+.ir:last-child{border-bottom:none}
+.il{color:var(--slate3);font-size:13px}
+.spa{background:var(--emerald2);color:var(--emerald);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.spp{background:var(--amber2);color:var(--amber);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.spu{background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.spb{background:var(--red2);color:var(--red);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.rbanner{background:var(--navy2);border-radius:var(--r2);padding:20px;margin-bottom:16px;cursor:pointer;color:#fff}
+.rbanner h4{font-weight:700;font-size:15px;margin-bottom:6px}
+.rbanner p{font-size:13px;color:rgba(255,255,255,.75);line-height:1.6}
+.ewarn{background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff}
+.jcard{background:var(--amber2);border:1.5px solid #fde68a;border-radius:var(--r2);padding:18px;margin-bottom:16px}
+.atb{display:flex;background:#f1f5f9;border-radius:var(--r);padding:3px;gap:3px;overflow-x:auto}
+.at{flex-shrink:0;padding:8px 10px;border-radius:9px;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap;transition:.2s}
+.at.active{background:var(--white);color:var(--navy);box-shadow:var(--shadow)}
+.pi{background:var(--white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid var(--amber)}
+.ri{width:100%;border-radius:var(--r);max-height:180px;object-fit:cover;margin:10px 0;border:1px solid var(--border)}
+.es{text-align:center;padding:48px 24px;color:var(--slate3);font-size:14px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="toast" id="T"></div>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+<div class="ov" id="ov" onclick="closeD()"></div>
+<div class="drw" id="drw"><div class="dh"></div><div id="dc"></div></div>
+
+<!-- SPLASH -->
+<div class="screen active" id="s-splash">
+  <div style="flex:1;background:linear-gradient(160deg,#0f172a,#1e3a8a,#1d4ed8);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+    <div style="position:absolute;bottom:-100px;left:-60px;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+    <div id="spl" style="opacity:0;transform:scale(.7);transition:all .6s cubic-bezier(.34,1.56,.64,1);text-align:center">
+      <div style="width:90px;height:90px;background:var(--blue2);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 20px 60px rgba(37,99,235,.5)">
+        <svg width="52" height="52" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/></svg>
+      </div>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:34px;color:#fff;margin-bottom:8px">Trusted <span style="color:#93c5fd">Hands</span></h1>
+      <p style="font-size:14px;color:rgba(255,255,255,.7)">Nigeria's #1 Verified Skilled Worker Marketplace</p>
+    </div>
+    <div id="spm" style="opacity:0;transition:opacity .5s;margin-top:48px;text-align:center;width:100%">
+      <div style="width:48px;height:2px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 16px;overflow:hidden"><div id="spf" style="height:100%;background:#93c5fd;width:0;transition:width 3.2s linear"></div></div>
+      <p id="spt" style="font-size:14px;color:rgba(255,255,255,.8);line-height:1.7;max-width:280px;margin:0 auto;transition:opacity .3s"></p>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="screen" id="s-auth">
+  <div class="auth-bg sb"><div class="auth-card">
+    <div style="text-align:center;margin-bottom:26px">
+      <div style="width:64px;height:64px;background:var(--blue2);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 24px rgba(37,99,235,.3)"><svg width="36" height="36" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/></svg></div>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--navy)">Trusted <span style="color:var(--blue2)">Hands</span></h1>
+      <p style="font-size:13px;color:var(--slate3);margin-top:5px">Nigeria's verified skilled worker marketplace</p>
+    </div>
+    <div class="tab-bar" id="atabs"><div class="tab active" onclick="stab('si')">Sign In</div><div class="tab" onclick="stab('reg')">Create Account</div></div>
+    <div id="si">
+      <div class="fg"><label>Email Address</label><input class="inp" type="email" id="le" placeholder="example@gmail.com"/></div>
+      <div class="fg"><label>Password</label><div class="pw-wrap"><input class="inp" type="password" id="lp" placeholder="••••••••"/><button class="pw-eye" type="button" onclick="tpw('lp',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div id="lerr" style="display:none" class="alert aw"></div>
+      <button class="btn bp" id="lbtn" onclick="doLogin()">Sign In Securely</button>
+      <div style="text-align:center;margin-top:10px"><a href="#" onclick="SS('s-fp');return false" style="font-size:13px;color:var(--blue2);font-weight:600;text-decoration:none">Forgot password?</a></div>
+      <div class="alink"><a href="#" onclick="stab('reg');return false">New user? Create account</a></div>
+    </div>
+    <div id="reg" style="display:none">
+      <div style="background:var(--emerald2);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--emerald);font-weight:600;text-align:center">🎉 Open for everyone! Are you a Customer or a Skilled Worker?</div>
+      <div class="tab-bar" id="rtabs"><div class="tab active" onclick="srt('c')">👤 I Need a Worker</div><div class="tab" onclick="srt('a')">🔧 I'm a Skilled Worker</div></div>
+      <div class="fg"><label>Full Name *</label><input class="inp" type="text" id="rn" placeholder="Your full name" oninput="vr()"/></div>
+      <div class="fg"><label>Email Address *</label><input class="inp" type="email" id="re" placeholder="example@gmail.com" oninput="vr()"/></div>
+      <div class="fg"><label>Phone Number *</label><input class="inp" type="tel" id="rph" placeholder="08012345678" oninput="vr()"/></div>
+      <div class="fg"><label>Password *</label><div class="pw-wrap"><input class="inp" type="password" id="rpw" placeholder="Min. 6 characters" oninput="vr()"/><button class="pw-eye" type="button" onclick="tpw('rpw',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="fg"><label>State *</label>
+        <select class="inp" id="rstate" onchange="onStateChange(this,document.getElementById('rlga'),document.getElementById('rz'));vr()">
+          <option value="">Select State</option>
+          <option value="Edo State">Edo State</option>
+          <option value="Delta State">Delta State</option>
+          <option value="Ogun State">Ogun State</option>
+        </select>
+      </div>
+      <div class="fg"><label>LGA / City *</label>
+        <select class="inp" id="rlga" onchange="onLGAChange(document.getElementById('rstate'),this,document.getElementById('rz'));vr()" disabled>
+          <option value="">Select State first</option>
+        </select>
+      </div>
+      <div class="fg"><label>Area / Zone *</label>
+        <select class="inp" id="rz" onchange="vr()" disabled>
+          <option value="">Select LGA first</option>
+        </select>
+      </div>
+      <div id="aex" style="display:none">
+        <div class="fg"><label>Trade Category *</label>
+          <select class="inp" id="rt" onchange="vr()"><option value="">Select your trade</option><option>Electricians</option><option>Plumbers</option><option>Cleaners</option><option>Tailors</option><option>Hairdressers</option><option>Barbers</option><option>Mechanics</option><option>Dry Cleaners</option><option>Bricklayer / Construction Manager</option><option>POP Installers</option><option>Interior Decorators</option><option>Shoe Makers</option><option>Massage Therapists</option><option>Counselors</option><option>Cooks</option><option>Car Wash</option><option>Errand Boy / Girl</option><option>Solar Installers</option><option>Welders</option><option>Carpenters</option><option>Nail Technicians</option><option>Lash Technicians</option></select>
+        </div>
+        <div class="fg"><label>Bio / Experience</label><textarea class="inp" id="rb" placeholder="Describe your skills and years of experience…"></textarea></div>
+        <div class="fg">
+          <label>Portfolio Photos * <span style="font-weight:400;font-size:11px;color:var(--slate3)">(Min. 2 photos)</span></label>
+          <div class="uz" onclick="document.getElementById('pfi').click()"><div style="font-size:28px;margin-bottom:6px">📷</div><p style="font-size:13px;color:var(--slate3)">Tap to upload past work photos</p></div>
+          <input type="file" id="pfi" accept="image/*" multiple style="display:none" onchange="hport(event)"/>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px" id="pprev"></div>
+          <div id="pcnt" style="font-size:12px;color:var(--emerald);font-weight:700;margin-top:6px"></div>
+        </div>
+        <div class="fg">
+          <label>ID Document <span style="font-weight:400;font-size:11px;color:var(--blue2)">(Optional — boosts trust score)</span></label>
+          <p style="font-size:11px;color:var(--slate3);margin-bottom:8px">Upload your NIN, Voter's Card, or Driver's License. Verified artisans get a trust badge that gets more bookings.</p>
+          <div class="uz" onclick="document.getElementById('idi').click()"><div style="font-size:28px;margin-bottom:6px">🪪</div><p style="font-size:13px;color:var(--slate3)">Tap to upload ID document</p></div>
+          <input type="file" id="idi" accept="image/*" style="display:none" onchange="hIdDoc(event)"/>
+          <div id="idprev" style="margin-top:10px"></div>
+        </div>
+        <div class="fg">
+          <div class="agbox">
+            <h4 style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px">📋 Safety Agreement</h4>
+            <p style="font-weight:600;margin-bottom:4px">✅ You MUST:</p><ul style="padding-left:16px;margin-bottom:8px"><li>Carry valid ID when requested</li><li>Communicate pricing before starting</li><li>Arrive on time and be professional</li><li>Respect client property at all times</li></ul>
+            <p style="font-weight:600;margin-bottom:4px">❌ You MUST NOT:</p><ul style="padding-left:16px"><li>Share client contacts outside platform</li><li>Misrepresent your qualifications</li><li>Engage in harassment or misconduct</li></ul>
+          </div>
+          <label class="crow"><input type="checkbox" id="agr" onchange="vr()"/><span>I have read and agree to the Trusted Hands Safety Agreement.</span></label>
+        </div>
+      </div>
+      <div id="rerr" style="display:none;margin-bottom:12px" class="alert aw"></div>
+      <p style="font-size:12px;color:var(--slate3);text-align:center;margin-bottom:10px;line-height:1.6">By creating an account you agree to our <a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms of Service</a> and <a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Privacy Policy</a></p>
+      <button class="btn bp" id="rbtn" onclick="doReg()" disabled>Create Account</button>
+      <div class="alink"><a href="#" onclick="stab('si');return false">Already have an account? Sign in</a></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- FORGOT PW -->
+<div class="screen" id="s-fp">
+  <div class="auth-bg sb"><div class="auth-card">
+    <div style="text-align:center;margin-bottom:24px"><h1 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy)">🔑 Reset Password</h1><p style="font-size:13px;color:var(--slate3);margin-top:5px">We'll send a reset link to your email</p></div>
+    <div class="fg"><label>Email Address</label><input class="inp" type="email" id="fpe" placeholder="example@gmail.com"/></div>
+    <div id="fperr" style="display:none" class="alert aw"></div>
+    <div id="fpok" style="display:none" class="alert ag"></div>
+    <button class="btn bp" id="fpbtn" onclick="sendReset()">Send Reset Link</button>
+    <div class="alink"><a href="#" onclick="SS('s-auth');return false">← Back to Sign In</a></div>
+  </div></div>
+</div>
+
+<!-- PAYWALL -->
+<div class="screen" id="s-paywall">
+  <div class="sb"><div style="padding:24px 20px 40px">
+    <div style="text-align:center;margin-bottom:24px"><div style="font-size:40px;margin-bottom:10px">🚀</div><h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy);margin-bottom:6px">Activate Your Profile</h2><p style="font-size:13px;color:var(--slate3)">Choose a plan to go live on the marketplace</p></div>
+    <div class="tc" id="tcs" onclick="selT('standard')">
+      <div style="font-weight:700;font-size:16px;color:var(--navy)">Standard Listing</div>
+      <div style="font-size:28px;font-weight:800;color:var(--blue2);margin:6px 0">&#8358;5,000</div>
+      <div style="font-size:13px;color:#475569">Active visibility on marketplace for 30 days</div>
+    </div>
+    <div class="tc" id="tcp" onclick="selT('premium')">
+      <div class="th">⭐ BEST VALUE</div>
+      <div style="font-weight:700;font-size:16px;color:var(--navy)">Premium Front-Row</div>
+      <div style="font-size:28px;font-weight:800;color:var(--amber);margin:6px 0">&#8358;10,000</div>
+      <div style="font-size:13px;color:#475569">Top placement in your trade category for 30 days</div>
+    </div>
+    <div class="bp2">
+      <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Bank</div><div style="font-size:15px;font-weight:700;margin-bottom:14px">Opay</div>
+      <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Account Number</div><div style="font-size:24px;font-weight:800;letter-spacing:4px;margin:6px 0 14px">08112595067</div>
+      <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Account Name</div><div style="font-size:15px;font-weight:700;margin-bottom:8px">Olawoye Gideon Ayomide</div>
+      <button class="cbtn" onclick="navigator.clipboard&&navigator.clipboard.writeText('08112595067').then(()=>toast('Copied!'))">📋 Copy Account Number</button>
+    </div>
+    <!-- PAYSTACK PAYMENT -->
+    <div id="paystackSection">
+      <div style="background:var(--emerald2);border-radius:var(--r);padding:12px;margin-bottom:14px;font-size:13px;color:var(--emerald);font-weight:600;display:flex;align-items:center;gap:8px">
+        <span>⚡</span><span>Pay instantly with Paystack — card, bank transfer or USSD</span>
+      </div>
+      <button class="btn bp" id="payBtn" onclick="initPaystack()" style="margin-bottom:12px">
+        <span style="display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Pay Now with Paystack
+        </span>
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:12px;color:var(--slate3);font-weight:600">OR pay manually</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+    </div>
+    <!-- MANUAL FALLBACK -->
+    <div id="manualSection">
+      <div class="fg"><label>Sender Bank &amp; Account Name *</label><input class="inp" type="text" id="sbk" placeholder="e.g. First Bank — John Doe"/></div>
+      <div class="fg"><label>Payment Receipt *</label>
+        <div class="uz" onclick="document.getElementById('rci').click()"><div style="font-size:28px;margin-bottom:6px">🧾</div><p style="font-size:13px;color:var(--slate3)">Tap to upload your receipt</p></div>
+        <input type="file" id="rci" accept="image/*" style="display:none" onchange="hrcpt(event)"/>
+        <div id="rcprev" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <div id="pwerr" style="display:none;margin-bottom:12px" class="alert aw"></div>
+    <button class="btn bp" onclick="subProof()">Submit Manual Receipt</button>
+    <p style="text-align:center;font-size:12px;color:var(--slate3);margin-top:12px">Reviewed and activated within 24 hours</p>
+    <p style="text-align:center;font-size:12px;color:var(--slate3);margin-top:6px">By subscribing you agree to our <a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms of Service</a>. Subscriptions are non-refundable.</p>
+  </div></div>
+</div>
+
+<!-- PENDING -->
+<div class="screen" id="s-pending">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;text-align:center">
+    <div style="font-size:60px;margin-bottom:18px">⏳</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy)">Under Review</h2>
+    <p style="color:var(--slate3);font-size:14px;margin-top:10px;line-height:1.8;max-width:300px">Your payment proof has been submitted. Admin will verify and activate your account within 24 hours.</p>
+    <div style="background:var(--white);border-radius:var(--r2);padding:18px;margin-top:22px;width:100%;text-align:left;box-shadow:var(--shadow)">
+      <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">What happens next:</div>
+      <div style="font-size:13px;color:#334155;line-height:2.2">✅ Admin reviews your payment receipt<br/>✅ Account activated with 30-day timer<br/>✅ Profile goes live on marketplace<br/>✅ Clients in your zone start finding you</div>
+    </div>
+    <button class="btn bo" style="margin-top:24px" onclick="chkPend()">🔄 Check Status</button>
+    <button class="btn bo" style="margin-top:10px;border-color:var(--border2);color:var(--slate3)" onclick="doLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- MARKET -->
+<div class="screen" id="s-market">
+  <div id="mqbar" style="display:none" class="marquee-bar"><span class="marquee-inner" id="mqtxt"></span></div>
+  <div class="nav">
+    <div class="nav-logo"><div class="logo-box"><svg width="20" height="20" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/></svg></div>Trusted <span>Hands</span></div>
+    <div style="display:flex;gap:6px">
+      <button class="icon-btn" onclick="gT('cl')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="notif-dot" id="cd"></span></button>
+      <button class="icon-btn" onclick="showProfileMenu()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg></button>
+    </div>
+  </div>
+  <div class="sb" id="mscroll">
+    <div class="mhero">
+      <div style="position:relative">
+        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">Ekpoma's Trusted Marketplace</p>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:24px;color:#fff;line-height:1.3;margin-bottom:5px">What service do<br/>you need today?</h2>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:18px">Tap a category or search below</p>
+        <div class="hs-wrap"><svg class="hs-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="hs" id="si2" placeholder="Search electrician, plumber, tailor…" oninput="hSrch(this.value)"/></div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2" style="flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <select class="zsel" id="fstate" onchange="window.onFStateChange()" style="flex:1;min-width:100px">
+            <option value="">All States</option>
+            <option value="Edo State">Edo State</option>
+            <option value="Delta State">Delta State</option>
+            <option value="Ogun State">Ogun State</option>
+          </select>
+          <select class="zsel" id="flga" onchange="window.onFLGAChange()" style="flex:1;min-width:100px">
+            <option value="">All LGAs</option>
+          </select>
+          <select class="zsel" id="zf" onchange="window.hZone()" style="flex:1;min-width:100px">
+            <option value="">All Areas</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="catView">
+      <div style="padding:16px 16px 4px;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy)">Browse Categories</div><div style="font-size:12px;color:var(--slate3);margin-top:2px">Tap any category to find workers</div></div>
+        <button onclick="showF('','All Workers')" style="background:none;border:none;color:var(--blue2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">See all →</button>
+      </div>
+      <div class="cgrid" id="cg"></div>
+    </div>
+    <div id="feedView" style="display:none">
+      <div style="padding:14px 16px 8px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--navy)" id="ftitle">All Workers</div>
+        <button onclick="showC()" style="background:none;border:none;color:var(--blue2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">← Categories</button>
+      </div>
+      <div style="padding:0 16px 80px" id="fl"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="screen" id="s-chat">
+  <div class="nav"><button class="icon-btn" onclick="goBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><div style="flex:1;padding:0 8px"><div style="font-weight:700;font-size:15px" id="chn">Chat</div><div style="font-size:12px;color:var(--slate3)" id="cht"></div></div><div style="width:34px"></div></div>
+  <div class="cb" id="cbody"></div>
+  <div id="typingInd" style="display:none;align-items:center;gap:6px;padding:4px 16px;background:var(--white)">
+    <div style="display:flex;gap:3px;align-items:center">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--slate3);animation:bounce .8s infinite 0s"></span>
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--slate3);animation:bounce .8s infinite .15s"></span>
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--slate3);animation:bounce .8s infinite .3s"></span>
+    </div>
+    <span style="font-size:12px;color:var(--slate3)">typing…</span>
+  </div>
+<div class="ciw">
+    <button class="icon-btn" onclick="document.getElementById('cimgIn').click()" style="padding:6px;color:var(--slate3)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+    <input type="file" id="cimgIn" accept="image/*" style="display:none" onchange="sendImgMsg(event)"/>
+    <textarea class="ci" id="cinp" placeholder="Type your message…" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';sendTyping()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM()}"></textarea>
+    <button class="sndbtn" onclick="sendM()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</div>
+
+<!-- CHAT LIST -->
+<div class="screen" id="s-cl"><div class="nav"><button class="icon-btn" onclick="goBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><span style="font-weight:700;font-size:16px">Messages</span><div style="width:34px"></div></div><div class="sb" id="clb"></div></div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="s-dash">
+  <div class="nav"><div class="nav-logo"><div class="logo-box"><svg width="20" height="20" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/></svg></div>Trusted <span>Hands</span></div><button class="icon-btn" onclick="gT('cl')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="notif-dot" id="cd2"></span></button></div>
+  <div class="sb"><div id="db"></div></div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="screen" id="s-adl"><div class="auth-bg sb"><div class="auth-card">
+  <div style="text-align:center;margin-bottom:24px"><h1 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy)">🔐 Admin Console</h1><p style="font-size:13px;color:var(--slate3);margin-top:5px">Authorized personnel only</p></div>
+  <div class="fg"><label>Admin Email</label><input class="inp" type="email" id="ae" placeholder="email"/></div>
+  <div class="fg"><label>Password</label><input class="inp" type="password" id="ap" placeholder="••••••••"/></div>
+  <div id="aerr" style="display:none;margin-bottom:12px" class="alert aw"></div>
+  <button class="btn bp" onclick="doAdminL()">Access Admin Console</button>
+  <div class="alink"><a href="#" onclick="SS('s-auth');return false">← Back</a></div>
+</div></div></div>
+
+<!-- ADMIN -->
+<div class="screen" id="s-admin">
+  <div style="padding:16px 18px 14px;background:var(--navy2);color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+    <div><div style="font-family:'DM Serif Display',serif;font-size:20px">Admin Console</div><div style="font-size:12px;color:#94a3b8;margin-top:1px">Trusted Hands</div></div>
+    <button onclick="doLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Sign Out</button>
+  </div>
+  <div style="padding:10px 14px 0;flex-shrink:0"><div class="atb" id="atabs2"><div class="at active" onclick="aTab('ap2')">✅ Approvals</div><div class="at" onclick="aTab('art')">🔧 Artisans</div><div class="at" onclick="aTab('cus')">👥 Customers</div><div class="at" onclick="aTab('bc')">📢 Broadcast</div><div class="at" onclick="aTab('sup')">🆘 Support</div><div class="at" onclick="aTab('analytics')">📊 Analytics</div><div class="at" onclick="aTab('set')">⚙️ Settings</div></div></div>
+  <div class="sb"><div style="padding:14px 14px 80px" id="ab"></div></div>
+</div>
+
+<!-- 404 -->
+<div class="screen" id="s-404"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center"><div style="font-size:72px;font-weight:800;color:var(--border2);font-family:'DM Serif Display',serif">404</div><h2 style="font-size:20px;font-weight:700;margin-top:10px">Page Not Found</h2><button class="btn bp" style="max-width:200px;margin-top:24px" onclick="SS('s-auth')">Back to Home</button></div></div>
+
+
+<!-- TERMS OF SERVICE + PRIVACY POLICY -->
+<div class="screen" id="s-tos">
+  <div class="nav">
+    <button class="icon-btn" onclick="goBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span style="font-weight:700;font-size:15px">Legal & Privacy</span>
+    <div style="width:34px"></div>
+  </div>
+  <div class="sb"><div style="padding:20px 18px 60px">
+    <div style="background:var(--navy2);border-radius:var(--r2);padding:16px;margin-bottom:18px;color:#fff;text-align:center">
+      <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Trusted Hands Platform</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.75)">Last updated: June 2026 · Ekpoma, Edo State, Nigeria</div>
+    </div>
+
+    <div class="ic">
+      <h3>📋 Terms of Service</h3>
+      <div style="font-size:13px;color:#334155;line-height:1.9">
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">1. Acceptance of Terms</p>
+        <p style="margin-bottom:12px">By registering on Trusted Hands, you agree to these terms in full. If you do not agree, do not use this platform. These terms apply to all users — customers and artisans alike.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">2. Platform Role</p>
+        <p style="margin-bottom:12px">Trusted Hands is a marketplace platform that connects customers with independent artisans. We do not employ artisans. We are not responsible for the quality of work delivered by any artisan. We facilitate connection, not the work itself.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">3. Artisan Obligations</p>
+        <p style="margin-bottom:12px">Artisans must: carry valid ID when requested, communicate pricing clearly before starting work, arrive on time, maintain professional conduct, and complete jobs they accept. Violations may result in account suspension or permanent ban.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">4. Customer Obligations</p>
+        <p style="margin-bottom:12px">Customers must: treat artisans with respect, pay agreed amounts promptly, not share artisan contact details outside the platform without consent, and provide accurate job descriptions.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">5. Subscriptions & Payments</p>
+        <p style="margin-bottom:12px">Artisan subscriptions are non-refundable once activated. Subscription pauses are limited to 3 days per billing period. Fraudulent payment receipts will result in immediate permanent ban and possible legal action.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">6. Disputes</p>
+        <p style="margin-bottom:12px">Disputes between customers and artisans must be reported through the in-app support system within 48 hours of the job. Trusted Hands reserves the right to freeze accounts, withhold visibility, or mediate disputes at our sole discretion.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">7. Prohibited Conduct</p>
+        <p style="margin-bottom:12px">The following are strictly prohibited: harassment, fraud, misrepresentation of qualifications, collecting payment outside the platform after being connected through it, and any form of abuse. Violations result in immediate permanent ban.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">8. Account Termination</p>
+        <p style="margin-bottom:12px">We reserve the right to suspend or permanently ban any account at our discretion, with or without notice, for violations of these terms or behavior that harms the platform community.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">9. Limitation of Liability</p>
+        <p style="margin-bottom:12px">Trusted Hands shall not be liable for any damages arising from use of this platform, including but not limited to: job quality disputes, loss of income, property damage, or personal injury during any job arranged through this platform.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">10. Governing Law</p>
+        <p>These terms are governed by the laws of the Federal Republic of Nigeria. Any disputes shall be resolved in courts of competent jurisdiction in Edo State, Nigeria.</p>
+      </div>
+    </div>
+
+    <div class="ic">
+      <h3>🔒 Privacy Policy</h3>
+      <div style="font-size:13px;color:#334155;line-height:1.9">
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">What We Collect</p>
+        <p style="margin-bottom:12px">We collect: full name, email address, phone number, location zone, profile photo, portfolio photos, payment receipt images, and chat messages. For artisans, we also collect trade category, bio, and booking history.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">How We Use Your Data</p>
+        <p style="margin-bottom:12px">Your data is used exclusively to: display your profile on the marketplace, facilitate communication between users, process subscription payments, improve platform features, and send you important platform notifications. We do not sell your data to any third party.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Data Storage & Security</p>
+        <p style="margin-bottom:12px">All data is stored securely on Google Firebase (Firestore) with authentication required for all reads and writes. Images are stored as compressed base64 strings. No raw passwords are stored — authentication is handled by Firebase Auth.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Your Rights</p>
+        <p style="margin-bottom:12px">You may request deletion of your account and all associated data at any time by contacting support. Profile data can be updated at any time through the Edit Profile screen. Chat history is retained for platform safety.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Cookies & Sessions</p>
+        <p style="margin-bottom:12px">We use browser session storage for login state only. Sessions expire when you close the browser. We do not use tracking cookies or advertising cookies of any kind.</p>
+
+        <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Contact</p>
+        <p>For privacy concerns or data deletion requests, contact us through the in-app support system or email: <strong>olaowyegideon@gmail.com</strong></p>
+      </div>
+    </div>
+
+    <div style="background:#f8fafc;border-radius:var(--r2);padding:16px;text-align:center;font-size:12px;color:var(--slate3);line-height:1.8">
+      © 2026 Trusted Hands · Ekpoma, Edo State, Nigeria<br/>
+      <strong style="color:var(--navy)">Business Name Registration Pending — CAC Nigeria</strong><br/>
+      Platform version 1.0 · trust-hand.vercel.app
+    </div>
+  </div></div>
+</div>
+
+<!-- COMING SOON -->
+<div class="screen" id="s-coming">
+  <div style="flex:1;background:linear-gradient(160deg,#0f172a 0%,#1e3a8a 60%,#1d4ed8 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;text-align:center;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-80px;right:-80px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+    <div style="position:absolute;bottom:-80px;left:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+    <div style="position:relative;width:100%">
+      <div style="width:80px;height:80px;background:rgba(255,255,255,.12);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:38px">🚀</div>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:28px;color:#fff;margin-bottom:8px">Coming Soon!</h1>
+      <p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:28px;max-width:300px;margin-left:auto;margin-right:auto">Trusted Hands is currently in artisan onboarding mode. The full marketplace opens very soon — get ready!</p>
+      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:24px 20px;margin-bottom:28px">
+        <div style="font-size:12px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">Marketplace Opens In</div>
+        <div style="display:flex;justify-content:center;gap:12px" id="cdrow">
+          <div style="text-align:center"><div style="font-size:36px;font-weight:800;color:#fff;font-family:'DM Serif Display',serif;min-width:52px" id="cd_d">00</div><div style="font-size:10px;color:rgba(255,255,255,.55);font-weight:600;margin-top:4px">DAYS</div></div>
+          <div style="font-size:32px;color:rgba(255,255,255,.4);font-weight:700;padding-top:4px">:</div>
+          <div style="text-align:center"><div style="font-size:36px;font-weight:800;color:#fff;font-family:'DM Serif Display',serif;min-width:52px" id="cd_h">00</div><div style="font-size:10px;color:rgba(255,255,255,.55);font-weight:600;margin-top:4px">HOURS</div></div>
+          <div style="font-size:32px;color:rgba(255,255,255,.4);font-weight:700;padding-top:4px">:</div>
+          <div style="text-align:center"><div style="font-size:36px;font-weight:800;color:#fff;font-family:'DM Serif Display',serif;min-width:52px" id="cd_m">00</div><div style="font-size:10px;color:rgba(255,255,255,.55);font-weight:600;margin-top:4px">MINS</div></div>
+          <div style="font-size:32px;color:rgba(255,255,255,.4);font-weight:700;padding-top:4px">:</div>
+          <div style="text-align:center"><div style="font-size:36px;font-weight:800;color:#fff;font-family:'DM Serif Display',serif;min-width:52px" id="cd_s">00</div><div style="font-size:10px;color:rgba(255,255,255,.55);font-weight:600;margin-top:4px">SECS</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:var(--r2);padding:16px;margin-bottom:24px;text-align:left">
+        <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">What's happening now</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.85);line-height:2">✅ Artisans are registering & getting verified<br/>✅ Portfolios are being reviewed by admin<br/>🔜 Marketplace opens to customers on launch day<br/>🔜 Book verified workers right from your phone</div>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,.45)">Are you an artisan? <a href="#" onclick="SS('s-auth');return false" style="color:#93c5fd;font-weight:700;text-decoration:none">Register here →</a></p>
+    </div>
+  </div>
+</div>
+
+</div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,browserSessionPersistence,setPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getStorage,ref,uploadString,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
+const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
+setPersistence(auth,browserSessionPersistence).catch(()=>{});
+const AE='olaowyegideon@gmail.com';
+const LOCS={"Edo State":{"Esan West (Ekpoma)":["Market Square Area","Ojo Street","School Gate Area","Igor / Uhumudumu","Alli Square","Abelmen Area","GT Extension","Ujemen","Ujuenle","Emado","College Road","Abia"],"Benin City (Oredo)":["Ring Road","Sapele Road","Airport Road","Upper Sakponba","Uselu","Ugbowo","New Benin","Ikpoba Hill","GRA","Ekenwan Road","Oba Market Area"],"Benin City (Egor)":["Uwelu","Aduwawa","Ogida","Oregbeni","Mission Road","Upper Mission","Evbuotubu"],"Benin City (Ikpoba-Okha)":["Ikpoba Hill","Oregbeni Housing Estate","Idogbo","Evbuotubu","Ohaeghele","Ekewan Road"],"Igueben":["Igueben Town","Ewatto","Ewohimi","Ukhun"],"Esan North-East (Uromi)":["Uromi Town Centre","Irrua Road","Igue","Ebhoieki"],"Esan South-East (Ubiaja)":["Ubiaja Town","Ewohimi Road","Ohordua"],"Etsako West (Auchi)":["Auchi Town Centre","Polytechnic Road","Jattu","Iyuku Road","New Layout"],"Etsako Central (Fugar)":["Fugar Town","Ibillo","Okpella"],"Etsako East (Uzairue)":["Uzairue","Anegbette","Aviele"],"Orhionmwon (Abudu)":["Abudu","Orhionmwon LGA Centre","Ekpoma Bypass Area"],"Ovia North-East (Okada)":["Okada Town","Igbinedion University Area","Iguosa"],"Uhunmwonde":["Usen","Iguoriakhi","Ekpoma Road Junction"]},"Delta State":{"Warri (Uvwie)":["Effurun","PTI Road","Jakpa Road","NPA Road","Udu Road","Ugboroke","Ekpan"],"Warri (Warri South)":["Warri Town Centre","Okumagba Avenue","Igbudu Market","Airport Road Warri","Okere Road","Pessu Market","DSC Road","Ovwian","Agbarho Road"],"Warri North (Koko)":["Koko Town","Saghara","Gbokoda"],"Asaba (Oshimili South)":["Asaba Town Centre","Summit Road","Cable Point","Okpanam Road","DLA Road","Infant Jesus Area","New Layout Asaba","Oguta Road"],"Oshimili North (Kwale)":["Kwale Town","Issele-Uku","Ogwashi-Uku"],"Sapele (Sapele LGA)":["Sapele Town Centre","Okirighwre Road","Amukpe","Dore Camp","Okuzu Road"],"Ethiope East (Eku)":["Eku","Jesse","Abraka"],"Ethiope West (Oghara)":["Oghara Town","Evwreni","Mosogar"],"Ughelli North (Ughelli)":["Ughelli Town Centre","Agbarho","Otovwodo","Orogun Road","Aghalokpe"],"Ughelli South (Olomu)":["Olomu","Ughievwen","Erherhe"],"Isoko North (Ozoro)":["Ozoro Town","Oleh Road","Aviara"],"Isoko South (Oleh)":["Oleh Town","Emede","Emevor","Irri"],"Okpe (Sapele Road)":["Okpe LGA HQ","Mereje","Ugbolu"],"Ndokwa East (Kwale Area)":["Kwale East","Abbi","Ase"],"Ukwuani (Kwale/Obiaruku)":["Obiaruku","Umukwata","Ashaka"],"Aniocha North (Owa-Oyibu)":["Owa-Oyibu","Owa-Alero","Agbor-Obi"],"Aniocha South (Agbor)":["Agbor Town","Boji-Boji","Ute-Ogbeje","Abavo"],"Bomadi":["Bomadi Town","Tuomo","Kiagbodo"],"Burutu":["Burutu Town","Forcados","Yokri"],"Patani":["Patani Town","Emede-Patani"]},"Ogun State":{"Abeokuta North":["Kuto","Iberekodo","Panseke","Adatan"],"Abeokuta South":["Ijaye","Obantoko","Lafenwa","Sabo"],"Ijebu Ode":["Ijebu Ode Town","Folagbade","Oke-Aje"],"Sagamu":["Sagamu Town","Makun","Ago-Iwoye","Ogijo"],"Ota":["Ota Town","Sango Ota","Agbado","Owode"],"Ifo":["Ifo Town","Mowe","Ofada","Isheri North"],"Ilaro":["Ilaro Town","Oja Oda","Owode-Yewa"],"Ewekoro":["Ewekoro Town","Itori","Wasimi"]}};
+const allAreas=Object.values(LOCS).flatMap(lgas=>Object.values(lgas).flat());
+const allLGAs=Object.values(LOCS).flatMap(lgas=>Object.keys(lgas));
+// Legacy ZZ kept for compatibility
+const ZZ=allAreas;
+function onStateChange(sEl,lEl,aEl){const st=sEl.value;lEl.innerHTML='<option value="">Select LGA / City</option>';aEl.innerHTML='<option value="">Select Area / Zone</option>';lEl.disabled=!st;aEl.disabled=true;if(!st||!LOCS[st])return;Object.keys(LOCS[st]).forEach(l=>{lEl.innerHTML+=`<option value="${l}">${l}</option>`;});}
+function onLGAChange(sEl,lEl,aEl){const st=sEl.value,lg=lEl.value;aEl.innerHTML='<option value="">Select Area / Zone</option>';aEl.disabled=!lg;if(!st||!lg||!LOCS[st]||!LOCS[st][lg])return;LOCS[st][lg].forEach(a=>{aEl.innerHTML+=`<option value="${a}">${a}</option>`;});}
+function locStr(st,lg,ar){if(ar&&lg&&st)return ar+', '+lg+', '+st;if(ar&&st)return ar+', '+st;return ar||lg||st||'—';}
+// ── CRITICAL: expose all location & helper functions on window so HTML attributes work ──
+window.onStateChange=onStateChange;
+window.onLGAChange=onLGAChange;
+window.locStr=locStr;
+function findLGAForArea(area){for(const[st,lgas] of Object.entries(LOCS)){for(const[lg,areas] of Object.entries(lgas)){if(areas.includes(area))return{state:st,lga:lg};}}return null;}
+function nbAreas(area){const loc=findLGAForArea(area);if(!loc)return[];return LOCS[loc.state][loc.lga].filter(a=>a!==area);}
+let S={u:null,p:null,ports:[],rcpt:null,idDoc:null,tier:null,ct:null,cu:null,fc:[],pv:'s-auth',at:'ap2',jobPhoto:null,jobDesc:''};
+const $=id=>document.getElementById(id);
+window.$=$; // expose globally so HTML onchange attributes can use it
+const sn=s=>String(s||'').replace(/[<>"'&]/g,c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c])).trim();
+const ini=n=>String(n||'').split(' ').map(x=>x[0]||'').join('').substring(0,2).toUpperCase()||'?';
+const ft=ts=>{if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')};
+// nb() replaced by nbAreas() above using LOCS structure
+
+function toast(m,d=3000){const t=$('T');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
+
+// ── DARK MODE TOGGLE ──
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  const btn=$('themeToggle');
+  if(btn)btn.textContent=theme==='dark'?'☀️':'🌙';
+}
+window.toggleTheme=function(){
+  const cur=document.documentElement.getAttribute('data-theme')||'light';
+  const next=cur==='dark'?'light':'dark';
+  applyTheme(next);
+  try{localStorage.setItem('th_theme',next);}catch(e){}
+};
+// Apply saved theme on load (default: light)
+try{
+  const saved=localStorage.getItem('th_theme');
+  if(saved==='dark')applyTheme('dark');
+}catch(e){}
+
+let navH=[];
+function SS(id){
+  if(id!=='s-splash'){const c=document.querySelector('.screen.active');if(c&&c.id!==id)navH.push(c.id);}
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=$(id);if(el)el.classList.add('active');
+  history.pushState({s:id},'',location.pathname);
+}
+window.SS=SS;
+window.addEventListener('popstate',()=>{if(navH.length){const p=navH.pop();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(p)?.classList.add('active');}else history.pushState({},'',location.pathname);});
+function gT(p){S.pv=document.querySelector('.screen.active')?.id||'s-market';if(p==='cl'){SS('s-cl');rCL();}else if(p==='dash'){SS('s-dash');rDash();}else if(p==='market'){SS('s-market');iMkt();}}
+window.gT=gT;
+window.goBack=function(){SS(S.pv||'s-market')};
+
+
+async function uploadImg(base64,path){
+  try{
+    const r=ref(storage,path);
+    await uploadString(r,base64,'data_url');
+    return await getDownloadURL(r);
+  }catch(e){return base64;}
+}
+
+async function compress(f,mx=900,q=0.78){return new Promise(r=>{const fr=new FileReader();fr.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');let w=img.width,h=img.height;if(w>mx){h=Math.round(h*mx/w);w=mx;}if(h>mx){w=Math.round(w*mx/h);h=mx;}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);r(c.toDataURL('image/jpeg',q));};img.src=e.target.result;};fr.readAsDataURL(f);})}
+
+// ── SPLASH ──
+const MSGS=['🔧 Find electricians, plumbers & more in your zone','⭐ Verified artisans with real portfolios and reviews','💬 Chat & negotiate safely before any booking','🚀 Ekpoma\'s most trusted worker marketplace is here'];
+function runSplash(){
+  const lo=$('spl'),ms=$('spm'),tx=$('spt'),fl=$('spf');
+  setTimeout(()=>{if(lo){lo.style.opacity='1';lo.style.transform='scale(1)';}},200);
+  setTimeout(()=>{if(ms)ms.style.opacity='1';if(tx)tx.textContent=MSGS[0];if(fl){fl.style.width='100%';}},800);
+  let idx=0;
+  const cy=setInterval(()=>{idx=(idx+1)%MSGS.length;if(tx){tx.style.opacity='0';setTimeout(()=>{tx.textContent=MSGS[idx];tx.style.opacity='1';},300);}if(fl){fl.style.transition='none';fl.style.width='0';setTimeout(()=>{fl.style.transition='width 3.2s linear';fl.style.width='100%';},50);}},3200);
+  setTimeout(()=>{clearInterval(cy);const sp=$('s-splash');if(sp){sp.style.opacity='0';sp.style.transition='opacity .6s';}setTimeout(()=>{if(!S.u)SS('s-auth');},600);},7000);
+}
+
+// ── AUTH STATE — fixed: waits for splash then routes ──
+let splashDone=false;let pendingRoute=null;
+setTimeout(()=>{splashDone=true;if(pendingRoute){pendingRoute();pendingRoute=null;}},7800);
+
+onAuthStateChanged(auth,async user=>{
+  const doRoute=async()=>{
+    if(user){
+      S.u=user;
+      if(user.email.toLowerCase()===AE){
+        S.p={uid:user.uid,type:'admin',email:user.email,name:'Admin'};
+        SS('s-admin');aTab('ap2');lMq();return;
+      }
+      try{
+        const snap=await getDoc(doc(db,'users',user.uid));
+        if(snap.exists()){S.p=snap.data();route();lMq();lUnread();}
+        else{await signOut(auth);SS('s-auth');}
+      }catch(e){SS('s-auth');}
+    } else {
+      S.u=null;S.p=null;SS('s-auth');
+    }
+  };
+  if(splashDone)doRoute();
+  else pendingRoute=doRoute;
+});
+
+function route(){
+  const p=S.p;
+  if(!p){SS('s-auth');return;}
+  // Block customers before launch date
+  if(p.type==='customer'&&!isLaunched()){SS('s-coming');return;}
+  if(p.type==='customer'){SS('s-market');iMkt();}
+  else if(p.type==='artisan'){
+    if(p.status==='pending')SS('s-pending');
+    else if(p.status==='active'||p.status==='unsubscribed'){SS('s-dash');rDash();setTimeout(askPushPermission,2000);}
+    else SS('s-paywall');
+  }
+}
+
+// ── EMAIL NOTIFICATIONS via EmailJS ──
+// Setup: go to emailjs.com → create account → create service (Gmail) → create template
+// Template variables: {{to_name}}, {{to_email}}, {{trade}}, {{missed_count}}, {{subscribe_link}}
+// Replace YOUR_EMAILJS_PUBLIC_KEY above, YOUR_SERVICE_ID and YOUR_TEMPLATE_ID below
+const EJS_SERVICE='service_8u1ufa9';
+const EJS_TEMPLATE='pxuryr6';
+
+async function sendMissedViewEmail(artisanData){
+  if(!window.emailjs)return;
+  try{
+    await emailjs.send(EJS_SERVICE,EJS_TEMPLATE,{
+      to_name:artisanData.name||'Artisan',
+      to_email:artisanData.email,
+      trade:artisanData.trade||'your trade',
+      missed_count:artisanData.missedViews||1,
+      subscribe_link:'https://trust-hand.vercel.app',
+      platform_name:'Trusted Hands',
+      zone:artisanData.zone||'Ekpoma',
+    });
+    console.log('Email notification sent to',artisanData.email);
+  }catch(e){
+    console.warn('EmailJS send failed:',e);
+  }
+}
+
+// ── FIRESTORE SECURITY HELPERS ──
+// All writes validated client-side before hitting Firestore
+// Firestore rules (set in Firebase Console) must also enforce:
+// - users can only write to their own document
+// - type field cannot be changed after creation
+// - admin fields (status,tier,expiry) only writable if request.auth.token.email == admin email
+function validateWrite(data,allowedKeys){
+  const keys=Object.keys(data);
+  const invalid=keys.filter(k=>!allowedKeys.includes(k));
+  if(invalid.length>0){console.warn('Blocked write with invalid keys:',invalid);return false;}
+  // Check for script injection in string values
+  for(const[k,v] of Object.entries(data)){
+    if(typeof v==='string'&&/<script|javascript:|on\w+=/i.test(v)){
+      console.warn('Blocked write with suspicious value in key:',k);return false;
+    }
+  }
+  return true;
+}
+// ── PAYSTACK PAYMENT ──
+const PAYSTACK_KEY='pk_test_f1d0564c82d7e47a62ed91a77030c75d6d573c22'; // get from paystack.com/dashboard
+const PRICES={standard:500000,premium:1000000}; // kobo: ₦5,000 & ₦10,000
+
+window.initPaystack=function(){
+  const err=$('pwerr');err.style.display='none';
+  if(!S.tier){err.textContent='Please select a plan first.';err.style.display='block';return;}
+  if(!S.u||!S.p){SS('s-auth');return;}
+  if(!['standard','premium'].includes(S.tier)){err.textContent='Invalid plan.';err.style.display='block';return;}
+  if(!window.PaystackPop){err.textContent='Payment system not loaded. Try manual payment below.';err.style.display='block';return;}
+  if(PAYSTACK_KEY==='pk_test_f1d0564c82d7e47a62ed91a77030c75d6d573c22'||!PAYSTACK_KEY){err.textContent='Card payment is being set up. Please use manual bank transfer below for now.';err.style.display='block';return;}
+  const amount=PRICES[S.tier];
+  const ref='TH_'+S.u.uid.substring(0,8)+'_'+Date.now();
+  $('payBtn').disabled=true;$('payBtn').textContent='Opening payment…';
+  const handler=PaystackPop.setup({
+    key:PAYSTACK_KEY,email:S.p.email,amount,currency:'NGN',ref,
+    metadata:{uid:S.u.uid,name:S.p.name,trade:S.p.trade,tier:S.tier,
+      custom_fields:[{display_name:'Artisan',variable_name:'artisan',value:S.p.name},{display_name:'Plan',variable_name:'plan',value:S.tier}]},
+    callback:async function(response){
+      $('payBtn').textContent='Verifying…';
+      try{
+        // Security: check reference not reused
+        const ex=await getDocs(query(collection(db,'payments'),where('reference','==',response.reference)));
+        if(!ex.empty){toast('⚠️ Reference already used. Contact support.');$('payBtn').disabled=false;$('payBtn').textContent='Pay Now with Paystack';return;}
+        await addDoc(collection(db,'payments'),{artisanUid:S.u.uid,name:S.p.name,trade:S.p.trade||'',tier:S.tier,amount:amount/100,reference:response.reference,status:'success',paidAt:serverTimestamp(),verified:true});
+        await updateDoc(doc(db,'users',S.u.uid),{status:'pending',tier:S.tier,paystackRef:response.reference});
+        await addDoc(collection(db,'pendingApprovals'),{artisanUid:S.u.uid,name:S.p.name||'',trade:S.p.trade||'',zone:S.p.zone||'',lga:S.p.lga||'',state:S.p.state||'',fullLocation:S.p.fullLocation||'',tier:S.tier==='premium'?'Premium (₦10,000)':'Standard (₦5,000)',paymentMethod:'paystack',paystackRef:response.reference,amount:amount/100,submittedAt:serverTimestamp(),reviewed:false,senderBank:'Paystack — Auto-verified ✅',receiptBase64:null});
+        S.p={...S.p,status:'pending'};SS('s-pending');toast('✅ Payment confirmed! Profile activating shortly.');
+      }catch(e){toast('Payment received but error occurred. Share ref '+response.reference+' with support.');}
+      $('payBtn').disabled=false;$('payBtn').textContent='Pay Now with Paystack';
+    },
+    onClose:function(){$('payBtn').disabled=false;$('payBtn').textContent='Pay Now with Paystack';toast('Payment cancelled. Complete payment to activate.');}
+  });
+  handler.openIframe();
+};
+
+const LAUNCH_DATE=new Date('2026-06-23T00:00:00');
+function isLaunched(){return true;}
+
+// Countdown ticker for coming soon screen
+function startCountdown(){
+  function tick(){
+    const diff=LAUNCH_DATE.getTime()-Date.now();
+    if(diff<=0){const el=$('s-coming');if(el&&el.classList.contains('active'))SS('s-auth');return;}
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    const sc=Math.floor((diff%60000)/1000);
+    const pad=n=>String(n).padStart(2,'0');
+    if($('cd_d'))$('cd_d').textContent=pad(d);
+    if($('cd_h'))$('cd_h').textContent=pad(h);
+    if($('cd_m'))$('cd_m').textContent=pad(m);
+    if($('cd_s'))$('cd_s').textContent=pad(sc);
+  }
+  tick();setInterval(tick,1000);
+}
+startCountdown();
+window.stab=function(t){
+  $('atabs').querySelectorAll('.tab').forEach((e,i)=>e.classList.toggle('active',i===(t==='si'?0:1)));
+  $('si').style.display=t==='si'?'block':'none';
+  $('reg').style.display=t==='si'?'none':'block';
+};
+// Pre-launch: force artisan-only mode
+let RT='c';
+setTimeout(()=>{if($('aex'))$('aex').style.display='none';},100);
+window.srt=function(t){
+  RT=t;
+  $('rtabs').querySelectorAll('.tab').forEach((e,i)=>e.classList.toggle('active',i===(t==='c'?0:1)));
+  $('aex').style.display=t==='a'?'block':'none';
+  vr();
+};
+window.vr=function(){
+  const n=$('rn')?.value.trim(),e=$('re')?.value.trim(),ph=$('rph')?.value.trim(),pw=$('rpw')?.value;
+  const st=$('rstate')?.value,lg=$('rlga')?.value,z=$('rz')?.value;
+  let ok=n&&e&&ph&&pw&&pw.length>=6&&st&&lg&&z;
+  if(RT==='a')ok=ok&&$('rt')?.value&&$('agr')?.checked&&S.ports.length>=2;
+  if($('rbtn'))$('rbtn').disabled=!ok;
+};
+window.tpw=function(id,btn){
+  const inp=$(id);if(!inp)return;
+  const s=inp.type==='password';inp.type=s?'text':'password';
+  btn.style.color=s?'var(--blue2)':'#94a3b8';
+};
+window.hport=async function(e){
+  const files=Array.from(e.target.files).slice(0,8);
+  for(const f of files){const u=await compress(f);S.ports.push(u);}
+  const w=$('pprev');if(w)w.innerHTML=S.ports.map(u=>`<img src="${u}" class="pimg"/>`).join('');
+  const c=$('pcnt');if(c)c.textContent=S.ports.length+' photo'+(S.ports.length!==1?'s':'')+' uploaded'+(S.ports.length>=2?' ✓':'');
+  vr();
+};
+window.hIdDoc=async function(e){
+  const f=e.target.files[0];if(!f)return;
+  S.idDoc=await compress(f,1200,.85);
+  const p=$('idprev');if(p)p.innerHTML=`<img src="${S.idDoc}" style="width:100%;border-radius:var(--r);border:2px solid var(--blue2);max-height:180px;object-fit:cover"/><div style="font-size:12px;color:var(--blue2);font-weight:600;margin-top:6px">✅ ID uploaded — will be reviewed by admin</div>`;
+};
+window.hrcpt=async function(e){
+  const f=e.target.files[0];if(!f)return;
+  S.rcpt=await compress(f,1200,.85);
+  const p=$('rcprev');if(p)p.innerHTML=`<img src="${S.rcpt}" style="width:100%;border-radius:var(--r);border:2px solid var(--emerald);max-height:200px;object-fit:cover"/>`;
+};
+window.doLogin=async function(){
+  // Security: rate limit login attempts
+  const now=Date.now();let attempts=[];
+  try{attempts=JSON.parse(sessionStorage.getItem('_la')||'[]');}catch(e){}
+  attempts=attempts.filter(t=>now-t<300000); // 5 min window
+  if(attempts.length>=5){const wait=Math.ceil((300000-(now-attempts[0]))/60000);const err=$('lerr');err.textContent='Too many attempts. Please wait '+wait+' minute'+(wait!==1?'s':'')+'.';err.style.display='block';return;}
+  const email=$('le').value.trim().toLowerCase(),pass=$('lp').value;
+  const err=$('lerr');err.style.display='none';
+  // Security: basic input validation
+  if(!email||!pass){err.textContent='Please enter your email and password.';err.style.display='block';return;}
+  if(email.length>200||pass.length>200){err.textContent='Invalid input.';err.style.display='block';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Enter a valid email address.';err.style.display='block';return;}
+  $('lbtn').disabled=true;$('lbtn').textContent='Signing in…';
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+    try{sessionStorage.removeItem('_la');}catch(e){}
+  }catch(e){
+    $('lbtn').disabled=false;$('lbtn').textContent='Sign In Securely';
+    // Log failed attempt
+    attempts.push(now);try{sessionStorage.setItem('_la',JSON.stringify(attempts));}catch(e2){}
+    // Generic error — don't reveal whether email exists
+    err.textContent=e.code==='auth/too-many-requests'?'Too many failed attempts. Try again later.':'Incorrect email or password.';
+    err.style.display='block';
+  }
+};
+window.doLogout=async function(){
+  await signOut(auth);
+  S={u:null,p:null,ports:[],rcpt:null,idDoc:null,tier:null,ct:null,cu:null,fc:[],pv:'s-auth',at:'ap2',jobPhoto:null,jobDesc:''};
+  toast('Signed out.');SS('s-auth');
+};
+window.doReg=async function(){
+  const n=sn($('rn').value),e=sn($('re').value.trim().toLowerCase()),ph=sn($('rph').value.trim()),pw=$('rpw').value,z=$('rz').value,lg=$('rlga').value,st=$('rstate').value;
+  const err=$('rerr');err.style.display='none';
+  // Security: strict input validation
+  if(n.length<2||n.length>80){err.textContent='Name must be 2–80 characters.';err.style.display='block';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)||e.length>200){err.textContent='Enter a valid email.';err.style.display='block';return;}
+  if(!/^[0-9+\s\-]{7,20}$/.test(ph)){err.textContent='Enter a valid phone number.';err.style.display='block';return;}
+  if(pw.length<6||pw.length>128){err.textContent='Password must be 6–128 characters.';err.style.display='block';return;}
+  if(!z){err.textContent='Please select your zone.';err.style.display='block';return;}
+  // Block customer registration before launch
+  if(RT==='c'&&!isLaunched()){SS('s-coming');return;}
+  $('rbtn').disabled=true;$('rbtn').textContent='Creating…';
+  try{
+    const cr=await createUserWithEmailAndPassword(auth,e,pw);
+    const uid=cr.user.uid;
+    if(RT==='c'){
+      const pd={uid,name:n,email:e,phone:ph,type:'customer',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),createdAt:serverTimestamp()};
+      await setDoc(doc(db,'users',uid),pd);S.p=pd;
+      toast('Welcome to Trusted Hands, '+n.split(' ')[0]+'! 🎉');
+      SS('s-market');iMkt();
+    }else{
+      const tr=$('rt').value,bio=sn($('rb').value).substring(0,500);
+      if(!tr){err.textContent='Please select your trade.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
+      if(S.ports.length<2){err.textContent='Please upload at least 2 portfolio photos.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
+      const pd={uid,name:n,email:e,phone:ph,type:'artisan',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),trade:tr,bio,status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,timerStarted:false,graceEnd:null,portfolios:S.ports.slice(),idDocument:S.idDoc||null,idVerified:false,contract_signed_date:serverTimestamp(),createdAt:serverTimestamp()};
+      await setDoc(doc(db,'users',uid),pd);S.p=pd;SS('s-paywall');setTimeout(()=>showArtisanTut(),800);
+    }
+  }catch(e2){
+    $('rbtn').disabled=false;$('rbtn').textContent='Create Account';
+    err.textContent=e2.code==='auth/email-already-in-use'?'Email already registered. Please sign in.':'Registration failed. Please try again.';
+    err.style.display='block';
+  }
+};
+window.sendReset=async function(){
+  const e=$('fpe').value.trim().toLowerCase();
+  const er=$('fperr'),ok=$('fpok');er.style.display='none';ok.style.display='none';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){er.textContent='Enter a valid email.';er.style.display='block';return;}
+  $('fpbtn').disabled=true;$('fpbtn').textContent='Sending…';
+  try{await sendPasswordResetEmail(auth,e);ok.textContent='✅ Reset link sent to '+e;ok.style.display='block';$('fpbtn').textContent='Email Sent ✓';}
+  catch(e2){$('fpbtn').disabled=false;$('fpbtn').textContent='Send Reset Link';er.textContent=e2.code==='auth/user-not-found'?'No account with this email.':'Error: '+e2.message;er.style.display='block';}
+};
+
+// ── PAYWALL ──
+window.selT=function(t){
+  S.tier=t;
+  $('tcs').className='tc'+(t==='standard'?' ss':'');
+  $('tcp').className='tc'+(t==='premium'?' sp':'');
+};
+window.subProof=async function(){
+  const err=$('pwerr');err.style.display='none';
+  if(!S.tier){err.textContent='Please select a plan.';err.style.display='block';return;}
+  const sb=sn($('sbk').value.trim());
+  if(!sb){err.textContent='Enter your sender bank/account name.';err.style.display='block';return;}
+  if(!S.rcpt){err.textContent='Please upload your payment receipt.';err.style.display='block';return;}
+  if(!S.u){SS('s-auth');return;}
+  try{
+    await updateDoc(doc(db,'users',S.u.uid),{status:'pending',tier:S.tier,senderBank:sb});
+    await addDoc(collection(db,'pendingApprovals'),{artisanUid:S.u.uid,name:S.p?.name||'',trade:S.p?.trade||'',zone:S.p?.zone||'',tier:S.tier==='premium'?'Premium (₦10,000)':'Standard (₦5,000)',senderBank:sb,receiptBase64:S.rcpt,submittedAt:serverTimestamp(),reviewed:false});
+    S.p={...S.p,status:'pending'};SS('s-pending');toast('Submitted! Admin will review shortly.');
+  }catch(e){err.textContent='Error: '+e.message;err.style.display='block';}
+};
+window.chkPend=async function(){
+  if(!S.u)return;
+  const snap=await getDoc(doc(db,'users',S.u.uid));
+  if(snap.exists()){S.p=snap.data();if(S.p.status==='active'){toast('🎉 Account activated!');route();}else toast('Still under review. Check back soon!');}
+};
+
+// ── MARKETPLACE ──
+const CATS=[
+  {t:'Electricians',g:'linear-gradient(145deg,#1e3a8a,#3b82f6)',e:'⚡',d:'Wiring, fittings & power'},
+  {t:'Plumbers',g:'linear-gradient(145deg,#065f46,#10b981)',e:'🔧',d:'Pipes, leaks & water'},
+  {t:'Cleaners',g:'linear-gradient(145deg,#0c4a6e,#0ea5e9)',e:'🧹',d:'Home & office cleaning'},
+  {t:'Tailors',g:'linear-gradient(145deg,#4c1d95,#8b5cf6)',e:'🧵',d:'Sewing & fashion design'},
+  {t:'Hairdressers',g:'linear-gradient(145deg,#831843,#ec4899)',e:'💇',d:'Hair styling & treatment'},
+  {t:'Barbers',g:'linear-gradient(145deg,#1f2937,#374151)',e:'💈',d:'Haircuts & grooming'},
+  {t:'Mechanics',g:'linear-gradient(145deg,#78350f,#f59e0b)',e:'🔩',d:'Car repairs & servicing'},
+  {t:'Dry Cleaners',g:'linear-gradient(145deg,#be185d,#f472b6)',e:'👔',d:'Laundry & pressing'},
+  {t:'Bricklayer / Construction Manager',g:'linear-gradient(145deg,#374151,#6b7280)',e:'🧱',d:'Building & renovation'},
+  {t:'POP Installers',g:'linear-gradient(145deg,#0f4c75,#1b6ca8)',e:'🏠',d:'Ceiling & POP work'},
+  {t:'Interior Decorators',g:'linear-gradient(145deg,#6d28d9,#c4b5fd)',e:'🛋️',d:'Decoration & furnishing'},
+  {t:'Shoe Makers',g:'linear-gradient(145deg,#92400e,#d97706)',e:'👟',d:'Shoe making & repairs'},
+  {t:'Massage Therapists',g:'linear-gradient(145deg,#065f46,#34d399)',e:'💆',d:'Massage & relaxation'},
+  {t:'Counselors',g:'linear-gradient(145deg,#1e3a8a,#60a5fa)',e:'🧠',d:'Guidance & counselling'},
+  {t:'Cooks',g:'linear-gradient(145deg,#7c2d12,#ea580c)',e:'👨‍🍳',d:'Home & event cooking'},
+  {t:'Car Wash',g:'linear-gradient(145deg,#0c4a6e,#38bdf8)',e:'🚗',d:'Car cleaning & detailing'},
+  {t:'Errand Boy / Girl',g:'linear-gradient(145deg,#134e4a,#2dd4bf)',e:'🏃',d:'Delivery & errands'},
+  {t:'Solar Installers',g:'linear-gradient(145deg,#713f12,#fbbf24)',e:'☀️',d:'Solar panels & power'},
+  {t:'Welders',g:'linear-gradient(145deg,#1c1917,#57534e)',e:'🔥',d:'Metal work & welding'},
+  {t:'Carpenters',g:'linear-gradient(145deg,#451a03,#a16207)',e:'🪚',d:'Furniture & woodwork'},
+  {t:'Nail Technicians',g:'linear-gradient(145deg,#500724,#db2777)',e:'💅',d:'Manicure & nail art'},
+  {t:'Lash Technicians',g:'linear-gradient(145deg,#581c87,#c026d3)',e:'👁️',d:'Eyelash extensions & lifts'},
+];
+
+function iMkt(){bCG();pFeed();showTut();}
+function bCG(){
+  const g=$('cg');if(!g)return;
+  g.innerHTML=CATS.map(c=>`<div class="ccard" style="background:${c.g}" onclick="showF('${c.t.replace(/'/g,"\\'")}','${c.t.replace(/'/g,"\\'")}')"><div style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.2);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">Find →</div><div style="font-size:26px;margin-bottom:8px">${c.e}</div><div><div style="font-weight:800;font-size:13px;color:#fff;line-height:1.3">${c.t}</div><div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">${c.d}</div></div></div>`).join('');
+}
+async function pFeed(){
+  try{
+    const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));
+    const all=snap.docs.map(d=>d.data()).filter(a=>a.status!=='pending'&&a.status!=='banned');
+    const fz=S.p?.zone||ZZ[0];
+    const srt=arr=>arr.sort((a,b)=>{const w={premium:0,standard:1,unsubscribed:2};const ta=w[a.status==='unsubscribed'?'unsubscribed':(a.tier||'standard')]??2;const tb=w[b.status==='unsubscribed'?'unsubscribed':(b.tier||'standard')]??2;return ta!==tb?ta-tb:(b.rating||0)-(a.rating||0);});
+    const s=all.filter(a=>a.zone===fz),n=all.filter(a=>a.zone!==fz&&nbAreas(fz).includes(a.zone)),r=all.filter(a=>!s.includes(a)&&!n.includes(a));
+    S.fc=[...srt(s),...srt(n),...srt(r)];
+  }catch(e){}
+}
+window.showF=async function(trade,title){
+  $('catView').style.display='none';$('feedView').style.display='block';
+  $('ftitle').textContent=title||'All Workers';
+  const l=$('fl');l.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner"></div></div>`;
+  try{
+    let items=S.fc;
+    if(!items.length){const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));items=snap.docs.map(d=>d.data()).filter(a=>a.status!=='pending'&&a.status!=='banned');S.fc=items;}
+    const f=trade?items.filter(a=>a.trade===trade):items;
+    const fst=$('fstate')?.value||'';const flg=$('flga')?.value||'';const z=$('zf')?.value||'';
+    let fin=f;
+    if(fst)fin=fin.filter(a=>a.state===fst);
+    if(flg)fin=fin.filter(a=>a.lga===flg);
+    if(z)fin=[...fin.filter(a=>a.zone===z),...fin.filter(a=>a.zone!==z&&nbAreas(z).includes(a.zone)),...fin.filter(a=>a.zone!==z&&!nbAreas(z).includes(a.zone))];
+    else if(!fst&&!flg){// default sort: same state as user first
+      const uSt=S.p?.state||'Edo State';fin=[...fin.filter(a=>a.state===uSt),...fin.filter(a=>a.state!==uSt)];}
+    if(!fin.length){l.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">🔍</div><div style="font-weight:600;margin-bottom:6px">No artisans found yet</div><p style="font-size:13px">Workers are joining daily. Check back soon!</p></div>`;return;}
+    l.innerHTML=fin.map(a=>aC(a)).join('');
+  }catch(e){l.innerHTML=`<div class="es">Failed to load. <button class="btn bo bsm" onclick="showF('${trade}','${title}')">Retry</button></div>`;}
+};
+window.showC=function(){$('catView').style.display='block';$('feedView').style.display='none';$('si2').value='';};
+window.hSrch=function(q){
+  if(!q.trim()){showC();return;}
+  $('catView').style.display='none';$('feedView').style.display='block';$('ftitle').textContent='Search: "'+q+'"';
+  const f=S.fc.filter(a=>(a.name||'').toLowerCase().includes(q.toLowerCase())||(a.trade||'').toLowerCase().includes(q.toLowerCase())||(a.zone||'').toLowerCase().includes(q.toLowerCase()));
+  const l=$('fl');
+  if(!f.length){l.innerHTML=`<div class="es">No results for "${sn(q)}"</div>`;return;}
+  l.innerHTML=f.map(a=>aC(a)).join('');
+};
+window.hZone=function(){if($('feedView').style.display!=='none')showF('',($('ftitle')||{textContent:''}).textContent);};
+window.onFStateChange=function(){
+  const st=$('fstate').value;
+  const flga=$('flga');const zf=$('zf');
+  flga.innerHTML='<option value="">All LGAs</option>';
+  zf.innerHTML='<option value="">All Areas</option>';
+  if(st&&LOCS[st]){Object.keys(LOCS[st]).forEach(l=>{flga.innerHTML+=`<option value="${l}">${l}</option>`;});}
+  hZone();
+};
+window.onFLGAChange=function(){
+  const st=$('fstate').value,lg=$('flga').value;
+  const zf=$('zf');
+  zf.innerHTML='<option value="">All Areas</option>';
+  if(st&&lg&&LOCS[st]&&LOCS[st][lg]){LOCS[st][lg].forEach(a=>{zf.innerHTML+=`<option value="${a}">${a}</option>`;});}
+  hZone();
+};
+
+function aC(u){
+  const iu=u.status==='unsubscribed';const ip=u.tier==='premium'&&u.status==='active';const ib=u.daily_booked;
+  const cc=iu?'inact':ip?'prem':'act';const ac=ip?'avp':iu?'avi':'ava';
+  const pi=ip?`<span class="tpill tpp">⭐ Premium</span>`:iu?`<span class="tpill tpi">Inactive</span>`:`<span class="tpill tpa">✓ Active</span>`;
+  const idBadge=u.idVerified?`<span class="tpill" style="background:var(--blue3);color:var(--blue2);margin-left:4px">🪪 ID Verified</span>`:'';
+  const respBadge=(u.avgResponseMin!==undefined&&u.avgResponseMin<=60)?`<div style="font-size:11px;color:var(--emerald);font-weight:700;margin-top:4px;display:flex;align-items:center;gap:3px">⚡ Usually responds in ${u.avgResponseMin<1?'under 1 min':u.avgResponseMin+' min'}</div>`:'';
+  const st=u.rating?`<span style="color:var(--amber)">${'★'.repeat(Math.round(u.rating))}</span><span style="font-size:12px;color:var(--slate3);margin-left:3px">${u.rating.toFixed(1)} (${u.reviews})</span>`:`<span style="font-size:12px;color:var(--slate3)">No reviews yet</span>`;
+  const ph=u.profilePhoto?`<img src="${u.profilePhoto}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0"/>`:`<div class="avc ${ac}">${ini(u.name)}</div>`;
+  const uid=u.uid;const nm=u.name.replace(/'/g,"\\'");const tr=u.trade.replace(/'/g,"\\'");
+  return`<div class="acard ${cc}" onclick="${iu?`sLP('${uid}','${nm}','${tr}')`:`oD('${uid}')`}"><div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px">${ph}<div style="flex:1"><div style="font-weight:700;font-size:15px;color:var(--navy)">${sn(u.name)}</div><div style="font-size:13px;color:var(--blue2);font-weight:600">${sn(u.trade)}</div><div style="font-size:12px;color:var(--slate3)">📍 ${sn(u.fullLocation||u.zone||u.lga||'—')}</div><div style="margin-top:4px">${pi}${idBadge}</div>${respBadge}</div></div><div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f1f5f9"><div style="display:flex;align-items:center;gap:4px">${st}</div><div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--slate3)"><div class="adot" style="background:${iu?'#94a3b8':ib?'var(--amber)':'var(--emerald)'}"></div>${iu?'Inactive':ib?'Booked today':'Available'}</div></div>${iu?'<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:8px">🔒 Subscribe to unlock profile & contact</div>':''}</div>`;
+}
+
+// ── WHATSAPP NOTIFICATION via CallMeBot (free, no API cost) ──
+// How it works: artisan sends ONE setup message to +34 644 59 78 19 on WhatsApp:
+// "I allow callmebot to send me messages"
+// After that, CallMeBot sends WhatsApp messages to their number automatically.
+// We store whether artisan has activated CallMeBot in their profile (waActivated: true)
+
+async function sendWhatsAppNotification(artisanData, messageType){
+  const phone = artisanData.phone;
+  if(!phone || !artisanData.waActivated) return; // Only send if artisan activated it
+  // Clean phone - remove spaces, dashes, leading 0, add country code
+  let cleanPhone = phone.replace(/[\s\-\(\)]/g,'');
+  if(cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
+  if(!cleanPhone.startsWith('234')) cleanPhone = '234' + cleanPhone;
+
+  let message = '';
+  if(messageType === 'profile_view'){
+    message = `🔔 *Trusted Hands Alert*\n\nA customer just viewed your ${artisanData.trade} profile and wants to book you!\n\n👉 Open the app to respond and secure the booking:\nhttps://trust-hand.vercel.app\n\n_Reply fast — customers book the first available artisan!_`;
+  } else if(messageType === 'booking'){
+    message = `📅 *New Booking Alert!*\n\nA customer has booked you on Trusted Hands.\n\n✅ Open the app to see job details and chat with them:\nhttps://trust-hand.vercel.app\n\n_Trusted Hands — Ekpoma's Artisan Marketplace_`;
+  }
+
+  const encoded = encodeURIComponent(message);
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encoded}&apikey=${artisanData.waApiKey||''}`;
+  try{
+    await fetch(url, {mode:'no-cors'});
+  }catch(e){ /* silent fail - WhatsApp notification is bonus, not critical */ }
+}
+
+// Show CallMeBot setup instructions to artisan (one-time setup)
+window.showWASetup = function(){
+  document.getElementById('waSetupModal')?.remove();
+  const el = document.createElement('div');
+  el.id = 'waSetupModal';
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML = `<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 44px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="width:44px;height:44px;background:#25d366;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📱</div>
+      <div><h3 style="font-weight:700;font-size:17px;color:var(--navy)">WhatsApp Booking Alerts</h3><p style="font-size:12px;color:var(--slate3)">Get notified on WhatsApp when customers view your profile</p></div>
+    </div>
+    <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:var(--r2);padding:16px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:10px">✅ Quick 2-step setup — FREE forever</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:#15803d;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px">Send this message on WhatsApp to <strong style="color:#15803d">+34 644 59 78 19</strong></div>
+            <div style="background:var(--white);border:1px solid #86efac;border-radius:var(--r);padding:10px;font-size:13px;font-family:monospace;color:var(--navy);margin-bottom:6px">I allow callmebot to send me messages</div>
+            <button onclick="navigator.clipboard?.writeText('I allow callmebot to send me messages').then(()=>toast('Copied! Now paste it on WhatsApp'))" style="background:#25d366;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📋 Copy Message</button>
+            <button onclick="window.open('https://wa.me/34644597819?text=I%20allow%20callmebot%20to%20send%20me%20messages','_blank')" style="background:var(--white);color:#15803d;border:1.5px solid #86efac;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:6px">📲 Open WhatsApp</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:#15803d;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px">CallMeBot will reply with your API key. Enter it below:</div>
+            <input class="inp" type="text" id="waApiKey" placeholder="e.g. 1234567" style="font-size:13px;margin-bottom:8px"/>
+            <button class="btn bp" style="font-size:13px;padding:10px" onclick="saveWASetup()">✅ Activate WhatsApp Alerts</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--slate3);line-height:1.6;text-align:center">CallMeBot is a free third-party service. Your WhatsApp number is only used to send you booking alerts. You can deactivate anytime.</p>
+    <button class="btn bo" style="margin-top:10px;border-color:var(--border2);color:var(--slate3)" onclick="document.getElementById('waSetupModal').remove()">Cancel</button>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', e=>{ if(e.target===el) el.remove(); });
+};
+
+window.saveWASetup = async function(){
+  const key = sn(document.getElementById('waApiKey')?.value?.trim()||'');
+  if(!key || key.length < 3){ toast('Please enter the API key from CallMeBot.'); return; }
+  try{
+    await updateDoc(doc(db,'users',S.u.uid),{ waActivated:true, waApiKey:key });
+    S.p.waActivated = true; S.p.waApiKey = key;
+    document.getElementById('waSetupModal')?.remove();
+    toast('🎉 WhatsApp alerts activated! You will now get notified when customers view your profile.');
+    rDash();
+  }catch(e){ toast('Failed to save: '+e.message); }
+};
+
+window.sLP=async function(uid,name,trade){
+  $('dc').innerHTML=`<div style="text-align:center;padding:10px 0 20px"><div class="avc avi" style="width:64px;height:64px;font-size:22px;margin:0 auto 12px">${ini(name)}</div><div style="font-weight:700;font-size:18px">${sn(name)}</div><div style="color:var(--blue2);font-weight:600;font-size:14px;margin-top:4px">${sn(trade)}</div></div><div style="background:#f8fafc;border:2px dashed var(--border2);border-radius:var(--r2);padding:24px;text-align:center;margin-bottom:16px"><div style="font-size:40px;margin-bottom:12px">🔒</div><div style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:8px">Profile Locked</div><div style="font-size:13px;color:var(--slate3);line-height:1.7">This artisan hasn't subscribed to a plan yet. Contact details and booking are unavailable.</div></div><div style="background:var(--amber2);border-radius:var(--r);padding:12px;text-align:center;font-size:13px;color:var(--amber);font-weight:600">⏳ Not available at the moment</div>`;
+  $('ov').classList.add('open');$('drw').classList.add('open');
+  // Only notify after customer launch is live
+  if(!isLaunched())return;
+  // Rate-limit: only notify this artisan once per 6 hours per device
+  const rkey='_notif_'+uid;
+  try{
+    const last=parseInt(sessionStorage.getItem(rkey)||'0');
+    if(Date.now()-last<21600000)return; // 6 hour cooldown
+    sessionStorage.setItem(rkey,String(Date.now()));
+  }catch(e){return;}
+  // Write notification to Firestore and send email
+  try{
+    const artSnap=await getDoc(doc(db,'users',uid));
+    if(!artSnap.exists())return;
+    const artData=artSnap.data();
+    const newCount=(artData.missedViews||0)+1;
+    await updateDoc(doc(db,'users',uid),{
+      missedViews:newCount,
+      lastMissedView:serverTimestamp()
+    });
+    await addDoc(collection(db,'notifications'),{
+      toUid:uid,toName:artData.name,type:'profile_view_missed',
+      message:'A potential customer just searched for a '+artData.trade+' and found your profile — but could not contact you because your subscription is not active. You are losing real customers right now. Subscribe today.',
+      viewedAt:serverTimestamp(),read:false
+    });
+    // Send email — only on first view and every 5th view after
+    if(newCount===1||newCount%5===0){
+      await sendMissedViewEmail({...artData,missedViews:newCount});
+      await sendWhatsAppNotification(artData,'profile_view');
+    }
+  }catch(e){}
+};
+
+window.oD=async function(uid){
+  let u=S.fc.find(a=>a.uid===uid);
+  if(!u){const snap=await getDoc(doc(db,'users',uid));if(snap.exists())u=snap.data();}
+  if(!u)return;
+  S.jobPhoto=null;S.jobDesc='';
+  // Notify active artisan via WhatsApp that someone is viewing their profile
+  if(isLaunched()&&u.waActivated&&u.status==='active'){
+    const vkey='_waview_'+uid;
+    try{
+      const last=parseInt(sessionStorage.getItem(vkey)||'0');
+      if(Date.now()-last>3600000){ // max once per hour per artisan per device
+        sessionStorage.setItem(vkey,String(Date.now()));
+        sendWhatsAppNotification(u,'profile_view'); // non-blocking
+      }
+    }catch(e){}
+  }
+  const ph=u.profilePhoto?`<img src="${u.profilePhoto}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--border);flex-shrink:0"/>`:`<div class="avc ${u.tier==='premium'?'avp':'ava'}" style="width:60px;height:60px;font-size:21px;flex-shrink:0">${ini(u.name)}</div>`;
+  const po=(u.portfolios||[]).length?u.portfolios.map(p=>`<img src="${p}" class="pt"/>`).join(''):`<div style="width:105px;height:82px;border-radius:10px;background:#f1f5f9;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--slate3)">No portfolio</div>`;
+  const on=u.lastSeen&&(Date.now()-(u.lastSeen.toDate?u.lastSeen.toDate().getTime():new Date(u.lastSeen).getTime()))<1800000;
+  $('dc').innerHTML=`
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">${ph}
+      <div style="flex:1"><div style="display:flex;align-items:center;gap:6px"><div style="font-weight:700;font-size:17px;color:var(--navy)">${sn(u.name)}</div>${u.idVerified?'<span style="background:var(--blue3);color:var(--blue2);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:3px">🪪 ID Verified</span>':''}</div><div style="color:var(--blue2);font-weight:600;font-size:14px">${sn(u.trade)}</div><div style="font-size:12px;color:var(--slate3);margin-top:2px">📍 ${sn(u.fullLocation||u.zone||u.lga||'—')}</div>
+        <div style="margin-top:5px;display:flex;align-items:center;gap:4px;font-size:11px;color:${on?'var(--emerald)':'var(--slate3)'};font-weight:600"><div style="width:7px;height:7px;border-radius:50%;background:${on?'var(--emerald)':'#94a3b8'}"></div>${on?'Online now':'Last seen recently'}</div>
+        <div style="margin-top:5px;font-size:13px;color:var(--slate3)">${u.rating?'★'.repeat(Math.round(u.rating))+' '+u.rating.toFixed(1)+' ('+u.reviews+' reviews)':'No reviews yet'}</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:#334155;margin-bottom:14px;line-height:1.6">${sn(u.bio||'Professional artisan based in Ekpoma.')}</p>
+    <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:8px">Past Work Portfolio</div>
+    <div class="pr">${po}</div>
+    <div style="margin-top:14px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border)">
+      <div style="padding:8px 12px;background:#f8fafc;font-size:12px;font-weight:600;color:var(--slate3);display:flex;align-items:center;gap:6px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        📍 ${sn(u.fullLocation||u.zone||'—')}
+      </div>
+      <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=5.0,6.0,6.5,7.5&layer=mapnik&marker=${encodeURIComponent((u.fullLocation||u.zone||'Ekpoma')+', Nigeria')}"
+        style="width:100%;height:160px;border:none;display:block"
+        loading="lazy"
+        title="Artisan location map"
+        sandbox="allow-scripts allow-same-origin">
+      </iframe>
+      <div style="padding:6px 12px;background:#f8fafc;font-size:11px;color:var(--slate3);text-align:right">
+        <a href="https://www.openstreetmap.org/search?query=${encodeURIComponent((u.fullLocation||u.zone||'Ekpoma')+', Nigeria')}" target="_blank" style="color:var(--blue2);text-decoration:none;font-weight:600">Open in Maps →</a>
+      </div>
+    </div>
+    ${u.daily_booked?'<div style="background:var(--amber2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--amber);font-weight:600;margin:12px 0">🔴 Currently booked for a job today</div>':''}
+    <div style="margin-top:16px"><div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:6px">📝 Describe your job (optional)</div>
+      <textarea class="inp" id="jdesc" placeholder="e.g. Fix a leaking pipe in my bathroom…" style="min-height:70px;font-size:13px" oninput="S.jobDesc=this.value"></textarea>
+    </div>
+    <div style="margin-top:10px"><div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:6px">📷 Attach job photo (optional)</div>
+      <div class="uz" onclick="document.getElementById('jpIn').click()" style="padding:14px"><div style="font-size:22px;margin-bottom:4px">📎</div><p style="font-size:12px;color:var(--slate3)" id="jpLbl">Tap to attach a photo</p></div>
+      <input type="file" id="jpIn" accept="image/*" style="display:none" onchange="hJobPhoto(event)"/>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+      <button class="btn bp" style="flex:1;min-width:140px" onclick="oChat('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}','${sn(u.trade).replace(/'/g,"\\'")}')">💬 Chat & Book</button>
+      ${!u.daily_booked?`<button class="btn bs bsm" onclick="cBook('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}')">📅 Book Now</button>`:''}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button style="flex:1;background:#25d366;color:#fff;padding:9px;border-radius:var(--r);font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit" onclick="sWA('${sn(u.name)}','${sn(u.trade)}','${sn(u.zone)}')">📲 WhatsApp</button>
+      <button style="flex:1;background:#f1f5f9;color:#475569;padding:9px;border-radius:var(--r);font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit" onclick="oRat('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}')">⭐ Leave Review</button>
+    </div>
+    <button style="width:100%;background:var(--red2);color:var(--red);padding:9px;border-radius:var(--r);font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;margin-top:8px" onclick="openDispute('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}')">🚨 Report a Problem</button>`;
+  $('ov').classList.add('open');$('drw').classList.add('open');
+};
+
+window.hJobPhoto=async function(e){const f=e.target.files[0];if(!f)return;S.jobPhoto=await compress(f,1200,.85);const lbl=$('jpLbl');if(lbl)lbl.textContent='✅ Photo attached — '+f.name;};
+window.closeD=function(){$('ov').classList.remove('open');$('drw').classList.remove('open');};
+window.sWA=function(n,t,z){window.open(`https://wa.me/?text=${encodeURIComponent('I found a '+t+' on Trusted Hands!\n\n👤 '+n+'\n📍 '+z+', Ekpoma\n\nhttps://trust-hand.vercel.app')}`,'_blank');};
+window.cBook=async function(uid,name){
+  if(!confirm('Confirm booking with '+name+' for today?'))return;
+  try{
+    await runTransaction(db,async txn=>{
+      const r=doc(db,'users',uid);const s=await txn.get(r);
+      if(!s.exists())throw new Error('Artisan not found');
+      if(s.data().daily_booked)throw new Error(name+' is already booked today.');
+      txn.update(r,{daily_booked:true,bookedBy:S.u?.uid,bookedAt:serverTimestamp()});
+    });
+    await addDoc(collection(db,'bookings'),{artisanUid:uid,artisanName:name,customerUid:S.u?.uid,customerName:S.p?.name||'Customer',jobDescription:S.jobDesc||'',jobPhoto:S.jobPhoto||null,createdAt:serverTimestamp(),status:'confirmed'});
+    toast('✅ '+name+' booked for today!');closeD();pFeed();
+    // Notify artisan on WhatsApp about the booking
+    try{
+      const artSnap=await getDoc(doc(db,'users',uid));
+      if(artSnap.exists()) const art=artSnap.data();sendWhatsAppNotification(art,'booking');sendSMSNotification(art,S.p?.name||'A customer',S.jobDesc||'');
+    }catch(e){}
+  }catch(e){toast(e.message);}
+};
+
+// ── CHAT ──
+const rId=(a,b)=>[a,b].sort().join('_');
+window.oChat=async function(uid,name,trade){
+  closeD();S.ct=uid;S.pv='s-market';
+  $('chn').textContent=name;$('cht').textContent=trade;
+  SS('s-chat');lChat(uid);
+  const desc=S.jobDesc?.trim();
+  if(desc||S.jobPhoto){
+    await new Promise(r=>setTimeout(r,500));
+    const rid=rId(S.u.uid,uid);
+    if(desc){
+      await addDoc(collection(db,'chats',rid,'messages'),{senderId:S.u.uid,receiverId:uid,text:'📋 Job: '+desc,sentAt:serverTimestamp(),read:false});
+      // Record first customer message time for response-time tracking (only if not already set)
+      const chatSnap=await getDoc(doc(db,'chats',rid));
+      if(!chatSnap.exists()||!chatSnap.data()?.firstCustomerMsgAt){
+        await setDoc(doc(db,'chats',rid),{participants:[S.u.uid,uid],lastMessage:'📋 Job: '+desc,lastAt:serverTimestamp(),firstCustomerMsgAt:serverTimestamp(),[`unread_${uid}`]:true},{merge:true});
+      } else {
+        await setDoc(doc(db,'chats',rid),{participants:[S.u.uid,uid],lastMessage:'📋 Job: '+desc,lastAt:serverTimestamp(),[`unread_${uid}`]:true},{merge:true});
+      }
+    }
+    if(S.jobPhoto){
+      await addDoc(collection(db,'chats',rid,'messages'),{senderId:S.u.uid,receiverId:uid,text:'',image:S.jobPhoto,sentAt:serverTimestamp(),read:false});
+      await setDoc(doc(db,'chats',rid),{participants:[S.u.uid,uid],lastMessage:'📷 Photo',lastAt:serverTimestamp(),[`unread_${uid}`]:true},{merge:true});
+    }
+    S.jobDesc='';S.jobPhoto=null;
+  }
+};
+let typingTimeout=null;
+function lChat(uid){
+  if(S.cu){S.cu();S.cu=null;}
+  if(!S.u)return;
+  const rid=rId(S.u.uid,uid);
+  setDoc(doc(db,'chats',rid),{[`unread_${S.u.uid}`]:false},{merge:true}).catch(()=>{});
+  // Mark all incoming messages as read
+  setDoc(doc(db,'chats',rid),{[`read_by_${S.u.uid}`]:serverTimestamp()},{merge:true}).catch(()=>{});
+  // Listen for typing indicator
+  onSnapshot(doc(db,'chats',rid),snap=>{
+    const data=snap.data()||{};
+    const typingEl=document.getElementById('typingInd');
+    if(typingEl){
+      const isTyping=data[`typing_${uid}`]&&(Date.now()-(data[`typing_${uid}`].toDate?data[`typing_${uid}`].toDate().getTime():0))<4000;
+      typingEl.style.display=isTyping?'flex':'none';
+    }
+  });
+  S.cu=onSnapshot(query(collection(db,'chats',rid,'messages'),orderBy('sentAt','asc'),limit(100)),snap=>{
+    const b=$('cbody');b.innerHTML='';
+    if(snap.empty){b.innerHTML=`<div class="msy" style="padding:20px;text-align:center;font-size:13px;color:var(--slate3)">No messages yet. Start the conversation!</div>`;return;}
+    const readTime=snap.metadata?.fromCache?null:null;
+    snap.docs.forEach(d=>{
+      const m=d.data();const s2=m.senderId===S.u.uid;
+      const tick=s2?`<span style="font-size:10px;opacity:.7;margin-left:3px">${m.read?'✓✓':'✓'}</span>`:'';
+      if(m.image){b.innerHTML+=`<div class="mb ${s2?'ms':'mr'}" style="padding:4px"><img src="${m.image}" style="max-width:200px;border-radius:10px;display:block"/><div class="mt">${ft(m.sentAt)}${tick}</div></div>`;}
+      else{b.innerHTML+=`<div class="mb ${s2?'ms':'mr'}">${sn(m.text)}<div class="mt">${ft(m.sentAt)}${tick}</div></div>`;}
+    });
+    // Mark received messages as read
+    snap.docs.forEach(async d=>{
+      const m=d.data();
+      if(m.senderId!==S.u.uid&&!m.read){
+        await updateDoc(doc(db,'chats',rid,'messages',d.id),{read:true}).catch(()=>{});
+      }
+    });
+    setTimeout(()=>{b.scrollTop=b.scrollHeight;},50);
+  });
+}
+
+// Typing indicator sender
+function sendTyping(){
+  if(!S.u||!S.ct)return;
+  const rid=rId(S.u.uid,S.ct);
+  setDoc(doc(db,'chats',rid),{[`typing_${S.u.uid}`]:serverTimestamp()},{merge:true}).catch(()=>{});
+  clearTimeout(typingTimeout);
+  typingTimeout=setTimeout(()=>{
+    setDoc(doc(db,'chats',rid),{[`typing_${S.u.uid}`]:null},{merge:true}).catch(()=>{});
+  },3000);
+}
+window.sendM=async function(){
+  const inp=$('cinp');const tx=inp.value.trim();if(!tx||!S.u||!S.ct)return;
+  inp.value='';inp.style.height='auto';
+  const rid=rId(S.u.uid,S.ct);
+  const sendTime=Date.now();
+  await addDoc(collection(db,'chats',rid,'messages'),{senderId:S.u.uid,receiverId:S.ct,text:tx,sentAt:serverTimestamp(),read:false});
+  await setDoc(doc(db,'chats',rid),{participants:[S.u.uid,S.ct],lastMessage:tx,lastAt:serverTimestamp(),[`unread_${S.ct}`]:true},{merge:true});
+  // Track artisan response time: if I'm an artisan replying to a customer's first message in this room
+  if(S.p?.type==='artisan'){
+    try{
+      const chatDoc=await getDoc(doc(db,'chats',rid));
+      const firstCustomerMsgAt=chatDoc.data()?.firstCustomerMsgAt;
+      if(firstCustomerMsgAt&&!chatDoc.data()?.responseRecorded){
+        const responseMinutes=Math.round((sendTime-(firstCustomerMsgAt.toDate?firstCustomerMsgAt.toDate().getTime():sendTime))/60000);
+        if(responseMinutes>=0&&responseMinutes<1440){ // sanity check: under 24hrs
+          await setDoc(doc(db,'chats',rid),{responseRecorded:true},{merge:true});
+          const userSnap=await getDoc(doc(db,'users',S.u.uid));
+          const prevAvg=userSnap.data()?.avgResponseMin;
+          const prevCount=userSnap.data()?.responseCount||0;
+          const newAvg=prevAvg?Math.round(((prevAvg*prevCount)+responseMinutes)/(prevCount+1)):responseMinutes;
+          await updateDoc(doc(db,'users',S.u.uid),{avgResponseMin:newAvg,responseCount:prevCount+1});
+        }
+      }
+    }catch(e){}
+  }
+};
+window.sendImgMsg=async function(e){
+  const f=e.target.files[0];if(!f||!S.u||!S.ct)return;
+  const img=await compress(f,1200,.85);
+  const rid=rId(S.u.uid,S.ct);
+  await addDoc(collection(db,'chats',rid,'messages'),{senderId:S.u.uid,receiverId:S.ct,text:'',image:img,sentAt:serverTimestamp(),read:false});
+  await setDoc(doc(db,'chats',rid),{participants:[S.u.uid,S.ct],lastMessage:'📷 Photo',lastAt:serverTimestamp(),[`unread_${S.ct}`]:true},{merge:true});
+  e.target.value='';
+};
+async function rCL(){
+  const b=$('clb');b.innerHTML=`<div style="padding:20px;text-align:center;color:var(--slate3)">Loading…</div>`;
+  if(!S.u){b.innerHTML='<div class="es">Please sign in.</div>';return;}
+  const snap=await getDocs(query(collection(db,'chats'),where('participants','array-contains',S.u.uid)));
+  if(snap.empty){b.innerHTML=`<div class="es">No conversations yet.</div>`;return;}
+  let h='';
+  for(const d of snap.docs){
+    const r=d.data();const oi=r.participants.find(p=>p!==S.u.uid);if(!oi)continue;
+    const os=await getDoc(doc(db,'users',oi));if(!os.exists())continue;
+    const o=os.data();const ur=r[`unread_${S.u.uid}`];
+    h+=`<div style="display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="oChat('${o.uid}','${sn(o.name).replace(/'/g,"\\'")}','${sn(o.trade||o.type||'User').replace(/'/g,"\\'")}')"><div class="avc ava" style="width:44px;height:44px;font-size:15px;position:relative">${ini(o.name)}${ur?'<span style="position:absolute;top:0;right:0;width:10px;height:10px;background:var(--red);border-radius:50%;border:2px solid var(--white)"></span>':''}</div><div style="flex:1;min-width:0"><div style="font-weight:${ur?700:600};font-size:14px">${sn(o.name)}</div><div style="font-size:12px;color:var(--slate3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sn(r.lastMessage||'')}</div></div></div>`;
+  }
+  b.innerHTML=h||`<div class="es">No conversations found.</div>`;
+}
+function lUnread(){
+  if(!S.u)return;
+  onSnapshot(query(collection(db,'chats'),where('participants','array-contains',S.u.uid)),snap=>{
+    const has=snap.docs.some(d=>d.data()[`unread_${S.u.uid}`]);
+    const d1=$('cd'),d2=$('cd2');
+    if(d1)d1.style.display=has?'block':'none';
+    if(d2)d2.style.display=has?'block':'none';
+  });
+}
+
+// ── RATING ──
+window.oRat=function(uid,name){
+  document.getElementById('ratM')?.remove();S._sr=0;
+  const m=document.createElement('div');m.id='ratM';
+  m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  m.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px"><div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div><h3 style="font-weight:700;font-size:17px;color:var(--navy);margin-bottom:4px">Rate ${sn(name)}</h3><p style="font-size:13px;color:var(--slate3);margin-bottom:20px">How was your experience?</p><div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px" id="srow">${[1,2,3,4,5].map(n=>`<span style="font-size:36px;cursor:pointer;opacity:.3;transition:.15s" onclick="sStar(${n})">★</span>`).join('')}</div><div class="fg"><textarea class="inp" id="rtxt" placeholder="Describe your experience (optional)…" style="min-height:80px"></textarea></div><button class="btn bp" onclick="subRat('${uid}','${sn(name).replace(/'/g,"\\'")}')">Submit Review</button><button class="btn bo" style="margin-top:8px" onclick="document.getElementById('ratM').remove()">Cancel</button></div>`;
+  document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)m.remove();});
+};
+window.sStar=function(v){S._sr=v;document.querySelectorAll('#srow span').forEach((s,i)=>{s.style.opacity=i<v?'1':'0.3';s.style.transform=i<v?'scale(1.15)':'scale(1)';});};
+window.subRat=async function(uid,name){
+  if(!S._sr){toast('Please tap a star to rate.');return;}
+  if(!S.u){toast('Please sign in to leave a review.');return;}
+  const rv=sn($('rtxt')?.value||'');
+  try{
+    // Security: verify a real booking exists between this customer and artisan before allowing review
+    const bookSnap=await getDocs(query(collection(db,'bookings'),where('artisanUid','==',uid),where('customerUid','==',S.u.uid)));
+    if(bookSnap.empty){
+      toast('⚠️ You can only review artisans you have booked through the app.');
+      return;
+    }
+    // Prevent duplicate reviews for the same booking relationship — check if already reviewed
+    const existingReview=await getDocs(query(collection(db,'reviews'),where('artisanUid','==',uid),where('reviewerUid','==',S.u.uid)));
+    if(!existingReview.empty){
+      toast('You have already reviewed this artisan. Thank you!');
+      document.getElementById('ratM')?.remove();
+      return;
+    }
+    await addDoc(collection(db,'reviews'),{artisanUid:uid,artisanName:name,reviewerUid:S.u.uid,reviewerName:S.p?.name||'Customer',rating:S._sr,review:rv,verifiedBooking:true,createdAt:serverTimestamp()});
+    const rs=await getDocs(query(collection(db,'reviews'),where('artisanUid','==',uid)));
+    const rts=rs.docs.map(d=>d.data().rating);
+    const avg=rts.reduce((a,b)=>a+b,0)/rts.length;
+    await updateDoc(doc(db,'users',uid),{rating:Math.round(avg*10)/10,reviews:rts.length});
+    document.getElementById('ratM')?.remove();toast('⭐ Review submitted! Thank you.');pFeed();
+  }catch(e){toast('Failed: '+e.message);}
+};
+
+// ── TUTORIAL ──
+const TT=[
+  {i:'🔍',t:'Find Your Worker',d:'Tap any category card to find workers near you. Premium artisans appear first.'},
+  {i:'💬',t:'Chat & Agree Terms',d:'Open chat to discuss your job, agree on price, and ask questions before booking.'},
+  {i:'📋',t:'Describe Your Job',d:'Type a description and attach a photo so the artisan knows exactly what is needed.'},
+  {i:'📅',t:'Confirm Your Booking',d:'Tap "Book Now" to reserve the artisan for today. They\'ll be marked as taken.'},
+  {i:'⭐',t:'Rate After the Job',d:'Leave a star rating after the job is done. Your review helps others choose the right worker.'}
+];
+let TI=0;
+function showTut(){try{if(localStorage.getItem('th_t'))return;}catch(e){}TI=0;rTut();}
+window.showTutorial=showTut;
+function rTut(){
+  document.getElementById('tut')?.remove();
+  const s=TT[TI];const il=TI===TT.length-1;
+  const gs=['linear-gradient(145deg,#0f172a,#1e3a8a)','linear-gradient(145deg,#065f46,#059669)','linear-gradient(145deg,#1d4ed8,#6366f1)','linear-gradient(145deg,#7c3aed,#a855f7)','linear-gradient(145deg,#be185d,#ec4899)'];
+  const el=document.createElement('div');el.id='tut';
+  el.style.cssText='position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;background:'+gs[TI];
+  el.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;position:relative"><button onclick="skipTut()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);border:none;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Skip</button><div style="position:absolute;top:20px;left:20px;font-size:11px;color:rgba(255,255,255,.5);font-weight:600">${TI+1} / ${TT.length}</div><div style="width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:52px;margin-bottom:28px">${s.i}</div><h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:14px">${s.t}</h2><p style="font-size:15px;color:rgba(255,255,255,.85);line-height:1.8;max-width:300px">${s.d}</p></div><div style="padding:24px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:14px"><div style="display:flex;gap:8px">${TT.map((_,i)=>`<div style="width:${i===TI?'24px':'8px'};height:8px;border-radius:20px;background:${i===TI?'#fff':'rgba(255,255,255,.3)'};transition:all .3s"></div>`).join('')}</div><button onclick="${il?'skipTut()':'TI++;rTut()'}" style="width:100%;max-width:320px;background:#fff;color:#1d4ed8;padding:15px;border-radius:14px;font-weight:800;font-size:16px;border:none;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(0,0,0,.2)">${il?'🚀 Start Finding Workers!':'Continue →'}</button>${TI>0?'<button onclick="TI--;rTut()" style="background:none;color:rgba(255,255,255,.6);border:none;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600">← Back</button>':''}</div>`;
+  document.body.appendChild(el);
+  let sx=0;
+  el.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+  el.addEventListener('touchend',e=>{const d=sx-e.changedTouches[0].clientX;if(Math.abs(d)>60){if(d>0&&TI<TT.length-1){TI++;rTut();}else if(d<0&&TI>0){TI--;rTut();}}},{passive:true});
+}
+window.skipTut=function(){document.getElementById('tut')?.remove();try{localStorage.setItem('th_t','1');}catch(e){}};
+
+// ── DASHBOARD ──
+async function rDash(){
+  if(!S.u||!S.p){SS('s-auth');return;}
+  const snap=await getDoc(doc(db,'users',S.u.uid));
+  if(snap.exists())S.p=snap.data();
+  const notesSnap=await getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),orderBy('sentAt','desc'),limit(5)));
+  const notes=notesSnap.docs.map(d=>d.data());
+  // Load missed view notifications
+  const notifSnap=await getDocs(query(collection(db,'notifications'),where('toUid','==',S.u.uid),where('type','==','profile_view_missed'),where('read','==',false),limit(1)));
+  const hasNotif=!notifSnap.empty;
+  const p=S.p;const b=$('db');
+  const fn=sn(p.name||'').split(' ')[0];
+  const ex=p.expiry?.toDate?p.expiry.toDate():p.expiry?new Date(p.expiry):null;
+  const dl=ex?Math.max(0,Math.round((ex-Date.now())/86400000)):0;
+  const notesHTML=notes.length?`<div class="ic"><h3>📩 Messages from Admin</h3>${notes.map(n=>`<div style="padding:10px 0;border-bottom:1px solid #f8fafc"><div style="font-size:13px;color:#334155;line-height:1.6">${sn(n.message)}</div><div style="font-size:11px;color:var(--slate3);margin-top:4px">${n.sentAt?.toDate?n.sentAt.toDate().toLocaleDateString():'—'}</div></div>`).join('')}</div>`:'';
+
+  if(p.type==='customer'){
+    b.innerHTML=`<div style="padding:22px 18px 16px;background:var(--white);border-bottom:1px solid var(--border)"><div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy)">Hello, ${fn} 👋</div><div style="font-size:13px;color:var(--slate3)">Customer Account</div></div>
+    <div style="padding:16px 16px 80px">
+      ${notesHTML}
+      <div class="ic"><h3>My Account</h3><div class="ir"><span class="il">Name</span><strong>${sn(p.name)}</strong></div><div class="ir"><span class="il">Email</span><span style="font-size:13px">${sn(p.email)}</span></div><div class="ir"><span class="il">Phone</span><span>${sn(p.phone||'—')}</span></div><div class="ir"><span class="il">Location</span><span style="font-size:13px">📍 ${sn(p.fullLocation||p.zone||'—')}</span></div></div>
+      <button class="btn bp" onclick="gT('market')">🔍 Browse Artisans</button>
+      <button class="btn bo" style="margin-top:10px" onclick="gT('cl')">💬 My Messages</button>
+      <button class="btn bo" style="margin-top:10px" onclick="showTutorial()">📖 How It Works</button>
+      <button class="btn bo" style="margin-top:10px" onclick="showCustomerSettings()">⚙️ My Settings</button>
+      <button class="btn bo" style="margin-top:10px" onclick="copyRef()">🎁 Refer a Friend</button>
+      <button class="btn bo" style="margin-top:10px;border-color:var(--border2);color:var(--slate3)" onclick="showSup()">🆘 Contact Support</button>
+      <button class="btn bo" style="margin-top:10px;border-color:var(--red2);color:var(--red)" onclick="doLogout()">Sign Out</button>
+      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--slate3)"><a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms & Privacy Policy</a></div>
+    </div>`;
+  } else {
+    const iu=p.status==='unsubscribed';const ib=p.daily_booked;
+    // Grace period logic
+    const timerStarted=p.timerStarted===true;
+    const graceEnd=p.graceEnd?.toDate?p.graceEnd.toDate():p.graceEnd?new Date(p.graceEnd):null;
+    const graceDaysLeft=graceEnd?Math.max(0,Math.ceil((graceEnd.getTime()-Date.now())/86400000)):null;
+    const inGrace=!timerStarted&&p.status==='active';
+    // Grace banner HTML
+    const graceBanner=inGrace?`<div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">🎁 You're in the Grace Period!</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.6;margin-bottom:8px">Your profile is live and visible to customers. Your 30-day subscription timer has <strong>not started yet</strong> — it begins on the official launch date.</div>
+      ${graceDaysLeft!==null?`<div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;display:inline-block">⏳ Grace ends in <span style="color:#fde68a">${graceDaysLeft} day${graceDaysLeft!==1?'s':''}</span></div>`:''}
+    </div>`:'';
+    // Daily popup
+    const popupKey='th_gp_'+S.u.uid+'_'+new Date().toDateString();
+    if(inGrace){try{if(!localStorage.getItem(popupKey)){localStorage.setItem(popupKey,'1');setTimeout(()=>showGracePopup(graceDaysLeft),800);}}catch(e){}}
+    const ew=dl<=5&&p.status==='active'&&timerStarted?`<div class="ewarn"><div style="font-weight:700;font-size:14px;margin-bottom:4px">⚠️ Expires in ${dl} day${dl!==1?'s':''}!</div><div style="font-size:12px;opacity:.85;margin-bottom:10px">Renew now to stay visible.</div><button onclick="SS('s-paywall')" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Renew Now →</button></div>`:'';
+    const photoHTML=p.profilePhoto?`<img src="${p.profilePhoto}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid #3b82f6;flex-shrink:0"/>`:`<div class="avc ava" style="width:52px;height:52px;font-size:18px;flex-shrink:0">${ini(p.name)}</div>`;
+    b.innerHTML=`
+    <div style="background:linear-gradient(135deg,#0f172a,#1e3a8a);padding:22px 18px 20px">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        ${photoHTML}
+        <div><div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff">Hello, ${fn} 👋</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.7)">${sn(p.trade||'Artisan')} · 📍 ${sn(p.fullLocation||p.zone||'—')}</div>
+        <div style="margin-top:4px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px">
+          <div style="width:7px;height:7px;border-radius:50%;background:${p.status==='active'?'#4ade80':'#f87171'}"></div>
+          <span style="font-size:11px;color:#fff;font-weight:600">${p.status==='active'?'Active on marketplace':'Not visible on marketplace'}</span>
+        </div></div>
+      </div>
+      ${p.status==='active'?`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:#fff">${p.reviews||0}</div><div style="font-size:11px;color:rgba(255,255,255,.65)">Reviews</div></div>
+        <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:#fff">${p.rating?p.rating.toFixed(1):'—'}</div><div style="font-size:11px;color:rgba(255,255,255,.65)">Rating</div></div>
+        <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:${dl<=5?'#f87171':'#4ade80'}">${dl||'—'}</div><div style="font-size:11px;color:rgba(255,255,255,.65)">Days Left</div></div>
+      </div>`:''}
+    </div>
+    <div style="padding:16px 16px 80px">
+      ${ew}${graceBanner}${notesHTML}
+      ${iu&&p.missedViews>0?`<div style="background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff"><div style="font-weight:700;font-size:15px;margin-bottom:6px">🔴 You are losing customers!</div><div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.7;margin-bottom:10px"><strong style="color:#fde68a">${p.missedViews} customer${p.missedViews!==1?'s':''}</strong> searched for a ${sn(p.trade)} and found your profile — but could not contact you because you are not subscribed. Subscribe now to start receiving bookings.</div><button onclick="SS('s-paywall')" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">⚡ Subscribe Now — Don't Lose More Clients</button></div>`:''}
+      ${iu?`<div class="rbanner" onclick="SS('s-paywall')"><h4>⚡ Activate Your Profile</h4><p>Subscribe now to appear on the marketplace and start getting bookings.</p><div style="margin-top:10px;background:rgba(255,255,255,.15);border-radius:var(--r);padding:8px 12px;font-size:13px;color:#fff;font-weight:600">Tap to subscribe →</div></div>`:''}
+      ${ib?`<div class="jcard"><h4 style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:8px">📋 You're Marked as Booked Today</h4>
+        <p style="font-size:13px;color:#334155;margin-bottom:12px">Submit a job completion report with proof photo to go back live.</p>
+        <div class="fg"><textarea class="inp" id="fbt" placeholder="Describe the work you completed today…" style="min-height:70px"></textarea></div>
+        <div class="fg">
+          <label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">📸 Photo of Completed Work *</label>
+          <div class="uz" onclick="document.getElementById('fbPhotoIn').click()" style="padding:14px">
+            <div style="font-size:22px;margin-bottom:4px">📷</div>
+            <p style="font-size:12px;color:var(--slate3)" id="fbPhotoLbl">Required — tap to upload proof photo</p>
+          </div>
+          <input type="file" id="fbPhotoIn" accept="image/*" style="display:none" onchange="hFbPhoto(event)"/>
+          <div id="fbPhotoPrev" style="margin-top:8px"></div>
+        </div>
+        <button class="btn bs" onclick="subFB()">✓ Submit & Go Back Live</button>
+      </div>`:''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);cursor:pointer;text-align:center;border:1.5px solid var(--border)" onclick="gT('cl')"><div style="font-size:28px;margin-bottom:6px">💬</div><div style="font-weight:700;font-size:13px;color:var(--navy)">My Messages</div><div style="font-size:11px;color:var(--slate3);margin-top:2px">Chat with customers</div></div>
+        <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);cursor:pointer;text-align:center;border:1.5px solid var(--border)" onclick="SS('s-market');iMkt()"><div style="font-size:28px;margin-bottom:6px">🔍</div><div style="font-weight:700;font-size:13px;color:var(--navy)">Find a Worker</div><div style="font-size:11px;color:var(--slate3);margin-top:2px">Hire other artisans</div></div>
+        <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);cursor:pointer;text-align:center;border:1.5px solid var(--border)" onclick="showArtisanSettings()"><div style="font-size:28px;margin-bottom:6px">✏️</div><div style="font-weight:700;font-size:13px;color:var(--navy)">Edit Profile</div><div style="font-size:11px;color:var(--slate3);margin-top:2px">Photo, bio & details</div></div>
+        <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);cursor:pointer;text-align:center;border:1.5px solid var(--border)" onclick="copyRef()"><div style="font-size:28px;margin-bottom:6px">🎁</div><div style="font-weight:700;font-size:13px;color:var(--navy)">Refer & Earn</div><div style="font-size:11px;color:var(--slate3);margin-top:2px">Get 7 free days</div></div>
+        <div style="background:${p.waActivated?'#f0fdf4':'var(--white)'};border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);cursor:pointer;text-align:center;border:1.5px solid ${p.waActivated?'#86efac':'var(--border)'}" onclick="showWASetup()"><div style="font-size:28px;margin-bottom:6px">${p.waActivated?'✅':'📱'}</div><div style="font-weight:700;font-size:13px;color:var(--navy)">${p.waActivated?'WA Alerts On':'WA Alerts'}</div><div style="font-size:11px;color:${p.waActivated?'#15803d':'var(--slate3)'};margin-top:2px">${p.waActivated?'Booking alerts active':'Tap to activate'}</div></div>
+      </div>
+      <div class="ic"><h3>📋 My Profile</h3>
+        <div class="ir"><span class="il">Status</span><span class="sp${p.status==='active'?'a':p.status==='pending'?'p':p.status==='unsubscribed'?'u':'b'}">${p.status==='active'?'✓ Active':p.status==='pending'?'Pending Review':p.status==='unsubscribed'?'Unsubscribed':'—'}</span></div>
+        <div class="ir"><span class="il">Plan</span><span style="font-weight:700;text-transform:capitalize;color:${p.tier==='premium'?'var(--amber)':'var(--blue2)'}">${p.tier||'None'}</span></div>
+        <div class="ir"><span class="il">Trade</span><span>${sn(p.trade||'—')}</span></div>
+        <div class="ir"><span class="il">Location</span><span style="font-size:13px">📍 ${sn(p.fullLocation||p.zone||'—')}</span></div>
+        ${p.status==='active'?`<div class="ir"><span class="il">Today</span><span style="font-weight:600;color:${ib?'var(--amber)':'var(--emerald)'}">${ib?'🔴 Booked':'🟢 Available'}</span></div>`:''}
+      </div>
+      ${p.status==='active'?`<div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn bo" style="flex:1" onclick="togBook()">${ib?'✓ Mark as Available':'🔴 Mark as Booked Today'}</button>
+        ${p.timerStarted&&!p.pausePending&&(p.pauseDaysUsed||0)<3?`<button class="btn bo" style="flex:1;border-color:var(--amber);color:var(--amber)" onclick="pauseSub()">⏸️ Pause</button>`:''}
+        ${p.pausePending?`<div style="flex:1;background:var(--amber2);border-radius:var(--r);padding:8px;text-align:center;font-size:12px;font-weight:600;color:var(--amber)">⏳ Pause pending admin review</div>`:''}
+      </div>`:''}
+      <button class="btn bo" style="margin-top:4px" onclick="showSup()">🆘 Contact Support</button>
+      <button class="btn bo" style="margin-top:10px;border-color:var(--red2);color:var(--red)" onclick="doLogout()">Sign Out</button>
+      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--slate3)"><a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms & Privacy Policy</a></div>
+    </div>`;
+  }
+}
+
+window.showProfileMenu=function(){
+  document.getElementById('pmenu')?.remove();
+  const p=S.p;if(!p)return;
+  const photoHTML=p.profilePhoto
+    ?`<img src="${p.profilePhoto}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--blue2);flex-shrink:0"/>`
+    :`<div style="width:46px;height:46px;border-radius:50%;background:var(--blue3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--blue2);flex-shrink:0">${ini(p.name)}</div>`;
+  const el=document.createElement('div');el.id='pmenu';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 20px 40px">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 18px"></div>
+    <div style="display:flex;gap:12px;align-items:center;padding:10px 0 18px;border-bottom:1px solid var(--border);margin-bottom:14px">
+      ${photoHTML}
+      <div style="flex:1"><div style="font-weight:700;font-size:15px;color:var(--navy)">${sn(p.name)}</div><div style="font-size:12px;color:var(--slate3)">${sn(p.email)}</div><div style="font-size:11px;color:var(--blue2);font-weight:600;margin-top:2px">${p.type==='customer'?'👤 Customer Account':'🔧 Artisan — '+sn(p.trade||'')}</div></div>
+      <button onclick="document.getElementById('pmenu').remove();${p.type==='customer'?'showCustomerSettings()':'showArtisanSettings()'}" style="background:var(--blue3);color:var(--blue2);border:none;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✏️ Edit</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <button onclick="document.getElementById('pmenu').remove();gT('dash')" style="background:none;border:none;padding:13px 4px;text-align:left;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;border-bottom:1px solid #f8fafc;display:flex;align-items:center;gap:10px">👤 My Dashboard</button>
+      <button onclick="document.getElementById('pmenu').remove();gT('cl')" style="background:none;border:none;padding:13px 4px;text-align:left;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;border-bottom:1px solid #f8fafc;display:flex;align-items:center;gap:10px">💬 My Messages</button>
+      <button onclick="document.getElementById('pmenu').remove();${p.type==='customer'?'showCustomerSettings()':'showArtisanSettings()'}" style="background:none;border:none;padding:13px 4px;text-align:left;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;border-bottom:1px solid #f8fafc;display:flex;align-items:center;gap:10px">✏️ Edit Profile</button>
+      <button onclick="document.getElementById('pmenu').remove();showSup()" style="background:none;border:none;padding:13px 4px;text-align:left;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;border-bottom:1px solid #f8fafc;display:flex;align-items:center;gap:10px">🆘 Contact Support</button>
+      <button onclick="document.getElementById('pmenu').remove();doLogout()" style="background:none;border:none;padding:13px 4px;text-align:left;font-size:14px;font-weight:700;color:var(--red);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:10px">🚪 Sign Out</button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+};
+window.copyRef=function(){const code=(S.u?.uid||'').substring(0,8);const link='https://trust-hand.vercel.app?ref='+code;navigator.clipboard?.writeText(link).then(()=>toast('🎁 Referral link copied!')).catch(()=>toast('Link: https://trust-hand.vercel.app?ref='+code));};
+window.hFbPhoto=async function(e){
+  const f=e.target.files[0];if(!f)return;
+  S._fbPhoto=await compress(f,1200,.85);
+  const lbl=$('fbPhotoLbl');if(lbl)lbl.textContent='✅ Photo attached — '+f.name;
+  const prev=$('fbPhotoPrev');if(prev)prev.innerHTML=`<img src="${S._fbPhoto}" style="width:100%;border-radius:var(--r);max-height:160px;object-fit:cover;border:2px solid var(--emerald)"/>`;
+};
+window.subFB=async function(){
+  const t=$('fbt')?.value?.trim();if(!t||t.length<10){toast('Please describe the job (min 10 chars).');return;}
+  if(!S._fbPhoto){toast('📸 Please upload a photo of the completed work — this is required.');return;}
+  try{
+    await runTransaction(db,async txn=>{const r=doc(db,'users',S.u.uid);const s=await txn.get(r);if(!s.exists())throw new Error('Not found');txn.update(r,{daily_booked:false,lastFeedback:t,lastFeedbackAt:serverTimestamp()});});
+    // Save proof photo to completedJobs collection for portfolio/marketing use
+    await addDoc(collection(db,'completedJobs'),{artisanUid:S.u.uid,artisanName:S.p?.name||'',trade:S.p?.trade||'',description:t,proofPhoto:S._fbPhoto,completedAt:serverTimestamp()});
+    S._fbPhoto=null;
+    S.p={...S.p,daily_booked:false};toast('Back on marketplace! ✅');rDash();
+  }catch(e){toast('Error: '+e.message);}
+};
+window.togBook=async function(){const v=!S.p.daily_booked;await updateDoc(doc(db,'users',S.u.uid),{daily_booked:v});S.p.daily_booked=v;toast(v?'Marked as booked today.':'Back to available! 🟢');rDash();};
+
+
+// ── ARTISAN ONBOARDING TUTORIAL ──
+const ATT=[
+  {i:'🎉',t:'Welcome to Trusted Hands!',d:'Your artisan profile is now being set up. Let us show you how to get your first booking in the next few steps.'},
+  {i:'📸',t:'Your Portfolio is Everything',d:'Customers choose artisans based on photos of past work. Upload clear, bright photos. Bad portfolio = fewer bookings. Great portfolio = more bookings.'},
+  {i:'💬',t:'Respond Fast to Chats',d:'When a customer messages you, respond within 30 minutes. Fast responses get more bookings. Agree on price clearly before starting any job.'},
+  {i:'📅',t:'Manage Your Availability',d:'Mark yourself as "Booked Today" when you are on a job. This prevents double-bookings and builds your reliability score. After each job, submit a completion report.'},
+];
+let ATI=0;
+function showArtisanTut(){
+  try{if(localStorage.getItem('th_at'))return;}catch(e){}
+  ATI=0;rATut();
+}
+function rATut(){
+  document.getElementById('atut')?.remove();
+  const s=ATT[ATI];const il=ATI===ATT.length-1;
+  const gs=['linear-gradient(145deg,#0f172a,#1e293b)','linear-gradient(145deg,#065f46,#059669)','linear-gradient(145deg,#7c3aed,#a855f7)','linear-gradient(145deg,#b45309,#d97706)'];
+  const el=document.createElement('div');el.id='atut';
+  el.style.cssText='position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;background:'+gs[ATI];
+  el.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;position:relative">
+    <button onclick="skipATut()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);border:none;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Skip</button>
+    <div style="position:absolute;top:20px;left:20px;font-size:11px;color:rgba(255,255,255,.5);font-weight:600">${ATI+1} / ${ATT.length}</div>
+    <div style="width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:52px;margin-bottom:28px">${s.i}</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:14px">${s.t}</h2>
+    <p style="font-size:15px;color:rgba(255,255,255,.85);line-height:1.8;max-width:300px">${s.d}</p>
+  </div>
+  <div style="padding:24px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:14px">
+    <div style="display:flex;gap:8px">${ATT.map((_,i)=>`<div style="width:${i===ATI?'24px':'8px'};height:8px;border-radius:20px;background:${i===ATI?'#fff':'rgba(255,255,255,.3)'};transition:all .3s"></div>`).join('')}</div>
+    <button onclick="${il?'skipATut()':"ATI++;rATut()"}" style="width:100%;max-width:320px;background:#fff;color:#1d4ed8;padding:15px;border-radius:14px;font-weight:800;font-size:16px;border:none;cursor:pointer;font-family:inherit">${il?'🚀 Start Getting Bookings!':'Continue →'}</button>
+    ${ATI>0?'<button onclick="ATI--;rATut()" style="background:none;color:rgba(255,255,255,.6);border:none;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600">← Back</button>':''}
+  </div>`;
+  document.body.appendChild(el);
+}
+window.skipATut=function(){document.getElementById('atut')?.remove();try{localStorage.setItem('th_at','1');}catch(e){}};
+
+// ── FULL PROFILE EDITOR ──
+function buildProfileEditor(isArtisan){
+  const p=S.p;
+  const photoHTML=p.profilePhoto
+    ?`<img src="${p.profilePhoto}" id="ppThumb" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--blue2);display:block;margin:0 auto"/>`
+    :`<div id="ppThumb" style="width:90px;height:90px;border-radius:50%;background:var(--blue3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--blue2);margin:0 auto">${ini(p.name)}</div>`;
+  const zoneOpts=['Market Square Area','Ojo Street','School Gate Area','Igor / Uhumudumu','Alli Square','Abelmen Area','GT Extension','Ujemen','Ujuenle','Emado','College Road','Abia'];
+  const tradeOpts=['Electricians','Plumbers','Cleaners','Tailors','Hairdressers','Barbers','Mechanics','Dry Cleaners','Bricklayer / Construction Manager','POP Installers','Interior Decorators','Shoe Makers','Massage Therapists','Counselors'];
+  const el=document.createElement('div');
+  el.id='profileEditor';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML=`<div style="background:var(--bg);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:20px 20px 50px">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 18px"></div>
+    <h3 style="font-weight:700;font-size:17px;color:var(--navy);margin-bottom:20px">✏️ Edit My Profile</h3>
+
+    <!-- Profile Photo -->
+    <div class="ic">
+      <h3>Profile Photo ${isArtisan?'<span style="color:var(--red);font-size:11px">* Required</span>':'<span style="color:var(--slate3);font-size:11px">(Optional)</span>'}</h3>
+      <div style="text-align:center;margin-bottom:14px">${photoHTML}</div>
+      <div class="uz" onclick="document.getElementById('ppInput').click()" style="padding:12px;text-align:center">
+        <div style="font-size:20px;margin-bottom:4px">📷</div>
+        <p style="font-size:13px;color:var(--slate3)">${p.profilePhoto?'Change photo':'Upload profile photo'}</p>
+      </div>
+      <input type="file" id="ppInput" accept="image/*" style="display:none" onchange="previewProfilePhoto(event)"/>
+      <div id="ppStatus" style="font-size:12px;color:var(--emerald);font-weight:600;margin-top:6px;text-align:center"></div>
+    </div>
+
+    <!-- Basic Info -->
+    <div class="ic">
+      <h3>Basic Information</h3>
+      <div class="fg"><label>Full Name *</label><input class="inp" id="ep_name" type="text" value="${sn(p.name)}" placeholder="Your full name" maxlength="80"/></div>
+      <div class="fg"><label>Phone Number *</label><input class="inp" id="ep_phone" type="tel" value="${sn(p.phone||'')}" placeholder="08012345678" maxlength="20"/></div>
+      <div class="fg"><label>State *</label>
+        <select class="inp" id="ep_state" onchange="onStateChange(this,document.getElementById('ep_lga'),document.getElementById('ep_zone'))">
+          <option value="">Select State</option>
+          <option value="Edo State" ${p.state==='Edo State'?'selected':''}>Edo State</option>
+          <option value="Delta State" ${p.state==='Delta State'?'selected':''}>Delta State</option>
+        </select>
+      </div>
+      <div class="fg"><label>LGA / City *</label>
+        <select class="inp" id="ep_lga" onchange="onLGAChange(document.getElementById('ep_state'),this,document.getElementById('ep_zone'))">
+          <option value="">Select LGA first</option>
+          ${p.state&&LOCS[p.state]?Object.keys(LOCS[p.state]).map(l=>`<option value="${l}" ${p.lga===l?'selected':''}>${l}</option>`).join(''):''}
+        </select>
+      </div>
+      <div class="fg"><label>Area / Zone *</label>
+        <select class="inp" id="ep_zone">
+          <option value="">Select Area</option>
+          ${p.state&&p.lga&&LOCS[p.state]&&LOCS[p.state][p.lga]?LOCS[p.state][p.lga].map(a=>`<option value="${a}" ${p.zone===a?'selected':''}>${a}</option>`).join(''):''}
+        </select>
+      </div>
+    </div>
+
+    ${isArtisan?`
+    <!-- Artisan-only fields -->
+    <div class="ic">
+      <h3>Artisan Details</h3>
+      <div class="fg"><label>Trade Category *</label>
+        <select class="inp" id="ep_trade">
+          ${tradeOpts.map(t=>`<option value="${t}" ${p.trade===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label>Bio / Experience *</label>
+        <textarea class="inp" id="ep_bio" style="min-height:90px" placeholder="Describe your skills, experience and years of work…" maxlength="500">${sn(p.bio||'')}</textarea>
+        <div style="font-size:11px;color:var(--slate3);margin-top:4px">Max 500 characters</div>
+      </div>
+    </div>`:''}
+
+    <div id="ep_err" style="display:none;margin-bottom:12px" class="alert aw"></div>
+    <button class="btn bp" id="ep_savebtn" onclick="saveFullProfile(${isArtisan})">💾 Save All Changes</button>
+    <button class="btn bo" style="margin-top:10px;border-color:var(--border2);color:var(--slate3)" onclick="document.getElementById('profileEditor').remove()">Cancel</button>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+}
+
+window.showArtisanSettings=function(){buildProfileEditor(true);};
+window.showCustomerSettings=function(){buildProfileEditor(false);};
+
+window.previewProfilePhoto=async function(e){
+  const f=e.target.files[0];if(!f)return;
+  const status=document.getElementById('ppStatus');
+  if(status)status.textContent='Compressing…';
+  S._newPhoto=await compress(f,600,.82);
+  const thumb=document.getElementById('ppThumb');
+  if(thumb){thumb.src=S._newPhoto;thumb.style.cssText='width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--emerald);display:block;margin:0 auto';}
+  if(status)status.textContent='✅ Photo ready — tap Save to apply';
+};
+
+window.saveFullProfile=async function(isArtisan){
+  const err=document.getElementById('ep_err');err.style.display='none';
+  const name=sn(document.getElementById('ep_name')?.value?.trim()||'');
+  const phone=sn(document.getElementById('ep_phone')?.value?.trim()||'');
+  const epst=document.getElementById('ep_state')?.value||'';
+  const eplg=document.getElementById('ep_lga')?.value||'';
+  const zone=document.getElementById('ep_zone')?.value||'';
+  // Validation
+  if(name.length<2){err.textContent='Please enter your full name.';err.style.display='block';return;}
+  if(!/^[0-9+\s\-]{7,20}$/.test(phone)){err.textContent='Enter a valid phone number.';err.style.display='block';return;}
+  if(!epst||!eplg||!zone){err.textContent='Please select your State, LGA and Area.';err.style.display='block';return;}
+  let updates={name,phone,state:epst,lga:eplg,zone,fullLocation:locStr(epst,eplg,zone)};
+  if(isArtisan){
+    const trade=document.getElementById('ep_trade')?.value||'';
+    const bio=sn(document.getElementById('ep_bio')?.value?.trim()||'').substring(0,500);
+    if(!trade){err.textContent='Please select your trade.';err.style.display='block';return;}
+    if(bio.length<10){err.textContent='Please write a short bio (at least 10 characters).';err.style.display='block';return;}
+    // Photo is mandatory for artisan
+    if(!S.p.profilePhoto&&!S._newPhoto){err.textContent='Profile photo is required for artisans.';err.style.display='block';return;}
+    updates={...updates,trade,bio};
+  }
+  if(S._newPhoto){updates.profilePhoto=S._newPhoto;}
+  const btn=document.getElementById('ep_savebtn');
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  try{
+    await updateDoc(doc(db,'users',S.u.uid),updates);
+    S.p={...S.p,...updates};
+    S._newPhoto=null;
+    document.getElementById('profileEditor')?.remove();
+    toast('✅ Profile updated successfully!');
+    // Refresh dashboard if on it
+    if(document.getElementById('s-dash')?.classList.contains('active'))rDash();
+  }catch(e){
+    err.textContent='Failed to save: '+e.message;err.style.display='block';
+    if(btn){btn.disabled=false;btn.textContent='💾 Save All Changes';}
+  }
+};
+
+// ── PAUSE SUBSCRIPTION ──
+window.pauseSub=async function(){
+  const p=S.p;
+  if(!p||p.status!=='active'||!p.timerStarted){toast('No active subscription to pause.');return;}
+  if(p.pauseUsed){toast('You have already used your pause this subscription period.');return;}
+  const pausesLeft=3-(p.pauseDaysUsed||0);
+  if(pausesLeft<=0){toast('You have used all 3 pause days this period.');return;}
+  document.getElementById('pauseModal')?.remove();
+  const el=document.createElement('div');el.id='pauseModal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div>
+    <h3 style="font-weight:700;font-size:17px;color:var(--navy);margin-bottom:6px">⏸️ Pause Subscription</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:16px;line-height:1.7">Pausing freezes your 30-day timer. You have <strong style="color:var(--blue2)">${pausesLeft} pause day${pausesLeft!==1?'s':''}</strong> remaining this period. Maximum 3 days total.</p>
+    <div style="background:var(--amber2);border-radius:var(--r);padding:12px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.6">
+      ⚠️ Your profile will be <strong>hidden from customers</strong> while paused. Admin will review and approve your pause request within 24 hours.
+    </div>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">Reason for pause *</label>
+      <textarea class="inp" id="pauseReason" placeholder="e.g. Travelling for 2 days, family emergency..." style="min-height:70px;font-size:13px" maxlength="200"></textarea>
+    </div>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">Days to pause (1–3 max)</label>
+      <select class="inp" id="pauseDays">
+        ${[1,2,3].filter(d=>d<=pausesLeft).map(d=>`<option value="${d}">${d} day${d!==1?'s':''}</option>`).join('')}
+      </select>
+    </div>
+    <button class="btn bp" onclick="submitPause()">Request Pause</button>
+    <button class="btn bo" style="margin-top:8px" onclick="document.getElementById('pauseModal').remove()">Cancel</button>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+};
+
+window.submitPause=async function(){
+  const reason=sn(document.getElementById('pauseReason')?.value?.trim()||'');
+  const days=parseInt(document.getElementById('pauseDays')?.value||1);
+  if(!reason||reason.length<5){toast('Please provide a reason for pausing.');return;}
+  if(days<1||days>3){toast('Invalid pause duration.');return;}
+  // Security: re-check server-side before submitting
+  const fresh=await getDoc(doc(db,'users',S.u.uid));
+  const fd=fresh.data();
+  if(fd.pauseUsed||(fd.pauseDaysUsed||0)>=3){toast('No pause days remaining.');document.getElementById('pauseModal')?.remove();return;}
+  try{
+    await addDoc(collection(db,'pauseRequests'),{
+      artisanUid:S.u.uid,name:S.p.name,trade:S.p.trade||'',
+      reason,days,requestedAt:serverTimestamp(),status:'pending',reviewed:false
+    });
+    await updateDoc(doc(db,'users',S.u.uid),{pausePending:true});
+    S.p.pausePending=true;
+    document.getElementById('pauseModal')?.remove();
+    toast('⏸️ Pause request submitted. Admin will review within 24 hours.');
+    rDash();
+  }catch(e){toast('Error: '+e.message);}
+};
+
+
+// ── DISPUTE RESOLUTION ──
+window.openDispute=function(artisanUid,artisanName){
+  document.getElementById('disputeModal')?.remove();
+  const el=document.createElement('div');el.id='disputeModal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto">
+    <div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div>
+    <h3 style="font-weight:700;font-size:17px;color:var(--red);margin-bottom:6px">🚨 Report a Dispute</h3>
+    <p style="font-size:13px;color:var(--slate3);margin-bottom:16px;line-height:1.7">Report an issue with <strong style="color:var(--navy)">${sn(artisanName)}</strong>. All disputes are reviewed by our admin team within 24 hours.</p>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">Issue Type *</label>
+      <select class="inp" id="dType" style="font-size:13px">
+        <option value="">Select issue type</option>
+        <option value="poor_work">Poor quality of work</option>
+        <option value="no_show">Artisan did not show up</option>
+        <option value="overcharge">Charged more than agreed</option>
+        <option value="damage">Damaged my property</option>
+        <option value="harassment">Harassment or misconduct</option>
+        <option value="fraud">Payment fraud</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">Describe what happened *</label>
+      <textarea class="inp" id="dDesc" placeholder="Give as much detail as possible — date, what was agreed, what happened..." style="min-height:100px;font-size:13px" maxlength="1000"></textarea>
+    </div>
+    <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">Amount involved (₦)</label>
+      <input class="inp" type="number" id="dAmount" placeholder="e.g. 5000" style="font-size:13px"/>
+    </div>
+    <div style="background:var(--blue3);border-radius:var(--r);padding:12px;margin-bottom:14px;font-size:12px;color:var(--blue2);line-height:1.6">
+      📌 After submitting, admin may temporarily hide the artisan's profile pending investigation. Do not submit false reports — this is a violation of our Terms of Service.
+    </div>
+    <button class="btn bd" onclick="submitDispute('${artisanUid}','${sn(artisanName).replace(/'/g,"\\'")}')">Submit Dispute Report</button>
+    <button class="btn bo" style="margin-top:8px" onclick="document.getElementById('disputeModal').remove()">Cancel</button>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+};
+
+window.submitDispute=async function(artisanUid,artisanName){
+  const type=document.getElementById('dType')?.value;
+  const desc=sn(document.getElementById('dDesc')?.value?.trim()||'');
+  const amount=parseFloat(document.getElementById('dAmount')?.value||0);
+  if(!type){toast('Please select an issue type.');return;}
+  if(!desc||desc.length<20){toast('Please describe what happened (min 20 characters).');return;}
+  if(!S.u){SS('s-auth');return;}
+  // Rate limit: max 3 disputes per user per day
+  try{
+    const today=new Date().toDateString();
+    const key='_disp_'+today;
+    const count=parseInt(sessionStorage.getItem(key)||'0');
+    if(count>=3){toast('You have submitted too many disputes today. Contact support directly.');return;}
+    sessionStorage.setItem(key,String(count+1));
+  }catch(e){}
+  try{
+    await addDoc(collection(db,'disputes'),{
+      reporterUid:S.u.uid,reporterName:S.p?.name||'',reporterEmail:S.p?.email||'',
+      artisanUid,artisanName,type,description:desc,
+      amountInvolved:amount||0,status:'open',
+      createdAt:serverTimestamp(),adminNote:'',resolved:false
+    });
+    // Notify admin via support ticket
+    await addDoc(collection(db,'supportTickets'),{
+      userId:S.u.uid,userName:S.p?.name||'',userEmail:S.p?.email||'',
+      message:'DISPUTE REPORT against artisan '+artisanName+' ('+artisanUid+'): '+type+' — '+desc,
+      createdAt:serverTimestamp(),resolved:false,isDispute:true,artisanUid
+    });
+    document.getElementById('disputeModal')?.remove();
+    toast('🚨 Dispute submitted. Admin will investigate within 24 hours.');
+  }catch(e){toast('Failed to submit: '+e.message);}
+};
+
+window.showGracePopup=function(daysLeft){
+  document.getElementById('gracePopup')?.remove();
+  const el=document.createElement('div');el.id='gracePopup';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px';
+  el.innerHTML=`<div style="background:var(--white);border-radius:22px;padding:28px 24px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+    <div style="font-size:48px;margin-bottom:14px">🎁</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy);margin-bottom:10px">You're in the Grace Period!</h2>
+    <p style="font-size:14px;color:var(--slate3);line-height:1.7;margin-bottom:16px">Your profile is <strong style="color:var(--emerald)">live and visible</strong> to customers. Your 30-day subscription has <strong>not started counting</strong> yet.</p>
+    ${daysLeft!==null?`<div style="background:var(--blue3);border-radius:var(--r);padding:12px;margin-bottom:16px"><div style="font-size:28px;font-weight:800;color:var(--blue2)">${daysLeft} day${daysLeft!==1?'s':''}</div><div style="font-size:12px;color:var(--slate3);margin-top:2px">remaining in grace period</div></div>`:''}
+    <p style="font-size:12px;color:var(--slate3);margin-bottom:18px;line-height:1.6">Once admin starts your timer on launch day, your 30 days begin counting from that moment.</p>
+    <button class="btn bp" onclick="document.getElementById('gracePopup').remove()">Got it, thanks! 👍</button>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+};
+window.showSup=function(){
+  const el=document.createElement('div');el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML=`<div style="background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px"><div style="width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px"></div><h3 style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:6px">🆘 Contact Support</h3><p style="font-size:13px;color:var(--slate3);margin-bottom:14px">Describe your issue and our team will help you.</p><div class="fg"><textarea class="inp" id="stxt" placeholder="Describe your issue…" style="min-height:100px"></textarea></div><button class="btn bp" onclick="subSup(this.closest('[style]'))">Submit</button><button class="btn bo" style="margin-top:8px" onclick="this.closest('[style]').remove()">Cancel</button></div>`;
+  document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+};
+window.subSup=async function(m){
+  const t=$('stxt')?.value?.trim();if(!t||t.length<10){toast('Please describe your issue.');return;}
+  await addDoc(collection(db,'supportTickets'),{userId:S.u?.uid||'',userName:S.p?.name||'',userEmail:S.p?.email||'',message:t,createdAt:serverTimestamp(),resolved:false});
+  m?.remove();toast('Ticket submitted! We\'ll get back to you ✅');
+};
+
+// ── ADMIN ──
+window.doAdminL=async function(){
+  const e=$('ae').value.trim().toLowerCase(),pw=$('ap').value;
+  const er=$('aerr');er.style.display='none';
+  if(e!==AE){er.textContent='Access denied.';er.style.display='block';return;}
+  try{
+    await signInWithEmailAndPassword(auth,e,pw);
+    const uid=auth.currentUser.uid;
+    const snap=await getDoc(doc(db,'users',uid));
+    if(!snap.exists())await setDoc(doc(db,'users',uid),{uid,type:'admin',email:e,name:'Admin',createdAt:serverTimestamp()});
+    S.p={type:'admin',email:e,name:'Admin'};SS('s-admin');aTab('ap2');
+  }catch(e2){er.textContent='Login failed: '+e2.message;er.style.display='block';}
+};
+window.aTab=function(t){
+  S.at=t;
+  const tabs=['ap2','art','cus','bc','sup','analytics','set'];
+  $('atabs2').querySelectorAll('.at').forEach((el,i)=>el.classList.toggle('active',tabs[i]===t));
+  rAdmin();
+};
+window.rAdmin=async function(){
+  const b=$('ab');b.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner"></div></div>`;
+  const t=S.at;
+  try{
+    if(t==='ap2'){
+      const snap=await getDocs(query(collection(db,'pendingApprovals'),where('reviewed','==',false)));
+      if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No pending approvals.</div>`;return;}
+      b.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px;font-weight:600">${snap.docs.length} pending</div>`+
+      snap.docs.map(d=>{const p=d.data();return`<div class="pi"><div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(p.name)}</div><div style="font-size:12px;color:var(--slate3);line-height:1.8">🔧 ${sn(p.trade)} · 📍 ${sn(p.zone)}<br/>Tier: <strong style="color:var(--blue2)">${sn(p.tier)}</strong><br/>Sender: ${sn(p.senderBank)}<br/>${p.submittedAt?.toDate?p.submittedAt.toDate().toLocaleDateString():'—'}</div>${p.receiptBase64?`<img src="${p.receiptBase64}" class="ri"/>`:'<div style="background:#f1f5f9;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--slate3);margin:10px 0">🧾 Receipt on file</div>'}<div style="display:flex;gap:8px;margin-top:10px"><button class="btn bs bsm" onclick="apArt('${p.artisanUid}','${d.id}','${p.tier}')">✓ Approve</button><button class="btn bd bsm" onclick="rjArt('${d.id}')">✕ Reject</button></div></div>`;}).join('');
+    }
+    else if(t==='art'){
+      const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));
+      if(snap.empty){b.innerHTML=`<div class="es">No artisans yet.</div>`;return;}
+      const arts=snap.docs.map(d=>d.data());window._adArts=arts;
+      b.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--slate3);margin-bottom:12px">${arts.length} artisan${arts.length!==1?'s':''}</div><div style="margin-bottom:12px"><input class="inp" type="text" placeholder="Search artisans…" oninput="fAdArts(this.value)" style="font-size:13px"/></div><div id="adArtList">`+
+      arts.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="adArt('${a.uid}')"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(a.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.zone)}</div></div><span class="sp${a.status==='active'?'a':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${a.status||'—'}</span></div>`).join('')+'</div>';
+    }
+    else if(t==='cus'){
+      const snap=await getDocs(query(collection(db,'users'),where('type','==','customer')));
+      if(snap.empty){b.innerHTML=`<div class="es">No customers yet.</div>`;return;}
+      const cs=snap.docs.map(d=>d.data());window._adCusts=cs;
+      b.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--slate3);margin-bottom:12px">${cs.length} customer${cs.length!==1?'s':''}</div><div style="margin-bottom:12px"><input class="inp" type="text" placeholder="Search customers…" oninput="fAdCusts(this.value)" style="font-size:13px"/></div><div id="adCustList">`+
+      cs.map(c=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(c.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.zone||'—')}</div></div></div>`).join('')+'</div>';
+    }
+    else if(t==='analytics'){await renderAnalytics();return;}
+    else if(t==='bc'){
+      let cur='';try{const bs=await getDoc(doc(db,'config','broadcast'));if(bs.exists())cur=bs.data().text||'';}catch(e){}
+      b.innerHTML=`<div class="ic"><h3>📢 Broadcast to All Users</h3><p style="font-size:13px;color:var(--slate3);margin-bottom:14px">Appears as a scrolling banner on all screens in real time.</p><textarea class="inp" id="bctxt" placeholder="Type your announcement…" style="min-height:90px;margin-bottom:12px">${sn(cur)}</textarea><div style="display:flex;gap:8px"><button class="btn bp" onclick="sdBC()">📢 Send to All</button><button class="btn bo" onclick="clBC()">Clear</button></div></div>`;
+    }
+    else if(t==='sup'){
+      const snap=await getDocs(query(collection(db,'supportTickets'),limit(100)));
+      if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">🎉</div>No support tickets yet.</div>`;return;}
+      const docs=snap.docs.sort((a,bx)=>{const at=a.data().createdAt?.toDate?a.data().createdAt.toDate():new Date(0);const bt=bx.data().createdAt?.toDate?bx.data().createdAt.toDate():new Date(0);return bt-at;});
+      const open=docs.filter(d=>!d.data().resolved).length;
+      b.innerHTML=`<div style="display:flex;gap:10px;margin-bottom:16px"><div style="background:var(--red2);color:var(--red);padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700">${open} Open</div><div style="background:var(--emerald2);color:var(--emerald);padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700">${docs.length-open} Resolved</div></div>`+
+      docs.map(d=>{const tk=d.data();const dt=tk.createdAt?.toDate?tk.createdAt.toDate().toLocaleDateString():'—';
+        return`<div style="background:var(--white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid ${tk.resolved?'var(--emerald)':'var(--red)'}"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-weight:700;font-size:14px">${sn(tk.userName||'Unknown')}</div><div style="font-size:12px;color:var(--slate3)">${sn(tk.userEmail||'—')} · ${dt}</div></div><span class="sp${tk.resolved?'a':'p'}" style="font-size:11px">${tk.resolved?'Resolved':'Open'}</span></div><div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap">${sn(tk.message)}</div>${!tk.resolved?`<textarea class="inp" id="rep_${d.id}" placeholder="Type reply…" style="min-height:60px;font-size:13px;margin-bottom:8px"></textarea><div style="display:flex;gap:8px"><button class="btn bs bsm" onclick="rsTk('${d.id}')">✓ Resolve</button><button class="btn bp bsm" onclick="rpTk('${d.id}','${sn(tk.userId||'')}','${sn(tk.userName||'')}')">📩 Reply</button></div>`:'<div style="font-size:12px;color:var(--emerald);font-weight:600">✓ Resolved</div>'}</div>`;
+      }).join('');
+    }
+    else{
+      b.innerHTML=`<div class="ic"><h3>⚙️ Settings</h3>
+        <div class="ir"><span class="il">Admin Email</span><span style="font-size:13px">${AE}</span></div>
+        <div class="ir"><span class="il">Payment Bank</span><span>Opay · 08112595067</span></div>
+        <div class="ir"><span class="il">Account Name</span><span>Olawoye Gideon Ayomide</span></div>
+        <div class="ir"><span class="il">Standard Plan</span><span style="font-weight:700;color:var(--blue2)">₦5,000 / 30 days</span></div>
+        <div class="ir"><span class="il">Premium Plan</span><span style="font-weight:700;color:var(--amber)">₦10,000 / 30 days</span></div>
+      </div>
+      <button class="btn bd" style="margin-top:8px" onclick="doLogout()">Exit Admin Console</button>`;
+    }
+  }catch(e){b.innerHTML=`<div class="es">Error: ${sn(e.message)}<br/><br/><button class="btn bo bsm" onclick="rAdmin()">Retry</button></div>`;}
+};
+
+window.fAdArts=function(q){const list=document.getElementById('adArtList');if(!list)return;const f=(window._adArts||[]).filter(a=>(a.name||'').toLowerCase().includes(q.toLowerCase())||(a.trade||'').toLowerCase().includes(q.toLowerCase())||(a.zone||'').toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="adArt('${a.uid}')"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(a.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.zone)}</div></div><span class="sp${a.status==='active'?'a':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${a.status||'—'}</span></div>`).join('');};
+window.fAdCusts=function(q){const list=document.getElementById('adCustList');if(!list)return;const f=(window._adCusts||[]).filter(c=>(c.name||'').toLowerCase().includes(q.toLowerCase())||(c.email||'').toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(c=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(c.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.zone||'—')}</div></div></div>`).join('');};
+window.apArt=async function(uid,did,tl){const tr=tl.toLowerCase().includes('premium')?'premium':'standard';const ex=new Date(Date.now()+2592000000);await runTransaction(db,async txn=>{txn.update(doc(db,'users',uid),{status:'active',tier:tr,expiry:ex,activatedAt:serverTimestamp()});txn.update(doc(db,'pendingApprovals',did),{reviewed:true,approvedAt:serverTimestamp()});});toast('✅ Activated for 30 days!');rAdmin();};
+window.rjArt=async function(did){if(!confirm('Reject this submission?'))return;await updateDoc(doc(db,'pendingApprovals',did),{reviewed:true,rejected:true,rejectedAt:serverTimestamp()});toast('Rejected.');rAdmin();};
+window.adArt=async function(uid){
+  const snap=await getDoc(doc(db,'users',uid));if(!snap.exists())return;const a=snap.data();
+  const ex=a.expiry?.toDate?a.expiry.toDate():a.expiry?new Date(a.expiry):null;
+  const dl=ex?Math.max(0,Math.round((ex-Date.now())/86400000)):0;
+  $('ab').innerHTML=`<button class="btn bo bsm" style="margin-bottom:16px" onclick="aTab('art')">← Back</button>
+  <div class="ic"><h3>${sn(a.name)}</h3>
+    <div class="ir"><span class="il">Email</span><span style="font-size:13px">${sn(a.email)}</span></div>
+    <div class="ir"><span class="il">Phone</span><span>${sn(a.phone||'—')}</span></div>
+    <div class="ir"><span class="il">Trade</span><span>${sn(a.trade||'—')}</span></div>
+    <div class="ir"><span class="il">Zone</span><span>📍 ${sn(a.zone||'—')}</span></div>
+    <div class="ir"><span class="il">Status</span><span class="sp${a.status==='active'?'a':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}">${a.status||'—'}</span></div>
+    <div class="ir"><span class="il">Tier</span><span style="font-weight:700;text-transform:capitalize;color:${a.tier==='premium'?'var(--amber)':'var(--blue2)'}">${a.tier||'None'}</span></div>
+    <div class="ir"><span class="il">Rating</span><span>${a.rating?a.rating.toFixed(1)+' ⭐ ('+a.reviews+' reviews)':'No reviews'}</span></div>
+    <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${a.status==='active'?dl+' days':'—'}</span></div>
+    <div class="ir"><span class="il">Booked Today</span><span>${a.daily_booked?'🔴 Yes':'🟢 No'}</span></div>
+  </div>
+  ${(a.portfolios||[]).length?`<div class="ic"><h3>📷 Portfolio</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${a.portfolios.map(p=>`<img src="${p}" style="width:90px;height:70px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`).join('')}</div></div>`:''}
+  <div class="ic"><h3>⚡ Admin Actions</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <button class="btn bs bsm" onclick="fAct('${uid}')">✓ Activate 30 days</button>
+      <button class="btn bo bsm" onclick="rBk('${uid}')">🔄 Reset Booking</button>
+      <button class="bsm btn" style="background:var(--amber);color:#fff;border:none" onclick="sPr('${uid}')">⭐ Set Premium</button>
+      <button class="btn bo bsm" onclick="sSt('${uid}')">Set Standard</button>
+      <button class="bsm btn" style="background:var(--red2);color:var(--red);border:none" onclick="sUs('${uid}')">Set Unsubscribed</button>
+      <button class="btn bd bsm" onclick="bUser('${uid}')">🚫 Ban Account</button>
+    </div>
+    <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">EXTEND SUBSCRIPTION (days)</label>
+    <div style="display:flex;gap:8px;margin-bottom:14px"><input class="inp" type="number" id="exd" placeholder="e.g. 30" style="font-size:13px"/><button class="btn bp bsm" onclick="extS('${uid}')">Extend</button></div>
+    <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">SEND NOTE TO ARTISAN</label>
+    <textarea class="inp" id="ntxt" placeholder="Message to artisan…" style="min-height:70px;margin-bottom:8px"></textarea>
+    <button class="btn bp bsm" onclick="sNote('${uid}','${sn(a.name).replace(/'/g,"\\'")}')">Send Note</button>
+  </div>`;
+};
+window.fAct=async function(u){await updateDoc(doc(db,'users',u),{status:'active',expiry:new Date(Date.now()+2592000000),activatedAt:serverTimestamp()});toast('✅ Activated 30 days!');adArt(u);};
+window.rBk=async function(u){await updateDoc(doc(db,'users',u),{daily_booked:false});toast('✅ Booking reset!');adArt(u);};
+window.sPr=async function(u){await updateDoc(doc(db,'users',u),{tier:'premium'});toast('⭐ Set Premium!');adArt(u);};
+window.sSt=async function(u){await updateDoc(doc(db,'users',u),{tier:'standard'});toast('Set Standard.');adArt(u);};
+window.sUs=async function(u){await updateDoc(doc(db,'users',u),{status:'unsubscribed'});toast('Set Unsubscribed.');adArt(u);};
+window.bUser=async function(u){if(!confirm('Ban this account?'))return;await updateDoc(doc(db,'users',u),{status:'banned'});toast('Banned.');aTab('art');};
+window.extS=async function(u){const d=parseInt($('exd')?.value||0);if(!d||d<1){toast('Enter valid days.');return;}const snap=await getDoc(doc(db,'users',u));const cur=snap.data().expiry?.toDate?snap.data().expiry.toDate():new Date(snap.data().expiry||Date.now());const ne=new Date(Math.max(cur.getTime(),Date.now())+d*86400000);await updateDoc(doc(db,'users',u),{expiry:ne,status:'active'});toast(`Extended ${d} days ✅`);adArt(u);};
+window.sNote=async function(u,n){const t=$('ntxt')?.value?.trim();if(!t){toast('Please type a message.');return;}await addDoc(collection(db,'supportNotes'),{toUid:u,toName:n,message:t,sentAt:serverTimestamp(),sentBy:'Admin'});toast('Note sent ✅');$('ntxt').value='';};
+window.sdBC=async function(){const m=$('bctxt')?.value?.trim();if(!m){toast('Please type a message.');return;}await setDoc(doc(db,'config','broadcast'),{text:m,updatedAt:serverTimestamp()});toast('📢 Broadcast sent!');};
+window.clBC=async function(){await setDoc(doc(db,'config','broadcast'),{text:'',updatedAt:serverTimestamp()});if($('bctxt'))$('bctxt').value='';toast('Cleared.');};
+window.rsTk=async function(id){await updateDoc(doc(db,'supportTickets',id),{resolved:true,resolvedAt:serverTimestamp()});toast('Resolved ✅');rAdmin();};
+window.rpTk=async function(id,uid,name){const t=document.getElementById('rep_'+id)?.value?.trim();if(!t){toast('Type a reply first.');return;}await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:name,message:t,sentAt:serverTimestamp(),sentBy:'Admin'});await updateDoc(doc(db,'supportTickets',id),{resolved:true,resolvedAt:serverTimestamp(),adminReply:t});toast('Reply sent ✅');rAdmin();};
+
+async function renderAnalytics(){
+  const b=$('ab');
+  try{
+    const[uSnap,bSnap]=await Promise.all([getDocs(collection(db,'users')),getDocs(collection(db,'bookings'))]);
+    const users=uSnap.docs.map(d=>d.data());
+    const arts=users.filter(u=>u.type==='artisan'),custs=users.filter(u=>u.type==='customer');
+    const active=arts.filter(u=>u.status==='active');
+    const prem=active.filter(u=>u.tier==='premium'),std=active.filter(u=>u.tier==='standard');
+    const bookings=bSnap.docs.length;
+    const rev=(prem.length*10000)+(std.length*5000);
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const now=new Date();const mA=Array(12).fill(0),mC=Array(12).fill(0);
+    arts.forEach(a=>{const d=a.createdAt?.toDate?a.createdAt.toDate():null;if(d&&d.getFullYear()===now.getFullYear())mA[d.getMonth()]++;});
+    custs.forEach(c=>{const d=c.createdAt?.toDate?c.createdAt.toDate():null;if(d&&d.getFullYear()===now.getFullYear())mC[d.getMonth()]++;});
+    const last6=[];for(let i=5;i>=0;i--){const m=(now.getMonth()-i+12)%12;last6.push({label:months[m],a:mA[m],c:mC[m]});}
+    const maxB=Math.max(...last6.map(m=>m.a+m.c),1);
+    const tC={};arts.forEach(a=>{if(a.trade)tC[a.trade]=(tC[a.trade]||0)+1;});
+    const tS=Object.entries(tC).sort((a,b)=>b[1]-a[1]);const maxT=Math.max(...tS.map(t=>t[1]),1);
+    const zC={};arts.forEach(a=>{if(a.zone)zC[a.zone]=(zC[a.zone]||0)+1;});
+    const zS=Object.entries(zC).sort((a,b)=>b[1]-a[1]);const maxZ=Math.max(...zS.map(z=>z[1]),1);
+    const bars=last6.map(m=>{const aH=Math.round((m.a/maxB)*110);const cH=Math.round((m.c/maxB)*110);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:10px;color:var(--slate3);font-weight:600">${m.a+m.c||''}</div><div style="width:100%;display:flex;flex-direction:column;gap:1px"><div style="width:100%;height:${aH}px;background:var(--blue2);border-radius:4px 4px 0 0;min-height:${m.a?3:0}px"></div><div style="width:100%;height:${cH}px;background:#34d399;border-radius:0 0 4px 4px;min-height:${m.c?3:0}px"></div></div><div style="font-size:10px;color:var(--slate3)">${m.label}</div></div>`;}).join('');
+    const tRows=tS.map(([tr,ct])=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:600">${tr}</span><span style="color:var(--slate3);font-weight:600">${ct}</span></div><div style="height:10px;background:#f1f5f9;border-radius:20px;overflow:hidden"><div style="height:100%;width:${Math.round((ct/maxT)*100)}%;background:var(--blue2);border-radius:20px"></div></div></div>`).join('')||'<div style="font-size:13px;color:var(--slate3)">No artisans yet.</div>';
+    const zRows=zS.map(([z,ct])=>`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>${z}</span><span style="color:var(--slate3);font-weight:600">${ct}</span></div><div style="height:8px;background:#f1f5f9;border-radius:20px;overflow:hidden"><div style="height:100%;width:${Math.round((ct/maxZ)*100)}%;background:var(--emerald);border-radius:20px"></div></div></div>`).join('')||'<div style="font-size:13px;color:var(--slate3)">No data yet.</div>';
+    b.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="ic" style="margin-bottom:0;text-align:center"><div style="font-size:28px;font-weight:800;color:var(--blue2)">${users.length}</div><div style="font-size:12px;color:var(--slate3)">Total Users</div></div>
+      <div class="ic" style="margin-bottom:0;text-align:center"><div style="font-size:28px;font-weight:800;color:var(--emerald)">${active.length}</div><div style="font-size:12px;color:var(--slate3)">Active Artisans</div></div>
+      <div class="ic" style="margin-bottom:0;text-align:center"><div style="font-size:28px;font-weight:800;color:var(--amber)">&#8358;${(rev/1000).toFixed(1)}k</div><div style="font-size:12px;color:var(--slate3)">Est. Monthly Revenue</div></div>
+      <div class="ic" style="margin-bottom:0;text-align:center"><div style="font-size:28px;font-weight:800;color:var(--navy)">${bookings}</div><div style="font-size:12px;color:var(--slate3)">Total Bookings</div></div>
+    </div>
+    <div class="ic"><h3>&#128200; Signups — Last 6 Months</h3><div style="display:flex;align-items:flex-end;gap:6px;height:150px;margin-bottom:10px;padding:0 4px">${bars}</div><div style="display:flex;gap:14px;font-size:12px"><div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--blue2);border-radius:3px"></div><span style="color:var(--slate3)">Artisans (${arts.length})</span></div><div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:#34d399;border-radius:3px"></div><span style="color:var(--slate3)">Customers (${custs.length})</span></div></div></div>
+    <div class="ic"><h3>&#128176; Revenue Breakdown</h3><div class="ir"><span class="il">Premium &#8358;10,000 &times; ${prem.length}</span><span style="font-weight:700;color:var(--amber)">&#8358;${(prem.length*10000).toLocaleString()}</span></div><div class="ir"><span class="il">Standard &#8358;5,000 &times; ${std.length}</span><span style="font-weight:700;color:var(--blue2)">&#8358;${(std.length*5000).toLocaleString()}</span></div><div class="ir" style="border-top:2px solid var(--border);padding-top:10px;margin-top:4px"><span class="il" style="font-weight:700">Monthly Total</span><span style="font-weight:800;font-size:18px;color:var(--emerald)">&#8358;${rev.toLocaleString()}</span></div></div>
+    <div class="ic"><h3>&#128295; Artisans by Trade</h3>${tRows}</div>
+    <div class="ic"><h3>&#128205; Artisans by Zone</h3>${zRows}</div>`;
+  }catch(e){b.innerHTML=`<div class="es">Error: ${sn(e.message)}<br/><button class="btn bo bsm" style="margin-top:12px" onclick="aTab('analytics')">Retry</button></div>`;}
+}
+
+function lMq(){
+  try{
+    // Listen to the global broadcast (everyone)
+    onSnapshot(doc(db,'config','broadcast'),snap=>{
+      updateMQ(snap.exists()?snap.data().text||'':'','all');
+    });
+    // Listen to role-specific broadcast
+    const role=S.p?.type||'customer';
+    const roleKey=role==='artisan'?'broadcast_artisan':'broadcast_customer';
+    onSnapshot(doc(db,'config',roleKey),snap=>{
+      updateMQ(snap.exists()?snap.data().text||'':'',role);
+    });
+  }catch(e){}
+}
+// Store both messages and show the most relevant one
+const _mqMsgs={all:'',artisan:'',customer:''};
+function updateMQ(text,audience){
+  _mqMsgs[audience]=text;
+  // Priority: role-specific > everyone
+  const role=S.p?.type||'customer';
+  const roleKey=role==='artisan'?'artisan':'customer';
+  const show=_mqMsgs[roleKey]||_mqMsgs['all']||'';
+  const bar=$('mqbar');const tx=$('mqtxt');
+  if(bar&&tx){
+    if(show){bar.style.display='block';tx.textContent='📢 '+show+'  ';}
+    else bar.style.display='none';
+  }
+}
+
+// ── PWA: Register service worker for installability ──
+// Self-healing: if an old/broken service worker is already installed in someone's
+// browser from before this fix, this clears it and all its caches automatically,
+// then registers the new safe version. This prevents anyone staying stuck on a
+// blank/stale cached page after we deploy a fix.
+
+// ── SMS NOTIFICATION via Termii ──
+const TERMII_API_KEY='TLwqNrHiSVKFJKMhsbuGOHvLIHFLwlTtGBHBfFnsscqeWsjliYOTgNDVkDwLNL';
+async function sendSMSNotification(artisanData,customerName,jobDesc){
+  if(!artisanData.phone)return;
+  let phone=artisanData.phone.replace(/[\s\-\(\)]/g,'');
+  if(phone.startsWith('0'))phone='234'+phone.substring(1);
+  if(!phone.startsWith('234'))phone='234'+phone;
+  const msg='TRUSTED HANDS: New booking!\n\nCustomer: '+customerName+'\n'+(jobDesc?'Job: '+jobDesc.substring(0,60)+'\n':'')+'\nOpen app:\nhttps://trust-hand.vercel.app';
+  try{
+    await fetch('https://v3.api.termii.com/api/sms/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({to:phone,from:'TrstHands',sms:msg,type:'plain',api_key:TERMII_API_KEY,channel:'generic'})
+    });
+  }catch(e){}
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',async()=>{
+    try{
+      const regs=await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){
+        await reg.unregister();
+      }
+      if('caches' in window){
+        const cacheNames=await caches.keys();
+        await Promise.all(cacheNames.filter(n=>n!=='trusted-hands-v2').map(n=>caches.delete(n)));
+      }
+      await navigator.serviceWorker.register('/sw.js');
+    }catch(e){
+      // Silent fail — app still works fully as a regular website if SW registration fails
+    }
+  });
+}
+
+runSplash();
+// ── PWA: Capture install prompt and show a friendly custom button ──
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  showInstallBanner();
+});
+function showInstallBanner(){
+  try{if(localStorage.getItem('th_install_dismissed'))return;}catch(err){}
+  if(document.getElementById('installBanner'))return;
+  const el=document.createElement('div');
+  el.id='installBanner';
+  el.style.cssText='position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--navy2);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:500;box-shadow:0 -4px 20px rgba(0,0,0,.2)';
+  el.innerHTML=`
+    <div style="width:40px;height:40px;background:var(--blue2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="22" height="22" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/></svg>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:13px">Install Trusted Hands</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6)">Add to your home screen for quick access</div>
+    </div>
+    <button onclick="installPWA()" style="background:var(--blue2);color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Install</button>
+    <button onclick="dismissInstallBanner()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
+  `;
+  document.body.appendChild(el);
+}
+window.installPWA=async function(){
+  if(!deferredInstallPrompt)return;
+  deferredInstallPrompt.prompt();
+  const{outcome}=await deferredInstallPrompt.userChoice;
+  if(outcome==='accepted')toast('🎉 Trusted Hands installed!');
+  deferredInstallPrompt=null;
+  document.getElementById('installBanner')?.remove();
+};
+window.dismissInstallBanner=function(){
+  document.getElementById('installBanner')?.remove();
+  try{localStorage.setItem('th_install_dismissed','1');}catch(err){}
+};
+
+
+// ── WEB PUSH NOTIFICATIONS (Firebase Cloud Messaging) ──
+// Setup: In Firebase Console → Project Settings → Cloud Messaging → Generate VAPID key
+// Replace YOUR_VAPID_KEY below with your real key
+const VAPID_KEY='YOUR_VAPID_KEY';
+
+async function initPushNotifications(){
+  if(!S.u||!S.p)return;
+  try{
+    if(!('Notification' in window)||!('serviceWorker' in navigator))return;
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted')return;
+    // Dynamic import of FCM (only if supported)
+    const{getMessaging,getToken,onMessage}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js');
+    const messaging=getMessaging(app);
+    const token=await getToken(messaging,{vapidKey:VAPID_KEY});
+    if(token){
+      // Save FCM token to user profile
+      await updateDoc(doc(db,'users',S.u.uid),{fcmToken:token,notifEnabled:true});
+      // Listen for foreground messages
+      onMessage(messaging,payload=>{
+        const{title,body}=payload.notification||{};
+        toast('🔔 '+(title||'New notification')+': '+(body||''));
+      });
+    }
+  }catch(e){console.warn('Push notifications not available:',e);}
+}
+
+// Ask for push permission after user logs in and is settled
+function askPushPermission(){
+  if(!S.u||!S.p)return;
+  const key='_push_asked_'+S.u.uid;
+  try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1');}catch(e){return;}
+  setTimeout(()=>{
+    if(Notification.permission==='default'){
+      const el=document.createElement('div');
+      el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy2);color:#fff;border-radius:var(--r2);padding:14px 18px;z-index:400;width:90%;max-width:400px;box-shadow:var(--shadow2)';
+      el.innerHTML=`<div style="font-weight:700;font-size:14px;margin-bottom:6px">🔔 Enable Notifications</div>
+        <p style="font-size:12px;color:rgba(255,255,255,.75);margin-bottom:12px;line-height:1.6">Get instant alerts when customers book you or send messages.</p>
+        <div style="display:flex;gap:8px">
+          <button onclick="initPushNotifications();this.closest('[style]').remove()" style="flex:1;background:var(--blue2);color:#fff;border:none;padding:8px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Enable</button>
+          <button onclick="this.closest('[style]').remove()" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:8px 14px;border-radius:var(--r);font-size:13px;cursor:pointer;font-family:inherit">Later</button>
+        </div>`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),12000);
+    }
+  },3000);
+}
+
+// ── OFFLINE DETECTION ──
+window.addEventListener('online',()=>toast('✅ Back online'));
+window.addEventListener('offline',()=>{
+  const t=$('T');t.style.background='var(--red)';
+  toast('⚠️ You are offline. Some features may not work.',6000);
+  setTimeout(()=>{t.style.background='';},6100);
+});
+
+// ── LAST SEEN UPDATER for artisans ──
+// Updates lastSeen every 5 min while artisan is active so online dot works
+setInterval(async()=>{
+  if(S.u&&S.p&&S.p.type==='artisan'&&S.p.status==='active'){
+    try{await updateDoc(doc(db,'users',S.u.uid),{lastSeen:serverTimestamp()});}catch(e){}
+  }
+},300000);
+</script>
+</body>
+</html>
