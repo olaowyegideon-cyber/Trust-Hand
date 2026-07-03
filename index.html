@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+// CACHE KILLER - runs first before anything else
+(function(){
+  // Kill all service workers
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){r.unregister();});
+    });
+  }
+  // Kill all caches
+  if('caches' in window){
+    caches.keys().then(function(keys){
+      keys.forEach(function(k){caches.delete(k);});
+    });
+  }
+})();
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <meta name="description" content="Trusted Hands — Nigeria's verified skilled worker marketplace. Find electricians, plumbers, tailors and more near you."/>
@@ -576,13 +593,13 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
 </div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,browserLocalPersistence,setPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,browserSessionPersistence,setPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
 const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
 // Set persistence immediately and await it
-const _authReady=setPersistence(auth,browserLocalPersistence).catch(()=>{});
+const _authReady=setPersistence(auth,browserSessionPersistence).catch(()=>{});
 const AE='olaowyegideon@gmail.com';
 const LOCS={"Edo State":{"Esan West (Ekpoma)":["Market Square Area","Ojo Street","School Gate Area","Igor / Uhumudumu","Alli Square","Abelmen Area","GT Extension","Ujemen","Ujuenle","Emado","College Road","Abia"],"Benin City (Oredo)":["Ring Road","Sapele Road","Airport Road","Upper Sakponba","Uselu","Ugbowo","New Benin","Ikpoba Hill","GRA","Ekenwan Road","Oba Market Area"],"Benin City (Egor)":["Uwelu","Aduwawa","Ogida","Oregbeni","Mission Road","Upper Mission","Evbuotubu"],"Benin City (Ikpoba-Okha)":["Ikpoba Hill","Oregbeni Housing Estate","Idogbo","Evbuotubu","Ohaeghele","Ekewan Road"],"Igueben":["Igueben Town","Ewatto","Ewohimi","Ukhun"],"Esan North-East (Uromi)":["Uromi Town Centre","Irrua Road","Igue","Ebhoieki"],"Esan South-East (Ubiaja)":["Ubiaja Town","Ewohimi Road","Ohordua"],"Etsako West (Auchi)":["Auchi Town Centre","Polytechnic Road","Jattu","Iyuku Road","New Layout"],"Etsako Central (Fugar)":["Fugar Town","Ibillo","Okpella"],"Etsako East (Uzairue)":["Uzairue","Anegbette","Aviele"],"Orhionmwon (Abudu)":["Abudu","Orhionmwon LGA Centre","Ekpoma Bypass Area"],"Ovia North-East (Okada)":["Okada Town","Igbinedion University Area","Iguosa"],"Uhunmwonde":["Usen","Iguoriakhi","Ekpoma Road Junction"]},"Delta State":{"Warri (Uvwie)":["Effurun","PTI Road","Jakpa Road","NPA Road","Udu Road","Ugboroke","Ekpan"],"Warri (Warri South)":["Warri Town Centre","Okumagba Avenue","Igbudu Market","Airport Road Warri","Okere Road","Pessu Market","DSC Road","Ovwian","Agbarho Road"],"Warri North (Koko)":["Koko Town","Saghara","Gbokoda"],"Asaba (Oshimili South)":["Asaba Town Centre","Summit Road","Cable Point","Okpanam Road","DLA Road","Infant Jesus Area","New Layout Asaba","Oguta Road"],"Oshimili North (Kwale)":["Kwale Town","Issele-Uku","Ogwashi-Uku"],"Sapele (Sapele LGA)":["Sapele Town Centre","Okirighwre Road","Amukpe","Dore Camp","Okuzu Road"],"Ethiope East (Eku)":["Eku","Jesse","Abraka"],"Ethiope West (Oghara)":["Oghara Town","Evwreni","Mosogar"],"Ughelli North (Ughelli)":["Ughelli Town Centre","Agbarho","Otovwodo","Orogun Road","Aghalokpe"],"Ughelli South (Olomu)":["Olomu","Ughievwen","Erherhe"],"Isoko North (Ozoro)":["Ozoro Town","Oleh Road","Aviara"],"Isoko South (Oleh)":["Oleh Town","Emede","Emevor","Irri"],"Okpe (Sapele Road)":["Okpe LGA HQ","Mereje","Ugbolu"],"Ndokwa East (Kwale Area)":["Kwale East","Abbi","Ase"],"Ukwuani (Kwale/Obiaruku)":["Obiaruku","Umukwata","Ashaka"],"Aniocha North (Owa-Oyibu)":["Owa-Oyibu","Owa-Alero","Agbor-Obi"],"Aniocha South (Agbor)":["Agbor Town","Boji-Boji","Ute-Ogbeje","Abavo"],"Bomadi":["Bomadi Town","Tuomo","Kiagbodo"],"Burutu":["Burutu Town","Forcados","Yokri"],"Patani":["Patani Town","Emede-Patani"],"Warri South-West":["Escravos","Ogheye","Ogulagha"],"Sapele":["Sapele Town","Amukpe","Okirigwe"],"Ughelli North":["Ughelli Town","Agbarho","Ogor","Evwreni"],"Ughelli South":["Oyovwian","Erohwa","Emevo"],"Isoko North":["Ozoro","Emevor","Igbide"],"Isoko South":["Oleh","Emede","Olomoro","Aviara"],"Ndokwa East":["Aboh","Afor","Kwale East"],"Ndokwa West":["Kwale","Abbi","Ogume","Ashaka"],"Ukwuani":["Obiaruku","Umukwata","Owa-Oyibu"],"Aniocha North":["Owa-Alero","Issele-Uku","Idumuje-Ugboko"],"Aniocha South":["Asaba","Okpanam","Ogwashi-Uku","Ibusa"],"Oshimili North":["Akwukwu-Igbo","Oko-Anala","Issele-Azagba"],"Oshimili South":["Asaba Town","Illah","Cable Point"],"Bomadi":["Bomadi Town","Toru-Orua","Adobaraibi"],"Burutu":["Burutu Town","Koluama","Forcados"],"Ethiope East":["Abraka","Agbon","Oria"],"Ethiope West":["Eku","Kokori","Jesse","Mosogar"],"Okpe":["Orerokpe","Otor-Owhe","Sapele Road"],"Ika North East":["Owa-Alero","Agbor-Obi","Mbiri"],"Ika South":["Agbor","Alisor","Umunede"],"Warri South":["Warri Town","Ekpan","Effurun","Udu","Ovwian"],"Warri North":["Koko","Diebiri","Ogidigben"],"Ethiope West LGA":["Jesse","Mosogar","Oghara","Eku"]},"Ogun State":{"Abeokuta North":["Kuto","Iberekodo","Panseke","Adatan","Ago Ika","Oke Lantoro","Asero","Olomore","Lafenwa Road"],"Abeokuta South":["Ijaye","Obantoko","Lafenwa","Sabo","Idi-Aba","Obada","Kemta","Oke-Agbo","Totoro"],"Ijebu Ode":["Ijebu Ode Town","Folagbade","Oke-Aje","Ijebu Waterside","Odogbolu Road","Imepe","Igbeba","Oke-Sopen"],"Sagamu":["Sagamu Town","Makun","Ago-Iwoye","Ogijo","Ilishan Road","Ode-Remo","Soyoye","Oke-Atan"],"Ado-Odo/Ota":["Ota Town","Sango Ota","Agbado","Owode","Alagbole","Ado-Odo","Idiroko","Ifo Road"],"Ifo":["Ifo Town","Mowe","Ofada","Isheri North","Ajuwon","Akute","Toll Gate","Redemption Camp"],"Yewa South":["Ilaro Town","Oja Odan","Owode-Yewa","Igbessa","Iwoye","Igan-Alade"],"Yewa North":["Ayetoro Town","Imeko","Ijoun","Ihunbo","Igbooro"],"Ijebu North":["Ijebu-Igbo Town","Oke-Sopin","Ago-Iwoye Road","Atikori","Ijebu-Mushin","Oke-Agbo"],"Remo North":["Iperu-Remo","Ilishan-Remo","Ikenne","Ogere","Ode-Remo","Irolu","Wasinmi"],"Ewekoro":["Ewekoro Town","Itori","Wasimi","Papalanto","Owowo","Abalabi"],"Obafemi-Owode":["Owode-Egba","Obafemi","Ibafo","Mowe","Ofada Road","Pakoto","Kobape"],"Odeda":["Odeda Town","Isabo","Kobape","Opeji","Oke-Odan","Obantoko Road"],"Odogbolu":["Odogbolu Town","Eruku","Ilese-Ijebu","Ode-Lemo","Orudu"],"Ijebu East":["Awa-Ijebu","Ilaporu","Ibiade","Atan-Ijebu","Oru"],"Ogun Waterside":["Abigi","Ereko","Omi-Aperin","Bebereke","Ode-Omi"],"Ikenne":["Ikenne Town","Ilishan","Iperu","Ode-Remo South","Ogere-Remo"],"Shagamu":["Shagamu Town","Oke-Atan","Makun-Sagamu","Soyoye","Ita-Oshin"],"Imeko-Afon":["Imeko Town","Afon","Ijoun Road","Igan"],"Aiyetoro":["Aiyetoro Town","Eruwa","Owode-Ketu","Igan-Alade"]}};
 const allAreas=Object.values(LOCS).flatMap(lgas=>Object.values(lgas).flat());
