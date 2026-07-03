@@ -22,15 +22,9 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"/>
 <title>Trusted Hands — Nigeria's Skilled Worker Marketplace</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 
 <script>
-// EmailJS init — public key only, safe to expose client-side
-(function(){
-  if(window.emailjs){
-    emailjs.init({publicKey:'YOUR_EMAILJS_PUBLIC_KEY'});
-  }
-})();
 // Security: disable right-click inspect on production (soft deterrent)
 document.addEventListener('contextmenu',function(e){e.preventDefault();});
 document.addEventListener('keydown',function(e){
@@ -724,30 +718,10 @@ function route(){
   }
 }
 
-// ── EMAIL NOTIFICATIONS via EmailJS ──
-// Setup: go to emailjs.com → create account → create service (Gmail) → create template
-// Template variables: {{to_name}}, {{to_email}}, {{trade}}, {{missed_count}}, {{subscribe_link}}
-// Replace YOUR_EMAILJS_PUBLIC_KEY above, YOUR_SERVICE_ID and YOUR_TEMPLATE_ID below
-const EJS_SERVICE='YOUR_SERVICE_ID';
-const EJS_TEMPLATE='YOUR_TEMPLATE_ID';
-
-async function sendMissedViewEmail(artisanData){
-  if(!window.emailjs)return;
-  try{
-    await emailjs.send(EJS_SERVICE,EJS_TEMPLATE,{
-      to_name:artisanData.name||'Artisan',
-      to_email:artisanData.email,
-      trade:artisanData.trade||'your trade',
-      missed_count:artisanData.missedViews||1,
-      subscribe_link:'https://trust-hand.vercel.app',
-      platform_name:'Trusted Hands',
-      zone:artisanData.zone||'Ekpoma',
-    });
-    console.log('Email notification sent to',artisanData.email);
-  }catch(e){
-    console.warn('EmailJS send failed:',e);
-  }
-}
+// Email notifications disabled — using WhatsApp + SMS only
+const EJS_SERVICE='service_8u1ufa9';
+const EJS_TEMPLATE='pxuryr6';
+async function sendMissedViewEmail(artisanData){return;}// disabled
 
 // ── FIRESTORE SECURITY HELPERS ──
 // All writes validated client-side before hitting Firestore
