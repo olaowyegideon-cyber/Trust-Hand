@@ -262,8 +262,13 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
       </div>
       <div id="aex" style="display:none">
         <div class="fg"><label>Trade Category *</label>
-          <select class="inp" id="rt" onchange="vr()"><option value="">Select your trade</option><option>Electricians</option><option>Plumbers</option><option>Cleaners</option><option>Tailors</option><option>Hairdressers</option><option>Barbers</option><option>Mechanics</option><option>Dry Cleaners</option><option>Bricklayer / Construction Manager</option><option>POP Installers</option><option>Interior Decorators</option><option>Shoe Makers</option><option>Massage Therapists</option><option>Counselors</option><option>Cooks</option><option>Car Wash</option><option>Errand Boy / Girl</option><option>Solar Installers</option><option>Welders</option><option>Carpenters</option><option>Nail Technicians</option><option>Lash Technicians</option><option>Painters</option><option>Tilers</option><option>AC Technicians</option><option>Generator Technicians</option><option>Phone / Laptop Repairers</option><option>Photographers</option><option>Makeup Artists</option><option>Event Decorators</option><option>Dispatch Riders</option><option>Fumigators</option><option>Security Guards</option><option>Tutors / Home Teachers</option><option>Bead Makers</option><option>Gate / Security Door Installers</option><option>CCTV / Alarm Installers</option><option>Graphic Designers</option><option>Web Designers</option><option>Writers / Content Creators</option></select>
+          <select class="inp" id="rt" onchange="onTradeSelectChange('rt');vr()"><option value="">Select your trade</option></select>
+          <div id="rt_other" style="display:none;margin-top:10px">
+            <input class="inp" type="text" id="rt_custom" placeholder="Type the trade/service you offer (e.g. Barber)" oninput="vr()"/>
+            <p style="font-size:11px;color:var(--slate3);margin-top:6px">Not in our list yet? We will send this to our admin team for review. Once approved, it becomes available to everyone on the platform.</p>
+          </div>
         </div>
+
         <div class="fg"><label>Bio / Experience</label><textarea class="inp" id="rb" placeholder="Describe your skills and years of experience…"></textarea></div>
         <div class="fg">
           <label>Portfolio Photos * <span style="font-weight:400;font-size:11px;color:var(--slate3)">(Min. 2 photos)</span></label>
@@ -594,7 +599,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,browserSessionPersistence,setPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
 const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
@@ -622,6 +627,78 @@ const sn=s=>String(s||'').replace(/[<>"'&]/g,c=>({'<':'&lt;','>':'&gt;','"':'&qu
 const ini=n=>String(n||'').split(' ').map(x=>x[0]||'').join('').substring(0,2).toUpperCase()||'?';
 const ft=ts=>{if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')};
 // nb() replaced by nbAreas() above using LOCS structure
+
+// ── FULL TRADE / SERVICE LIST (40 built-in trades, shared everywhere: signup, profile edit, marketplace browse) ──
+const TRADE_DEFS=[
+  {t:'Electricians',e:'⚡',g:'linear-gradient(145deg,#1e3a8a,#3b82f6)',d:'Wiring, fittings & power'},
+  {t:'Plumbers',e:'🔧',g:'linear-gradient(145deg,#065f46,#10b981)',d:'Pipes, leaks & water'},
+  {t:'Cleaners',e:'🧹',g:'linear-gradient(145deg,#0c4a6e,#0ea5e9)',d:'Home & office cleaning'},
+  {t:'Tailors',e:'🧵',g:'linear-gradient(145deg,#4c1d95,#8b5cf6)',d:'Sewing & fashion design'},
+  {t:'Hairdressers',e:'💇',g:'linear-gradient(145deg,#831843,#ec4899)',d:'Hair styling & treatment'},
+  {t:'Barbers',e:'💈',g:'linear-gradient(145deg,#1f2937,#374151)',d:'Haircuts & grooming'},
+  {t:'Mechanics',e:'🔩',g:'linear-gradient(145deg,#78350f,#f59e0b)',d:'Car repairs & servicing'},
+  {t:'Dry Cleaners',e:'👔',g:'linear-gradient(145deg,#be185d,#f472b6)',d:'Laundry & pressing'},
+  {t:'Bricklayer / Construction Manager',e:'🧱',g:'linear-gradient(145deg,#374151,#6b7280)',d:'Building & renovation'},
+  {t:'POP Installers',e:'🏠',g:'linear-gradient(145deg,#0f4c75,#1b6ca8)',d:'Ceiling & POP work'},
+  {t:'Interior Decorators',e:'🛋️',g:'linear-gradient(145deg,#6d28d9,#c4b5fd)',d:'Decoration & furnishing'},
+  {t:'Shoe Makers',e:'👟',g:'linear-gradient(145deg,#92400e,#d97706)',d:'Shoe making & repairs'},
+  {t:'Massage Therapists',e:'💆',g:'linear-gradient(145deg,#065f46,#34d399)',d:'Massage & relaxation'},
+  {t:'Counselors',e:'🧠',g:'linear-gradient(145deg,#1e3a8a,#60a5fa)',d:'Guidance & counselling'},
+  {t:'Cooks',e:'👨‍🍳',g:'linear-gradient(145deg,#7c2d12,#ea580c)',d:'Home & event cooking'},
+  {t:'Car Wash',e:'🚗',g:'linear-gradient(145deg,#0c4a6e,#38bdf8)',d:'Car cleaning & detailing'},
+  {t:'Errand Boy / Girl',e:'🏃',g:'linear-gradient(145deg,#134e4a,#2dd4bf)',d:'Delivery & errands'},
+  {t:'Solar Installers',e:'☀️',g:'linear-gradient(145deg,#713f12,#fbbf24)',d:'Solar panels & power'},
+  {t:'Welders',e:'🔥',g:'linear-gradient(145deg,#1c1917,#57534e)',d:'Metal work & welding'},
+  {t:'Carpenters',e:'🪚',g:'linear-gradient(145deg,#451a03,#a16207)',d:'Furniture & woodwork'},
+  {t:'Nail Technicians',e:'💅',g:'linear-gradient(145deg,#500724,#db2777)',d:'Manicure & nail art'},
+  {t:'Lash Technicians',e:'👁️',g:'linear-gradient(145deg,#581c87,#c026d3)',d:'Eyelash extensions & lifts'},
+  {t:'Painters',e:'🎨',g:'linear-gradient(145deg,#7c2d12,#dc2626)',d:'Wall & building painting'},
+  {t:'Tilers',e:'🔲',g:'linear-gradient(145deg,#164e63,#0891b2)',d:'Floor & wall tiling'},
+  {t:'AC Technicians',e:'❄️',g:'linear-gradient(145deg,#0c4a6e,#38bdf8)',d:'AC installation & repair'},
+  {t:'Generator Technicians',e:'⚙️',g:'linear-gradient(145deg,#374151,#9ca3af)',d:'Generator repair & service'},
+  {t:'Phone / Laptop Repairers',e:'📱',g:'linear-gradient(145deg,#1e293b,#475569)',d:'Device repairs & servicing'},
+  {t:'Photographers',e:'📷',g:'linear-gradient(145deg,#312e81,#6366f1)',d:'Photography & videography'},
+  {t:'Makeup Artists',e:'💄',g:'linear-gradient(145deg,#831843,#f472b6)',d:'Bridal & event makeup'},
+  {t:'Event Decorators',e:'🎉',g:'linear-gradient(145deg,#6d28d9,#a78bfa)',d:'Party & event decoration'},
+  {t:'Dispatch Riders',e:'🏍️',g:'linear-gradient(145deg,#0f172a,#334155)',d:'Fast delivery & logistics'},
+  {t:'Fumigators',e:'🐜',g:'linear-gradient(145deg,#365314,#84cc16)',d:'Pest control & fumigation'},
+  {t:'Security Guards',e:'🛡️',g:'linear-gradient(145deg,#1e293b,#334155)',d:'Security & protection'},
+  {t:'Tutors / Home Teachers',e:'📚',g:'linear-gradient(145deg,#1e3a8a,#3b82f6)',d:'Home tutoring & lessons'},
+  {t:'Bead Makers',e:'📿',g:'linear-gradient(145deg,#831843,#db2777)',d:'Bead crafts & jewelry'},
+  {t:'Gate / Security Door Installers',e:'🚪',g:'linear-gradient(145deg,#44403c,#78716c)',d:'Gates & security doors'},
+  {t:'CCTV / Alarm Installers',e:'📹',g:'linear-gradient(145deg,#0f172a,#1e40af)',d:'CCTV & alarm systems'},
+  {t:'Graphic Designers',e:'🖌️',g:'linear-gradient(145deg,#581c87,#9333ea)',d:'Logos, flyers & branding'},
+  {t:'Web Designers',e:'💻',g:'linear-gradient(145deg,#0c4a6e,#0284c7)',d:'Websites & web apps'},
+  {t:'Writers / Content Creators',e:'✍️',g:'linear-gradient(145deg,#78350f,#b45309)',d:'Content & copywriting'}
+];
+// Trades added by artisans and approved by admin — loaded from Firestore, available app-wide once approved
+let CUSTOM_TRADES=[];
+async function loadCustomTrades(){
+  try{
+    const snap=await getDoc(doc(db,'config','customTrades'));
+    if(snap.exists())CUSTOM_TRADES=snap.data().trades||[];
+  }catch(e){}
+}
+function allTradeNames(){return[...TRADE_DEFS.map(t=>t.t),...CUSTOM_TRADES];}
+function populateTradeSelects(){const rt=$('rt');if(rt)rt.innerHTML=tradeOptionsHTML(rt.value);}
+window.populateTradeSelects=populateTradeSelects;
+populateTradeSelects();
+loadCustomTrades().then(populateTradeSelects);
+// Builds <option> list for any trade <select>, including custom-approved trades + an "Other" option to request a new one
+function tradeOptionsHTML(selected){
+  let html='<option value="">Select your trade</option>';
+  TRADE_DEFS.forEach(t=>{html+=`<option${t.t===selected?' selected':''}>${t.t}</option>`;});
+  CUSTOM_TRADES.forEach(t=>{const st=sn(t);html+=`<option${st===selected?' selected':''}>${st}</option>`;});
+  html+=`<option value="__other__"${selected==='__other__'?' selected':''}>➕ My trade is not listed here</option>`;
+  return html;
+}
+window.tradeOptionsHTML=tradeOptionsHTML;
+// Shows/hides the custom-trade text box next to any trade <select> that has id `${selectId}` and a sibling box `${selectId}_other`
+window.onTradeSelectChange=function(selectId){
+  const sel=$(selectId);const box=$(selectId+'_other');
+  if(!sel||!box)return;
+  box.style.display=sel.value==='__other__'?'block':'none';
+};
 
 function toast(m,d=3000){const t=$('T');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
 
@@ -660,13 +737,16 @@ async function compress(f,mx=900,q=0.78){return new Promise(r=>{const fr=new Fil
 
 // ── SPLASH ──
 const MSGS=['🔧 Find electricians, plumbers & more in your zone','⭐ Verified skilled workers with real portfolios and reviews','💬 Chat & negotiate safely before any booking','🚀 Ekpoma\'s most trusted worker marketplace is here'];
+const SPLASH_MS=7000; // total splash duration
+const SPLASH_START=800; // when the first message appears
+const SPLASH_CYCLE=Math.round((SPLASH_MS-SPLASH_START)/MSGS.length); // each message gets an even share of the remaining time
 function runSplash(){
   const lo=$('spl'),ms=$('spm'),tx=$('spt'),fl=$('spf');
   setTimeout(()=>{if(lo){lo.style.opacity='1';lo.style.transform='scale(1)';}},200);
-  setTimeout(()=>{if(ms)ms.style.opacity='1';if(tx)tx.textContent=MSGS[0];if(fl){fl.style.width='100%';}},800);
+  setTimeout(()=>{if(ms)ms.style.opacity='1';if(tx)tx.textContent=MSGS[0];if(fl){fl.style.transition=`width ${SPLASH_CYCLE}ms linear`;fl.style.width='100%';}},SPLASH_START);
   let idx=0;
-  const cy=setInterval(()=>{idx=(idx+1)%MSGS.length;if(tx){tx.style.opacity='0';setTimeout(()=>{tx.textContent=MSGS[idx];tx.style.opacity='1';},300);}if(fl){fl.style.transition='none';fl.style.width='0';setTimeout(()=>{fl.style.transition='width 3.2s linear';fl.style.width='100%';},50);}},3200);
-  // After 3 seconds hide splash — much faster
+  const cy=setInterval(()=>{idx=(idx+1)%MSGS.length;if(tx){tx.style.opacity='0';setTimeout(()=>{tx.textContent=MSGS[idx];tx.style.opacity='1';},300);}if(fl){fl.style.transition='none';fl.style.width='0';setTimeout(()=>{fl.style.transition=`width ${SPLASH_CYCLE}ms linear`;fl.style.width='100%';},50);}},SPLASH_CYCLE);
+  // Show the full slideshow (all messages) before moving on
   setTimeout(()=>{
     clearInterval(cy);
     const sp=$('s-splash');
@@ -682,13 +762,13 @@ function runSplash(){
       }
       // If S.u is set but no pendingRoute, onAuthStateChanged will handle it
     },400);
-  },3000);
+  },SPLASH_MS);
 }
 
 // Auth state — waits for splash before routing
 let splashDone=false;let pendingRoute=null;
 
-// Safety net — if Firebase takes longer than 6s on slow network, show auth
+// Safety net — if Firebase takes longer than the splash+buffer on slow network, show auth
 setTimeout(()=>{
   if(!splashDone){
     splashDone=true;
@@ -699,7 +779,7 @@ setTimeout(()=>{
       else if(!S.u)SS('s-auth');
     },400);
   }
-},6000);
+},SPLASH_MS+3000);
 
 onAuthStateChanged(auth,async user=>{
   const doRoute=async()=>{
@@ -832,7 +912,11 @@ window.vr=function(){
   const n=$('rn')?.value.trim(),e=$('re')?.value.trim(),ph=$('rph')?.value.trim(),pw=$('rpw')?.value;
   const st=$('rstate')?.value,lg=$('rlga')?.value,z=$('rz')?.value;
   let ok=n&&e&&ph&&pw&&pw.length>=6&&st&&lg&&z;
-  if(RT==='a')ok=ok&&$('rt')?.value&&$('agr')?.checked&&S.ports.length>=2;
+  if(RT==='a'){
+    const rtv=$('rt')?.value;
+    const tradeOk=rtv&&(rtv!=='__other__'||($('rt_custom')?.value.trim().length>=2));
+    ok=ok&&tradeOk&&$('agr')?.checked&&S.ports.length>=2;
+  }
   if($('rbtn'))$('rbtn').disabled=!ok;
 };
 window.tpw=function(id,btn){
@@ -914,11 +998,18 @@ window.doReg=async function(){
       toast('Welcome to Trusted Hands, '+n.split(' ')[0]+'! 🎉');
       SS('s-market');iMkt();
     }else{
-      const tr=$('rt').value,bio=sn($('rb').value).substring(0,500);
-      if(!tr){err.textContent='Please select your trade.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
+      let tr=$('rt').value;const bio=sn($('rb').value).substring(0,500);
+      const isCustomTrade=tr==='__other__';
+      if(isCustomTrade)tr=sn($('rt_custom').value.trim()).substring(0,60);
+      if(!tr){err.textContent='Please select or enter your trade.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
       if(S.ports.length<2){err.textContent='Please upload at least 2 portfolio photos.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
-      const pd={uid,name:n,email:e,phone:ph,type:'artisan',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),trade:tr,bio,status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,timerStarted:false,graceEnd:null,portfolios:S.ports.slice(),idDocument:S.idDoc||null,idVerified:false,contract_signed_date:serverTimestamp(),createdAt:serverTimestamp()};
-      await setDoc(doc(db,'users',uid),pd);S.p=pd;SS('s-paywall');setTimeout(()=>showArtisanTut(),800);
+      const pd={uid,name:n,email:e,phone:ph,type:'artisan',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),trade:tr,bio,status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,timerStarted:false,graceEnd:null,portfolios:S.ports.slice(),idDocument:S.idDoc||null,idVerified:false,contract_signed_date:serverTimestamp(),createdAt:serverTimestamp(),tradePendingReview:isCustomTrade};
+      await setDoc(doc(db,'users',uid),pd);S.p=pd;
+      if(isCustomTrade){
+        try{await addDoc(collection(db,'tradeRequests'),{artisanUid:uid,artisanName:n,trade:tr,status:'pending',createdAt:serverTimestamp()});}catch(e3){}
+        toast('🎉 Account created! Your new trade "'+tr+'" was sent to admin for review.');
+      }
+      SS('s-paywall');setTimeout(()=>showArtisanTut(),800);
     }
   }catch(e2){
     $('rbtn').disabled=false;$('rbtn').textContent='Create Account';
@@ -960,35 +1051,15 @@ window.chkPend=async function(){
   if(snap.exists()){S.p=snap.data();if(S.p.status==='active'){toast('🎉 Account activated!');route();}else toast('Still under review. Check back soon!');}
 };
 
-// ── MARKETPLACE ──
-const CATS=[
-  {t:'Electricians',g:'linear-gradient(145deg,#1e3a8a,#3b82f6)',e:'⚡',d:'Wiring, fittings & power'},
-  {t:'Plumbers',g:'linear-gradient(145deg,#065f46,#10b981)',e:'🔧',d:'Pipes, leaks & water'},
-  {t:'Cleaners',g:'linear-gradient(145deg,#0c4a6e,#0ea5e9)',e:'🧹',d:'Home & office cleaning'},
-  {t:'Tailors',g:'linear-gradient(145deg,#4c1d95,#8b5cf6)',e:'🧵',d:'Sewing & fashion design'},
-  {t:'Hairdressers',g:'linear-gradient(145deg,#831843,#ec4899)',e:'💇',d:'Hair styling & treatment'},
-  {t:'Barbers',g:'linear-gradient(145deg,#1f2937,#374151)',e:'💈',d:'Haircuts & grooming'},
-  {t:'Mechanics',g:'linear-gradient(145deg,#78350f,#f59e0b)',e:'🔩',d:'Car repairs & servicing'},
-  {t:'Dry Cleaners',g:'linear-gradient(145deg,#be185d,#f472b6)',e:'👔',d:'Laundry & pressing'},
-  {t:'Bricklayer / Construction Manager',g:'linear-gradient(145deg,#374151,#6b7280)',e:'🧱',d:'Building & renovation'},
-  {t:'POP Installers',g:'linear-gradient(145deg,#0f4c75,#1b6ca8)',e:'🏠',d:'Ceiling & POP work'},
-  {t:'Interior Decorators',g:'linear-gradient(145deg,#6d28d9,#c4b5fd)',e:'🛋️',d:'Decoration & furnishing'},
-  {t:'Shoe Makers',g:'linear-gradient(145deg,#92400e,#d97706)',e:'👟',d:'Shoe making & repairs'},
-  {t:'Massage Therapists',g:'linear-gradient(145deg,#065f46,#34d399)',e:'💆',d:'Massage & relaxation'},
-  {t:'Counselors',g:'linear-gradient(145deg,#1e3a8a,#60a5fa)',e:'🧠',d:'Guidance & counselling'},
-  {t:'Cooks',g:'linear-gradient(145deg,#7c2d12,#ea580c)',e:'👨‍🍳',d:'Home & event cooking'},
-  {t:'Car Wash',g:'linear-gradient(145deg,#0c4a6e,#38bdf8)',e:'🚗',d:'Car cleaning & detailing'},
-  {t:'Errand Boy / Girl',g:'linear-gradient(145deg,#134e4a,#2dd4bf)',e:'🏃',d:'Delivery & errands'},
-  {t:'Solar Installers',g:'linear-gradient(145deg,#713f12,#fbbf24)',e:'☀️',d:'Solar panels & power'},
-  {t:'Welders',g:'linear-gradient(145deg,#1c1917,#57534e)',e:'🔥',d:'Metal work & welding'},
-  {t:'Carpenters',g:'linear-gradient(145deg,#451a03,#a16207)',e:'🪚',d:'Furniture & woodwork'},
-  {t:'Nail Technicians',g:'linear-gradient(145deg,#500724,#db2777)',e:'💅',d:'Manicure & nail art'},
-  {t:'Lash Technicians',g:'linear-gradient(145deg,#581c87,#c026d3)',e:'👁️',d:'Eyelash extensions & lifts'},
-];
-
+// ── MARKETPLACE ── (categories now sourced from the shared TRADE_DEFS list — all 40 trades, plus any admin-approved custom trades)
+function getCATS(){
+  const extra=CUSTOM_TRADES.map(t=>({t,g:'linear-gradient(145deg,#334155,#64748b)',e:'🛠️',d:'Skilled service'}));
+  return[...TRADE_DEFS,...extra];
+}
 function iMkt(){bCG();pFeed();showTut();}
 function bCG(){
   const g=$('cg');if(!g)return;
+  const CATS=getCATS();
   g.innerHTML=CATS.map(c=>`<div class="ccard" style="background:${c.g}" onclick="showF('${c.t.replace(/'/g,"\\'")}','${c.t.replace(/'/g,"\\'")}')"><div style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.2);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">Find →</div><div style="font-size:26px;margin-bottom:8px">${c.e}</div><div><div style="font-weight:800;font-size:13px;color:#fff;line-height:1.3">${c.t}</div><div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">${c.d}</div></div></div>`).join('');
 }
 async function pFeed(){
@@ -1458,13 +1529,18 @@ window.skipTut=function(){document.getElementById('tut')?.remove();try{localStor
 // ── DASHBOARD ──
 async function rDash(){
   if(!S.u||!S.p){SS('s-auth');return;}
-  const snap=await getDoc(doc(db,'users',S.u.uid));
-  if(snap.exists())S.p=snap.data();
-  const notesSnap=await getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),orderBy('sentAt','desc'),limit(5)));
-  const notes=notesSnap.docs.map(d=>d.data());
-  // Load missed view notifications
-  const notifSnap=await getDocs(query(collection(db,'notifications'),where('toUid','==',S.u.uid),where('type','==','profile_view_missed'),where('read','==',false),limit(1)));
-  const hasNotif=!notifSnap.empty;
+  try{const snap=await getDoc(doc(db,'users',S.u.uid));if(snap.exists())S.p=snap.data();}catch(e){}
+  let notes=[];
+  try{
+    const notesSnap=await getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),orderBy('sentAt','desc'),limit(5)));
+    notes=notesSnap.docs.map(d=>d.data());
+  }catch(e){}
+  // Load missed view notifications (best-effort — never block the dashboard if this query fails)
+  let hasNotif=false;
+  try{
+    const notifSnap=await getDocs(query(collection(db,'notifications'),where('toUid','==',S.u.uid),where('type','==','profile_view_missed'),where('read','==',false),limit(1)));
+    hasNotif=!notifSnap.empty;
+  }catch(e){}
   const p=S.p;const b=$('db');
   const fn=sn(p.name||'').split(' ')[0];
   const ex=p.expiry?.toDate?p.expiry.toDate():p.expiry?new Date(p.expiry):null;
@@ -1798,7 +1874,6 @@ function buildProfileEditor(isArtisan){
     ?`<img src="${p.profilePhoto}" id="ppThumb" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--blue2);display:block;margin:0 auto"/>`
     :`<div id="ppThumb" style="width:90px;height:90px;border-radius:50%;background:var(--blue3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--blue2);margin:0 auto">${ini(p.name)}</div>`;
   const zoneOpts=['Market Square Area','Ojo Street','School Gate Area','Igor / Uhumudumu','Alli Square','Abelmen Area','GT Extension','Ujemen','Ujuenle','Emado','College Road','Abia'];
-  const tradeOpts=['Electricians','Plumbers','Cleaners','Tailors','Hairdressers','Barbers','Mechanics','Dry Cleaners','Bricklayer / Construction Manager','POP Installers','Interior Decorators','Shoe Makers','Massage Therapists','Counselors'];
   const el=document.createElement('div');
   el.id='profileEditor';
   el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center';
@@ -1849,9 +1924,14 @@ function buildProfileEditor(isArtisan){
     <div class="ic">
       <h3>Skilled Worker Details</h3>
       <div class="fg"><label>Trade Category *</label>
-        <select class="inp" id="ep_trade">
-          ${tradeOpts.map(t=>`<option value="${t}" ${p.trade===t?'selected':''}>${t}</option>`).join('')}
+        <select class="inp" id="ep_trade" onchange="onTradeSelectChange('ep_trade')">
+          ${!allTradeNames().includes(p.trade)&&p.trade?`<option value="${sn(p.trade)}" selected>${sn(p.trade)}</option>`:''}
+          ${tradeOptionsHTML(p.trade)}
         </select>
+        <div id="ep_trade_other" style="display:none;margin-top:10px">
+          <input class="inp" type="text" id="ep_trade_custom" placeholder="Type the trade/service you offer (e.g. Barber)"/>
+          <p style="font-size:11px;color:var(--slate3);margin-top:6px">Not in our list yet? We will send this to our admin team for review. Once approved, it becomes available to everyone on the platform.</p>
+        </div>
       </div>
       <div class="fg"><label>Bio / Experience *</label>
         <textarea class="inp" id="ep_bio" style="min-height:90px" placeholder="Describe your skills, experience and years of work…" maxlength="500">${sn(p.bio||'')}</textarea>
@@ -1893,13 +1973,17 @@ window.saveFullProfile=async function(isArtisan){
   if(!epst||!eplg||!zone){err.textContent='Please select your State, LGA and Area.';err.style.display='block';return;}
   let updates={name,phone,state:epst,lga:eplg,zone,fullLocation:locStr(epst,eplg,zone)};
   if(isArtisan){
-    const trade=document.getElementById('ep_trade')?.value||'';
+    let trade=document.getElementById('ep_trade')?.value||'';
     const bio=sn(document.getElementById('ep_bio')?.value?.trim()||'').substring(0,500);
-    if(!trade){err.textContent='Please select your trade.';err.style.display='block';return;}
+    const isCustomTrade=trade==='__other__';
+    if(isCustomTrade)trade=sn(document.getElementById('ep_trade_custom')?.value?.trim()||'').substring(0,60);
+    if(!trade){err.textContent='Please select or enter your trade.';err.style.display='block';return;}
     if(bio.length<10){err.textContent='Please write a short bio (at least 10 characters).';err.style.display='block';return;}
     // Photo is mandatory for artisan
     if(!S.p.profilePhoto&&!S._newPhoto){err.textContent='Profile photo is required for artisans.';err.style.display='block';return;}
     updates={...updates,trade,bio};
+    if(isCustomTrade)updates.tradePendingReview=true;
+    S._customTradeRequested=isCustomTrade?trade:null;
   }
   if(S._newPhoto){updates.profilePhoto=S._newPhoto;}
   const btn=document.getElementById('ep_savebtn');
@@ -1908,8 +1992,14 @@ window.saveFullProfile=async function(isArtisan){
     await updateDoc(doc(db,'users',S.u.uid),updates);
     S.p={...S.p,...updates};
     S._newPhoto=null;
+    if(S._customTradeRequested){
+      try{await addDoc(collection(db,'tradeRequests'),{artisanUid:S.u.uid,artisanName:S.p?.name||'',trade:S._customTradeRequested,status:'pending',createdAt:serverTimestamp()});}catch(e3){}
+      toast('✅ Profile updated! Your new trade "'+S._customTradeRequested+'" was sent to admin for review.');
+      S._customTradeRequested=null;
+    } else {
+      toast('✅ Profile updated successfully!');
+    }
     document.getElementById('profileEditor')?.remove();
-    toast('✅ Profile updated successfully!');
     // Refresh dashboard if on it
     if(document.getElementById('s-dash')?.classList.contains('active'))rDash();
   }catch(e){
@@ -2094,9 +2184,18 @@ window.rAdmin=async function(){
   try{
     if(t==='ap2'){
       const snap=await getDocs(query(collection(db,'pendingApprovals'),where('reviewed','==',false)));
-      if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No pending approvals.</div>`;return;}
-      b.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px;font-weight:600">${snap.docs.length} pending</div>`+
+      let trSnap={empty:true,docs:[]};
+      try{trSnap=await getDocs(query(collection(db,'tradeRequests'),where('status','==','pending')));}catch(e4){}
+      let html='';
+      if(!trSnap.empty){
+        html+=`<div style="font-size:13px;color:var(--slate3);margin-bottom:10px;font-weight:600">🆕 ${trSnap.docs.length} new trade request${trSnap.docs.length!==1?'s':''}</div>`+
+        trSnap.docs.map(d=>{const r=d.data();return`<div class="pi" style="border-left:3px solid var(--blue2)"><div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">➕ "${sn(r.trade)}"</div><div style="font-size:12px;color:var(--slate3);line-height:1.8">Requested by ${sn(r.artisanName||'Artisan')}<br/>${r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString():'—'}</div><p style="font-size:12px;color:var(--slate3);margin-top:8px">Approving makes this trade available to everyone — for browsing and future sign-ups.</p><div style="display:flex;gap:8px;margin-top:10px"><button class="btn bs bsm" onclick="apTradeReq('${d.id}','${sn(r.trade).replace(/'/g,"\\'")}')">✓ Approve Trade</button><button class="btn bd bsm" onclick="rjTradeReq('${d.id}')">✕ Reject</button></div></div>`;}).join('')+
+        `<div style="height:6px"></div>`;
+      }
+      if(snap.empty&&trSnap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No pending approvals.</div>`;return;}
+      html+=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px;font-weight:600">${snap.docs.length} pending payment approval${snap.docs.length!==1?'s':''}</div>`+
       snap.docs.map(d=>{const p=d.data();return`<div class="pi"><div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(p.name)}</div><div style="font-size:12px;color:var(--slate3);line-height:1.8">🔧 ${sn(p.trade)} · 📍 ${sn(p.zone)}<br/>Tier: <strong style="color:var(--blue2)">${sn(p.tier)}</strong><br/>Sender: ${sn(p.senderBank)}<br/>${p.submittedAt?.toDate?p.submittedAt.toDate().toLocaleDateString():'—'}</div>${p.receiptBase64?`<img src="${p.receiptBase64}" class="ri"/>`:'<div style="background:#f1f5f9;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--slate3);margin:10px 0">🧾 Receipt on file</div>'}<div style="display:flex;gap:8px;margin-top:10px"><button class="btn bs bsm" onclick="apArt('${p.artisanUid}','${d.id}','${p.tier}')">✓ Approve</button><button class="btn bd bsm" onclick="rjArt('${d.id}')">✕ Reject</button></div></div>`;}).join('');
+      b.innerHTML=html;
     }
     else if(t==='art'){
       const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));
@@ -2144,6 +2243,20 @@ window.fAdArts=function(q){const list=document.getElementById('adArtList');if(!l
 window.fAdCusts=function(q){const list=document.getElementById('adCustList');if(!list)return;const f=(window._adCusts||[]).filter(c=>(c.name||'').toLowerCase().includes(q.toLowerCase())||(c.email||'').toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(c=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(c.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.zone||'—')}</div></div></div>`).join('');};
 window.apArt=async function(uid,did,tl){const tr=tl.toLowerCase().includes('premium')?'premium':'standard';const ex=new Date(Date.now()+2592000000);await runTransaction(db,async txn=>{txn.update(doc(db,'users',uid),{status:'active',tier:tr,expiry:ex,activatedAt:serverTimestamp()});txn.update(doc(db,'pendingApprovals',did),{reviewed:true,approvedAt:serverTimestamp()});});toast('✅ Activated for 30 days!');rAdmin();};
 window.rjArt=async function(did){if(!confirm('Reject this submission?'))return;await updateDoc(doc(db,'pendingApprovals',did),{reviewed:true,rejected:true,rejectedAt:serverTimestamp()});toast('Rejected.');rAdmin();};
+window.apTradeReq=async function(did,tradeName){
+  try{
+    await setDoc(doc(db,'config','customTrades'),{trades:arrayUnion(tradeName)},{merge:true});
+    await updateDoc(doc(db,'tradeRequests',did),{status:'approved',approvedAt:serverTimestamp()});
+    await loadCustomTrades();
+    toast('✅ "'+tradeName+'" approved — now visible to everyone on the platform!');
+    rAdmin();
+  }catch(e){toast('Error approving trade: '+e.message);}
+};
+window.rjTradeReq=async function(did){
+  if(!confirm('Reject this trade request?'))return;
+  await updateDoc(doc(db,'tradeRequests',did),{status:'rejected',rejectedAt:serverTimestamp()});
+  toast('Trade request rejected.');rAdmin();
+};
 window.adArt=async function(uid){
   const snap=await getDoc(doc(db,'users',uid));if(!snap.exists())return;const a=snap.data();
   const ex=a.expiry?.toDate?a.expiry.toDate():a.expiry?new Date(a.expiry):null;
