@@ -736,7 +736,7 @@ window.goBack=function(){SS(S.pv||'s-market')};
 async function compress(f,mx=900,q=0.78){return new Promise(r=>{const fr=new FileReader();fr.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');let w=img.width,h=img.height;if(w>mx){h=Math.round(h*mx/w);w=mx;}if(h>mx){w=Math.round(w*mx/h);h=mx;}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);r(c.toDataURL('image/jpeg',q));};img.src=e.target.result;};fr.readAsDataURL(f);})}
 
 // ── SPLASH ──
-const MSGS=['🔧 Find electricians, plumbers & more in your zone','⭐ Verified skilled workers with real portfolios and reviews','💬 Chat & negotiate safely before any booking','
+const MSGS=['🔧 Find electricians, plumbers & more in your zone','⭐ Verified skilled workers with real portfolios and reviews'];
 const SPLASH_MS=7000; // total splash duration
 const SPLASH_START=800; // when the first message appears
 const SPLASH_CYCLE=Math.round((SPLASH_MS-SPLASH_START)/MSGS.length); // each message gets an even share of the remaining time
