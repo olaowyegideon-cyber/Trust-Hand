@@ -248,6 +248,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
           <option value="Edo State">Edo State</option>
           <option value="Delta State">Delta State</option>
           <option value="Ogun State">Ogun State</option>
+          <option value="Lagos State">Lagos State</option>
         </select>
       </div>
       <div class="fg"><label>LGA / City *</label>
@@ -406,6 +407,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
             <option value="Edo State">Edo State</option>
             <option value="Delta State">Delta State</option>
             <option value="Ogun State">Ogun State</option>
+            <option value="Lagos State">Lagos State</option>
           </select>
           <select class="zsel" id="flga" onchange="window.onFLGAChange()" style="flex:1;min-width:100px">
             <option value="">All LGAs</option>
@@ -603,10 +605,13 @@ import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,g
 
 const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
 const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
+// Capture a referral code from the URL (?ref=UID) the moment the app loads, so it survives
+// browsing/splash all the way through to registration, even if the user signs up minutes later.
+(function(){try{const p=new URLSearchParams(location.search).get('ref');if(p)sessionStorage.setItem('th_ref',p);}catch(e){}})();
 // Set persistence immediately and await it
 const _authReady=setPersistence(auth,browserSessionPersistence).catch(()=>{});
 const AE='olaowyegideon@gmail.com';
-const LOCS={"Edo State":{"Esan West (Ekpoma)":["Market Square Area","Ojo Street","School Gate Area","Igor / Uhumudumu","Alli Square","Abelmen Area","GT Extension","Ujemen","Ujuenle","Emado","College Road","Abia"],"Benin City (Oredo)":["Ring Road","Sapele Road","Airport Road","Upper Sakponba","Uselu","Ugbowo","New Benin","Ikpoba Hill","GRA","Ekenwan Road","Oba Market Area"],"Benin City (Egor)":["Uwelu","Aduwawa","Ogida","Oregbeni","Mission Road","Upper Mission","Evbuotubu"],"Benin City (Ikpoba-Okha)":["Ikpoba Hill","Oregbeni Housing Estate","Idogbo","Evbuotubu","Ohaeghele","Ekewan Road"],"Igueben":["Igueben Town","Ewatto","Ewohimi","Ukhun"],"Esan North-East (Uromi)":["Uromi Town Centre","Irrua Road","Igue","Ebhoieki"],"Esan South-East (Ubiaja)":["Ubiaja Town","Ewohimi Road","Ohordua"],"Etsako West (Auchi)":["Auchi Town Centre","Polytechnic Road","Jattu","Iyuku Road","New Layout"],"Etsako Central (Fugar)":["Fugar Town","Ibillo","Okpella"],"Etsako East (Uzairue)":["Uzairue","Anegbette","Aviele"],"Orhionmwon (Abudu)":["Abudu","Orhionmwon LGA Centre","Ekpoma Bypass Area"],"Ovia North-East (Okada)":["Okada Town","Igbinedion University Area","Iguosa"],"Uhunmwonde":["Usen","Iguoriakhi","Ekpoma Road Junction"]},"Delta State":{"Warri (Uvwie)":["Effurun","PTI Road","Jakpa Road","NPA Road","Udu Road","Ugboroke","Ekpan"],"Warri (Warri South)":["Warri Town Centre","Okumagba Avenue","Igbudu Market","Airport Road Warri","Okere Road","Pessu Market","DSC Road","Ovwian","Agbarho Road"],"Warri North (Koko)":["Koko Town","Saghara","Gbokoda"],"Asaba (Oshimili South)":["Asaba Town Centre","Summit Road","Cable Point","Okpanam Road","DLA Road","Infant Jesus Area","New Layout Asaba","Oguta Road"],"Oshimili North (Kwale)":["Kwale Town","Issele-Uku","Ogwashi-Uku"],"Sapele (Sapele LGA)":["Sapele Town Centre","Okirighwre Road","Amukpe","Dore Camp","Okuzu Road"],"Ethiope East (Eku)":["Eku","Jesse","Abraka"],"Ethiope West (Oghara)":["Oghara Town","Evwreni","Mosogar"],"Ughelli North (Ughelli)":["Ughelli Town Centre","Agbarho","Otovwodo","Orogun Road","Aghalokpe"],"Ughelli South (Olomu)":["Olomu","Ughievwen","Erherhe"],"Isoko North (Ozoro)":["Ozoro Town","Oleh Road","Aviara"],"Isoko South (Oleh)":["Oleh Town","Emede","Emevor","Irri"],"Okpe (Sapele Road)":["Okpe LGA HQ","Mereje","Ugbolu"],"Ndokwa East (Kwale Area)":["Kwale East","Abbi","Ase"],"Ukwuani (Kwale/Obiaruku)":["Obiaruku","Umukwata","Ashaka"],"Aniocha North (Owa-Oyibu)":["Owa-Oyibu","Owa-Alero","Agbor-Obi"],"Aniocha South (Agbor)":["Agbor Town","Boji-Boji","Ute-Ogbeje","Abavo"],"Bomadi":["Bomadi Town","Tuomo","Kiagbodo"],"Burutu":["Burutu Town","Forcados","Yokri"],"Patani":["Patani Town","Emede-Patani"],"Warri South-West":["Escravos","Ogheye","Ogulagha"],"Sapele":["Sapele Town","Amukpe","Okirigwe"],"Ughelli North":["Ughelli Town","Agbarho","Ogor","Evwreni"],"Ughelli South":["Oyovwian","Erohwa","Emevo"],"Isoko North":["Ozoro","Emevor","Igbide"],"Isoko South":["Oleh","Emede","Olomoro","Aviara"],"Ndokwa East":["Aboh","Afor","Kwale East"],"Ndokwa West":["Kwale","Abbi","Ogume","Ashaka"],"Ukwuani":["Obiaruku","Umukwata","Owa-Oyibu"],"Aniocha North":["Owa-Alero","Issele-Uku","Idumuje-Ugboko"],"Aniocha South":["Asaba","Okpanam","Ogwashi-Uku","Ibusa"],"Oshimili North":["Akwukwu-Igbo","Oko-Anala","Issele-Azagba"],"Oshimili South":["Asaba Town","Illah","Cable Point"],"Bomadi":["Bomadi Town","Toru-Orua","Adobaraibi"],"Burutu":["Burutu Town","Koluama","Forcados"],"Ethiope East":["Abraka","Agbon","Oria"],"Ethiope West":["Eku","Kokori","Jesse","Mosogar"],"Okpe":["Orerokpe","Otor-Owhe","Sapele Road"],"Ika North East":["Owa-Alero","Agbor-Obi","Mbiri"],"Ika South":["Agbor","Alisor","Umunede"],"Warri South":["Warri Town","Ekpan","Effurun","Udu","Ovwian"],"Warri North":["Koko","Diebiri","Ogidigben"],"Ethiope West LGA":["Jesse","Mosogar","Oghara","Eku"]},"Ogun State":{"Abeokuta North":["Kuto","Iberekodo","Panseke","Adatan","Ago Ika","Oke Lantoro","Asero","Olomore","Lafenwa Road"],"Abeokuta South":["Ijaye","Obantoko","Lafenwa","Sabo","Idi-Aba","Obada","Kemta","Oke-Agbo","Totoro"],"Ijebu Ode":["Ijebu Ode Town","Folagbade","Oke-Aje","Ijebu Waterside","Odogbolu Road","Imepe","Igbeba","Oke-Sopen"],"Sagamu":["Sagamu Town","Makun","Ago-Iwoye","Ogijo","Ilishan Road","Ode-Remo","Soyoye","Oke-Atan"],"Ado-Odo/Ota":["Ota Town","Sango Ota","Agbado","Owode","Alagbole","Ado-Odo","Idiroko","Ifo Road"],"Ifo":["Ifo Town","Mowe","Ofada","Isheri North","Ajuwon","Akute","Toll Gate","Redemption Camp"],"Yewa South":["Ilaro Town","Oja Odan","Owode-Yewa","Igbessa","Iwoye","Igan-Alade"],"Yewa North":["Ayetoro Town","Imeko","Ijoun","Ihunbo","Igbooro"],"Ijebu North":["Ijebu-Igbo Town","Oke-Sopin","Ago-Iwoye Road","Atikori","Ijebu-Mushin","Oke-Agbo"],"Remo North":["Iperu-Remo","Ilishan-Remo","Ikenne","Ogere","Ode-Remo","Irolu","Wasinmi"],"Ewekoro":["Ewekoro Town","Itori","Wasimi","Papalanto","Owowo","Abalabi"],"Obafemi-Owode":["Owode-Egba","Obafemi","Ibafo","Mowe","Ofada Road","Pakoto","Kobape"],"Odeda":["Odeda Town","Isabo","Kobape","Opeji","Oke-Odan","Obantoko Road"],"Odogbolu":["Odogbolu Town","Eruku","Ilese-Ijebu","Ode-Lemo","Orudu"],"Ijebu East":["Awa-Ijebu","Ilaporu","Ibiade","Atan-Ijebu","Oru"],"Ogun Waterside":["Abigi","Ereko","Omi-Aperin","Bebereke","Ode-Omi"],"Ikenne":["Ikenne Town","Ilishan","Iperu","Ode-Remo South","Ogere-Remo"],"Shagamu":["Shagamu Town","Oke-Atan","Makun-Sagamu","Soyoye","Ita-Oshin"],"Imeko-Afon":["Imeko Town","Afon","Ijoun Road","Igan"],"Aiyetoro":["Aiyetoro Town","Eruwa","Owode-Ketu","Igan-Alade"]}};
+const LOCS={"Edo State":{"Esan West (Ekpoma)":["Market Square Area","Ojo Street","School Gate Area","Igor / Uhumudumu","Alli Square","Abelmen Area","GT Extension","Ujemen","Ujuenle","Emado","College Road","Abia"],"Benin City (Oredo)":["Ring Road","Sapele Road","Airport Road","Upper Sakponba","Uselu","Ugbowo","New Benin","Ikpoba Hill","GRA","Ekenwan Road","Oba Market Area"],"Benin City (Egor)":["Uwelu","Aduwawa","Ogida","Oregbeni","Mission Road","Upper Mission","Evbuotubu"],"Benin City (Ikpoba-Okha)":["Ikpoba Hill","Oregbeni Housing Estate","Idogbo","Evbuotubu","Ohaeghele","Ekewan Road"],"Igueben":["Igueben Town","Ewatto","Ewohimi","Ukhun"],"Esan North-East (Uromi)":["Uromi Town Centre","Irrua Road","Igue","Ebhoieki"],"Esan South-East (Ubiaja)":["Ubiaja Town","Ewohimi Road","Ohordua"],"Etsako West (Auchi)":["Auchi Town Centre","Polytechnic Road","Jattu","Iyuku Road","New Layout"],"Etsako Central (Fugar)":["Fugar Town","Ibillo","Okpella"],"Etsako East (Uzairue)":["Uzairue","Anegbette","Aviele"],"Orhionmwon (Abudu)":["Abudu","Orhionmwon LGA Centre","Ekpoma Bypass Area"],"Ovia North-East (Okada)":["Okada Town","Igbinedion University Area","Iguosa"],"Uhunmwonde":["Usen","Iguoriakhi","Ekpoma Road Junction"]},"Delta State":{"Warri (Uvwie)":["Effurun","PTI Road","Jakpa Road","NPA Road","Udu Road","Ugboroke","Ekpan"],"Warri (Warri South)":["Warri Town Centre","Okumagba Avenue","Igbudu Market","Airport Road Warri","Okere Road","Pessu Market","DSC Road","Ovwian","Agbarho Road"],"Warri North (Koko)":["Koko Town","Saghara","Gbokoda"],"Asaba (Oshimili South)":["Asaba Town Centre","Summit Road","Cable Point","Okpanam Road","DLA Road","Infant Jesus Area","New Layout Asaba","Oguta Road"],"Oshimili North (Kwale)":["Kwale Town","Issele-Uku","Ogwashi-Uku"],"Sapele (Sapele LGA)":["Sapele Town Centre","Okirighwre Road","Amukpe","Dore Camp","Okuzu Road"],"Ethiope East (Eku)":["Eku","Jesse","Abraka"],"Ethiope West (Oghara)":["Oghara Town","Evwreni","Mosogar"],"Ughelli North (Ughelli)":["Ughelli Town Centre","Agbarho","Otovwodo","Orogun Road","Aghalokpe"],"Ughelli South (Olomu)":["Olomu","Ughievwen","Erherhe"],"Isoko North (Ozoro)":["Ozoro Town","Oleh Road","Aviara"],"Isoko South (Oleh)":["Oleh Town","Emede","Emevor","Irri"],"Okpe (Sapele Road)":["Okpe LGA HQ","Mereje","Ugbolu"],"Ndokwa East (Kwale Area)":["Kwale East","Abbi","Ase"],"Ukwuani (Kwale/Obiaruku)":["Obiaruku","Umukwata","Ashaka"],"Aniocha North (Owa-Oyibu)":["Owa-Oyibu","Owa-Alero","Agbor-Obi"],"Aniocha South (Agbor)":["Agbor Town","Boji-Boji","Ute-Ogbeje","Abavo"],"Bomadi":["Bomadi Town","Tuomo","Kiagbodo"],"Burutu":["Burutu Town","Forcados","Yokri"],"Patani":["Patani Town","Emede-Patani"],"Warri South-West":["Escravos","Ogheye","Ogulagha"],"Sapele":["Sapele Town","Amukpe","Okirigwe"],"Ughelli North":["Ughelli Town","Agbarho","Ogor","Evwreni"],"Ughelli South":["Oyovwian","Erohwa","Emevo"],"Isoko North":["Ozoro","Emevor","Igbide"],"Isoko South":["Oleh","Emede","Olomoro","Aviara"],"Ndokwa East":["Aboh","Afor","Kwale East"],"Ndokwa West":["Kwale","Abbi","Ogume","Ashaka"],"Ukwuani":["Obiaruku","Umukwata","Owa-Oyibu"],"Aniocha North":["Owa-Alero","Issele-Uku","Idumuje-Ugboko"],"Aniocha South":["Asaba","Okpanam","Ogwashi-Uku","Ibusa"],"Oshimili North":["Akwukwu-Igbo","Oko-Anala","Issele-Azagba"],"Oshimili South":["Asaba Town","Illah","Cable Point"],"Bomadi":["Bomadi Town","Toru-Orua","Adobaraibi"],"Burutu":["Burutu Town","Koluama","Forcados"],"Ethiope East":["Abraka","Agbon","Oria"],"Ethiope West":["Eku","Kokori","Jesse","Mosogar"],"Okpe":["Orerokpe","Otor-Owhe","Sapele Road"],"Ika North East":["Owa-Alero","Agbor-Obi","Mbiri"],"Ika South":["Agbor","Alisor","Umunede"],"Warri South":["Warri Town","Ekpan","Effurun","Udu","Ovwian"],"Warri North":["Koko","Diebiri","Ogidigben"],"Ethiope West LGA":["Jesse","Mosogar","Oghara","Eku"]},"Ogun State":{"Abeokuta North":["Kuto","Iberekodo","Panseke","Adatan","Ago Ika","Oke Lantoro","Asero","Olomore","Lafenwa Road"],"Abeokuta South":["Ijaye","Obantoko","Lafenwa","Sabo","Idi-Aba","Obada","Kemta","Oke-Agbo","Totoro"],"Ijebu Ode":["Ijebu Ode Town","Folagbade","Oke-Aje","Ijebu Waterside","Odogbolu Road","Imepe","Igbeba","Oke-Sopen"],"Sagamu":["Sagamu Town","Makun","Ago-Iwoye","Ogijo","Ilishan Road","Ode-Remo","Soyoye","Oke-Atan"],"Ado-Odo/Ota":["Ota Town","Sango Ota","Agbado","Owode","Alagbole","Ado-Odo","Idiroko","Ifo Road"],"Ifo":["Ifo Town","Mowe","Ofada","Isheri North","Ajuwon","Akute","Toll Gate","Redemption Camp"],"Yewa South":["Ilaro Town","Oja Odan","Owode-Yewa","Igbessa","Iwoye","Igan-Alade"],"Yewa North":["Ayetoro Town","Imeko","Ijoun","Ihunbo","Igbooro"],"Ijebu North":["Ijebu-Igbo Town","Oke-Sopin","Ago-Iwoye Road","Atikori","Ijebu-Mushin","Oke-Agbo"],"Remo North":["Iperu-Remo","Ilishan-Remo","Ikenne","Ogere","Ode-Remo","Irolu","Wasinmi"],"Ewekoro":["Ewekoro Town","Itori","Wasimi","Papalanto","Owowo","Abalabi"],"Obafemi-Owode":["Owode-Egba","Obafemi","Ibafo","Mowe","Ofada Road","Pakoto","Kobape"],"Odeda":["Odeda Town","Isabo","Kobape","Opeji","Oke-Odan","Obantoko Road"],"Odogbolu":["Odogbolu Town","Eruku","Ilese-Ijebu","Ode-Lemo","Orudu"],"Ijebu East":["Awa-Ijebu","Ilaporu","Ibiade","Atan-Ijebu","Oru"],"Ogun Waterside":["Abigi","Ereko","Omi-Aperin","Bebereke","Ode-Omi"],"Ikenne":["Ikenne Town","Ilishan","Iperu","Ode-Remo South","Ogere-Remo"],"Shagamu":["Shagamu Town","Oke-Atan","Makun-Sagamu","Soyoye","Ita-Oshin"],"Imeko-Afon":["Imeko Town","Afon","Ijoun Road","Igan"],"Aiyetoro":["Aiyetoro Town","Eruwa","Owode-Ketu","Igan-Alade"]},"Lagos State":{"Ikeja":["Allen Avenue","Opebi","GRA Ikeja","Awolowo Way","Oregun","Ogba","Alausa","Anifowoshe"],"Eti-Osa":["Victoria Island","Lekki Phase 1","Ikoyi","Ajah","Chevron Drive","Osapa London","Oniru"],"Lagos Island":["Marina","Obalende","CMS","Idumota","Balogun Market","Onikan"],"Surulere":["Surulere Town","Ojuelegba","Aguda","Adeniran Ogunsanya","Bode Thomas","Coker","Ijesha"],"Mushin":["Mushin Town","Ilupeju","Idi-Oro","Papa Ajao","Odi-Olowo"],"Oshodi-Isolo":["Oshodi","Isolo","Mafoluku","Ajao Estate","Okota","Bolade"],"Alimosho":["Egbeda","Ikotun","Igando","Akowonjo","Idimu","Ipaja","Abule Egba Road"],"Agege":["Agege Town","Orile Agege","Pen Cinema","Iju","Oko-Oba"],"Ifako-Ijaiye":["Ifako","Ijaiye","Fagba","Ojokoro","Iju Ishaga"],"Kosofe":["Ketu","Ogudu","Anthony","Mile 12","Ojota","Alapere"],"Ikorodu":["Ikorodu Town","Igbogbo","Ijede","Owutu","Agric","Odogunyan"],"Epe":["Epe Town","Poka","Ejinrin","Ise"],"Badagry":["Badagry Town","Ajara","Topo","Aradagun"],"Ojo":["Ojo Town","Okokomaiko","Alaba International Market","Volkswagen"],"Amuwo-Odofin":["Festac Town","Satellite Town","Amuwo","Mile 2","Trade Fair Complex"],"Apapa":["Apapa Town","Ajegunle","Tincan Island","Wharf Road"],"Lagos Mainland":["Yaba","Ebute Metta","Iddo","Herbert Macaulay Way"],"Ajeromi-Ifelodun":["Ajegunle","Amukoko","Awodi Ora","Olodi"],"Shomolu":["Bariga","Gbagada","Fadeyi","Pedro"],"Ibeju-Lekki":["Lekki Free Trade Zone","Awoyaya","Abijo","Eleko"]}};
 const allAreas=Object.values(LOCS).flatMap(lgas=>Object.values(lgas).flat());
 const allLGAs=Object.values(LOCS).flatMap(lgas=>Object.keys(lgas));
 // Legacy ZZ kept for compatibility
@@ -993,8 +998,9 @@ window.doReg=async function(){
     const cr=await createUserWithEmailAndPassword(auth,e,pw);
     const uid=cr.user.uid;
     if(RT==='c'){
-      const pd={uid,name:n,email:e,phone:ph,type:'customer',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),createdAt:serverTimestamp()};
+      const pd={uid,name:n,email:e,phone:ph,type:'customer',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),referredBy:getPendingRef()||null,createdAt:serverTimestamp()};
       await setDoc(doc(db,'users',uid),pd);S.p=pd;
+      processReferral(uid,n);
       toast('Welcome to Trusted Hands, '+n.split(' ')[0]+'! 🎉');
       SS('s-market');iMkt();
     }else{
@@ -1003,8 +1009,9 @@ window.doReg=async function(){
       if(isCustomTrade)tr=sn($('rt_custom').value.trim()).substring(0,60);
       if(!tr){err.textContent='Please select or enter your trade.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
       if(S.ports.length<2){err.textContent='Please upload at least 2 portfolio photos.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
-      const pd={uid,name:n,email:e,phone:ph,type:'artisan',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),trade:tr,bio,status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,timerStarted:false,graceEnd:null,portfolios:S.ports.slice(),idDocument:S.idDoc||null,idVerified:false,contract_signed_date:serverTimestamp(),createdAt:serverTimestamp(),tradePendingReview:isCustomTrade};
+      const pd={uid,name:n,email:e,phone:ph,type:'artisan',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),trade:tr,bio,status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,timerStarted:false,graceEnd:null,portfolios:S.ports.slice(),idDocument:S.idDoc||null,idVerified:false,contract_signed_date:serverTimestamp(),createdAt:serverTimestamp(),tradePendingReview:isCustomTrade,referredBy:getPendingRef()||null};
       await setDoc(doc(db,'users',uid),pd);S.p=pd;
+      processReferral(uid,n);
       if(isCustomTrade){
         try{await addDoc(collection(db,'tradeRequests'),{artisanUid:uid,artisanName:n,trade:tr,status:'pending',createdAt:serverTimestamp()});}catch(e3){}
         toast('🎉 Account created! Your new trade "'+tr+'" was sent to admin for review.');
@@ -1511,8 +1518,8 @@ const TT=[
 ];
 let TI=0;
 function showTut(){try{if(localStorage.getItem('th_t'))return;}catch(e){}TI=0;rTut();}
-  window.showTutorial=showTut;
-  window.openHowItWorks=function(){TI=0;rTut();};
+window.showTutorial=showTut;
+window.openHowItWorks=function(){TI=0;rTut();};
 function rTut(){
   document.getElementById('tut')?.remove();
   const s=TT[TI];const il=TI===TT.length-1;
@@ -1708,7 +1715,7 @@ async function rDash(){
           <div onclick="copyRef()" style="background:linear-gradient(135deg,#78350f,#f59e0b);border-radius:var(--r2);padding:16px;cursor:pointer;text-align:center;box-shadow:0 4px 12px rgba(245,158,11,.3)">
             <div style="font-size:28px;margin-bottom:6px">🎁</div>
             <div style="font-weight:700;font-size:13px;color:#fff">Refer & Earn</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">Get 7 free days</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">5 refs = 3 free days</div>
           </div>
           <div onclick="showWASetup()" style="background:${p.waActivated?'linear-gradient(135deg,#065f46,#22c55e)':'linear-gradient(135deg,#374151,#6b7280)'};border-radius:var(--r2);padding:16px;cursor:pointer;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.15)">
             <div style="font-size:28px;margin-bottom:6px">${p.waActivated?'✅':'📱'}</div>
@@ -1739,13 +1746,20 @@ async function rDash(){
         <div class="ir"><span class="il">Rating</span><span>${p.rating?'★'.repeat(Math.round(p.rating))+' '+p.rating.toFixed(1)+' ('+p.reviews+' reviews)':'No reviews yet'}</span></div>
         <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${dl>0?dl+' days':p.timerStarted?'Expired — renew now':'Grace period'}</span></div>
       </div>
+      <div style="background:linear-gradient(135deg,#78350f,#f59e0b);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff">
+        <div style="font-weight:700;font-size:14px;margin-bottom:8px">🎁 Refer & Earn — This Month</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.9);margin-bottom:10px">${(p.referralMonthKey===monthKey()?(p.referralMonthCount||0):0)} / 5 referrals${p.lastReferralRewardMonth===monthKey()?' — ✅ 3 free days already unlocked this month!':''}</div>
+        <div style="background:rgba(255,255,255,.25);border-radius:20px;height:8px;overflow:hidden;margin-bottom:10px"><div style="height:100%;background:#fff;width:${Math.min(100,((p.referralMonthKey===monthKey()?(p.referralMonthCount||0):0)/5)*100)}%;border-radius:20px"></div></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);margin-bottom:10px">All-time referrals: ${p.referralCount||0}</div>
+        <button onclick="copyRef()" style="width:100%;background:#fff;color:#78350f;border:none;padding:10px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📋 Copy My Referral Link</button>
+      </div>
       <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:var(--r2);padding:16px;margin-bottom:14px;border:1.5px solid #86efac">
         <div style="font-weight:700;font-size:14px;color:#15803d;margin-bottom:10px">💡 Tips to Get More Bookings</div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;gap:10px;align-items:flex-start"><span>📸</span><div style="font-size:13px;color:#166534;line-height:1.5">Upload clear photos of your best work — customers judge by portfolio first</div></div>
           <div style="display:flex;gap:10px;align-items:flex-start"><span>⚡</span><div style="font-size:13px;color:#166534;line-height:1.5">Reply to messages fast — first to respond usually gets the booking</div></div>
           <div style="display:flex;gap:10px;align-items:flex-start"><span>📝</span><div style="font-size:13px;color:#166534;line-height:1.5">Write a detailed bio with your years of experience and speciality</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><span>🎁</span><div style="font-size:13px;color:#166534;line-height:1.5">Share your referral link — every person you bring earns you extra free days</div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><span>🎁</span><div style="font-size:13px;color:#166534;line-height:1.5">Refer 5 people in one month to unlock 3 free subscription days — resets every new month</div></div>
         </div>
       </div>
       ${dl<=5&&dl>0?`<div style="background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff"><div style="font-weight:700;font-size:14px;margin-bottom:6px">⚠️ Expiring in ${dl} day${dl!==1?'s':''} — Renew Now!</div><div style="font-size:13px;color:rgba(255,255,255,.85);margin-bottom:10px">Your profile goes offline soon. Renew to stay visible to customers.</div><button onclick="SS('s-paywall')" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);padding:9px 18px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">🔄 Renew Subscription →</button></div>`:''}`:''}
@@ -1783,7 +1797,44 @@ window.showProfileMenu=function(){
   document.body.appendChild(el);
   el.addEventListener('click',e=>{if(e.target===el)el.remove();});
 };
-window.copyRef=function(){const code=(S.u?.uid||'').substring(0,8);const link='https://trust-hand.vercel.app?ref='+code;navigator.clipboard?.writeText(link).then(()=>toast('🎁 Referral link copied!')).catch(()=>toast('Link: https://trust-hand.vercel.app?ref='+code));};
+window.copyRef=function(){const uid=S.u?.uid||'';const link='https://trust-hand.vercel.app?ref='+uid;navigator.clipboard?.writeText(link).then(()=>toast('🎁 Referral link copied!')).catch(()=>toast('Link: https://trust-hand.vercel.app?ref='+uid));};
+
+// ── REFERRALS ── 5 referrals in a calendar month = 3 free days (artisans only — customers can refer but don't earn, since they don't hold a paid subscription)
+function monthKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function getPendingRef(){try{return sessionStorage.getItem('th_ref')||null;}catch(e){return null;}}
+// Runs right after a NEW account finishes registering. Safe by design: wrapped in its own try/catch
+// so a referral hiccup can never block or break the new user's registration.
+async function processReferral(newUid,newName){
+  const refUid=getPendingRef();
+  if(!refUid||refUid===newUid)return;
+  try{
+    const rewarded=await runTransaction(db,async txn=>{
+      const refDocRef=doc(db,'users',refUid);
+      const snap=await txn.get(refDocRef);
+      if(!snap.exists())return false;
+      const d=snap.data();
+      const curMonth=monthKey();
+      const monthCount=(d.referralMonthKey===curMonth?(d.referralMonthCount||0):0)+1;
+      const totalCount=(d.referralCount||0)+1;
+      const updates={referralCount:totalCount,referralMonthKey:curMonth,referralMonthCount:monthCount};
+      let didReward=false;
+      // Only artisans earn the reward, only once per calendar month, only once they hit 5 in that month
+      if(d.type==='artisan'&&monthCount>=5&&d.lastReferralRewardMonth!==curMonth){
+        const curExpiry=d.expiry?.toDate?d.expiry.toDate():(d.expiry?new Date(d.expiry):null);
+        const base=(d.status==='active'&&curExpiry&&curExpiry>new Date())?curExpiry:new Date();
+        updates.expiry=new Date(base.getTime()+3*86400000);
+        updates.status='active';
+        if(!d.tier)updates.tier='standard';
+        updates.lastReferralRewardMonth=curMonth;
+        didReward=true;
+      }
+      txn.update(refDocRef,updates);
+      return didReward;
+    });
+    try{await addDoc(collection(db,'notifications'),{toUid:refUid,type:'referral_new',read:false,createdAt:serverTimestamp(),message:(newName||'Someone')+' joined using your referral link!'+(rewarded?' You just unlocked 3 free days! 🎉':'')});}catch(e2){}
+    try{sessionStorage.removeItem('th_ref');}catch(e3){}
+  }catch(e){/* never let a referral error affect the new account */}
+}
 window.hFbPhoto=async function(e){
   const f=e.target.files[0];if(!f)return;
   S._fbPhoto=await compress(f,1200,.85);
@@ -1904,6 +1955,8 @@ function buildProfileEditor(isArtisan){
           <option value="">Select State</option>
           <option value="Edo State" ${p.state==='Edo State'?'selected':''}>Edo State</option>
           <option value="Delta State" ${p.state==='Delta State'?'selected':''}>Delta State</option>
+          <option value="Ogun State" ${p.state==='Ogun State'?'selected':''}>Ogun State</option>
+          <option value="Lagos State" ${p.state==='Lagos State'?'selected':''}>Lagos State</option>
         </select>
       </div>
       <div class="fg"><label>LGA / City *</label>
