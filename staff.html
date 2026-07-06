@@ -318,7 +318,7 @@ async function renderArtisans(filter=''){
   <div style="margin-bottom:12px"><input class="inp" type="text" id="asrch" placeholder="Search name, trade, zone…" value="${sn(filter)}" oninput="renderArtisans(this.value.toLowerCase())" style="font-size:13px"/></div>
   <div id="artList">`+filtered.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="artDetail('${a.uid}')">
     <div class="avc">${ini(a.name)}</div>
-    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.fullLocation||a.zone||a.lga||'—')}</div></div>
+    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.fullLocation||a.zone||a.lga||'—')} · 🎁 ${a.referralCount||0} ref${(a.referralCount||0)!==1?'s':''}</div></div>
     <span class="sp${a.status==='active'?'a':a.status==='frozen'?'b':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${a.status||'—'}</span>
   </div>`).join('')+'</div>';
 }
@@ -388,7 +388,7 @@ async function renderCustomers(filter=''){
   <div style="margin-bottom:12px"><input class="inp" type="text" id="csrch" placeholder="Search name or email…" value="${sn(filter)}" oninput="renderCustomers(this.value.toLowerCase())" style="font-size:13px"/></div>
   <div id="custList">`+filtered.map(c=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc">
     <div class="avc" style="background:#d1fae5;color:var(--emerald)">${ini(c.name)}</div>
-    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.fullLocation||c.zone||'—')}</div></div>
+    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.fullLocation||c.zone||'—')} · 🎁 ${c.referralCount||0} ref${(c.referralCount||0)!==1?'s':''}</div></div>
     <div style="font-size:11px;color:var(--slate3)">${c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString():'—'}</div>
   </div>`).join('')+'</div>';
 }
@@ -659,6 +659,8 @@ window.artDetail=async function(uid){
     <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${a.status==='active'?dl+' days':'—'}</span></div>
     <div class="ir"><span class="il">Booked Today</span><span>${a.daily_booked?'🔴 Yes':'🟢 No'}</span></div>
     <div class="ir"><span class="il">Missed Views</span><span style="font-weight:700;color:${(a.missedViews||0)>0?'var(--red)':'var(--slate3)'}">${a.missedViews||0} customer${(a.missedViews||0)!==1?'s':''} turned away</span></div>
+    <div class="ir"><span class="il">Referrals (this month)</span><span style="font-weight:700;color:var(--blue2)">${(a.referralMonthKey===(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'))?(a.referralMonthCount||0):0)} / 5${a.lastReferralRewardMonth===(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'))?' ✅ reward given':''}</span></div>
+    <div class="ir"><span class="il">Referrals (all-time)</span><span>${a.referralCount||0}</span></div>
     <div class="ir"><span class="il">Contract Signed</span><span style="font-size:12px">${a.contract_signed_date?.toDate?a.contract_signed_date.toDate().toLocaleDateString():'—'}</span></div>
     <div class="ir"><span class="il">Joined</span><span style="font-size:12px">${a.createdAt?.toDate?a.createdAt.toDate().toLocaleDateString():'—'}</span></div>
     <div class="ir"><span class="il">ID Verified</span><span class="sp${a.idVerified?'a':'p'}">${a.idVerified?'🪪 Verified':'Pending Review'}</span></div>
