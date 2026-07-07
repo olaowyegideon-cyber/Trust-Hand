@@ -23,7 +23,7 @@
 <meta name="description" content="Trusted Hands — Nigeria's verified skilled worker marketplace. Find electricians, plumbers, tailors and more near you."/>
 <meta name="robots" content="index,follow"/>
 <meta property="og:title" content="Trusted Hands — Nigeria's Skilled Worker Marketplace"/>
-<meta property="og:description" content="Find and book verified local workers in Ekpoma, Edo State."/>
+<meta property="og:description" content="Find and book verified skilled workers across Nigeria — currently active in Edo, Delta, Ogun & Lagos States."/>
 <meta property="og:url" content="https://trust-hand.vercel.app"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
@@ -396,7 +396,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
   <div class="sb" id="mscroll">
     <div class="mhero">
       <div style="position:relative">
-        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">Ekpoma's Trusted Marketplace</p>
+        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">Nigeria's Trusted Marketplace</p>
         <h2 style="font-family:'DM Serif Display',serif;font-size:24px;color:#fff;line-height:1.3;margin-bottom:5px">What service do<br/>you need today?</h2>
         <p style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:18px">Tap a category or search below</p>
         <div class="hs-wrap"><svg class="hs-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="hs" id="si2" placeholder="Search electrician, plumber, tailor…" oninput="hSrch(this.value)"/></div>
@@ -674,7 +674,8 @@ const TRADE_DEFS=[
   {t:'CCTV / Alarm Installers',e:'📹',g:'linear-gradient(145deg,#0f172a,#1e40af)',d:'CCTV & alarm systems'},
   {t:'Graphic Designers',e:'🖌️',g:'linear-gradient(145deg,#581c87,#9333ea)',d:'Logos, flyers & branding'},
   {t:'Web Designers',e:'💻',g:'linear-gradient(145deg,#0c4a6e,#0284c7)',d:'Websites & web apps'},
-  {t:'Writers / Content Creators',e:'✍️',g:'linear-gradient(145deg,#78350f,#b45309)',d:'Content & copywriting'}
+  {t:'Writers / Content Creators',e:'✍️',g:'linear-gradient(145deg,#78350f,#b45309)',d:'Content & copywriting'},
+  {t:'Social Media Manager',e:'📱',g:'linear-gradient(145deg,#1e1b4b,#6366f1)',d:'Social media & online growth'}
 ];
 // Trades added by artisans and approved by admin — loaded from Firestore, available app-wide once approved
 let CUSTOM_TRADES=[];
@@ -726,14 +727,28 @@ try{
 }catch(e){}
 
 let navH=[];
-function SS(id){
-  if(id!=='s-splash'){const c=document.querySelector('.screen.active');if(c&&c.id!==id)navH.push(c.id);}
+// Screens that are safe to silently restore after a refresh (they need no extra
+// context to redraw — e.g. a specific chat thread or profile can't be restored this way)
+const RESTORABLE=['s-dash','s-market','s-cl'];
+function SS(id,replace){
+  const c=document.querySelector('.screen.active');
+  if(c&&c.id===id)return; // already on this screen — nothing to do, avoids junk history entries
+  if(id!=='s-splash'&&c)navH.push(c.id);
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const el=$(id);if(el)el.classList.add('active');
-  history.pushState({s:id},'',location.pathname);
+  if(replace)history.replaceState({s:id},'',location.pathname);
+  else history.pushState({s:id},'',location.pathname);
+  if(RESTORABLE.includes(id)){try{sessionStorage.setItem('th_lastScreen',id);}catch(e){}}
 }
 window.SS=SS;
-window.addEventListener('popstate',()=>{if(navH.length){const p=navH.pop();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(p)?.classList.add('active');}else history.pushState({},'',location.pathname);});
+window.addEventListener('popstate',()=>{
+  if(navH.length){
+    const p=navH.pop();
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    $(p)?.classList.add('active');
+    if(RESTORABLE.includes(p)){try{sessionStorage.setItem('th_lastScreen',p);}catch(e){}}
+  } else history.replaceState({},'',location.pathname);
+});
 function gT(p){S.pv=document.querySelector('.screen.active')?.id||'s-market';if(p==='cl'){SS('s-cl');rCL();}else if(p==='dash'){SS('s-dash');rDash();}else if(p==='market'){SS('s-market');iMkt();}}
 window.gT=gT;
 window.goBack=function(){SS(S.pv||'s-market')};
@@ -812,11 +827,16 @@ function route(){
   if(!p){SS('s-auth');return;}
   // Block customers before launch date
   if(p.type==='customer'&&!isLaunched()){SS('s-coming');return;}
-  if(p.type==='customer'){SS('s-market');iMkt();}
+  // Restore the screen the user was last on (e.g. after a page refresh), when it's safe to do so
+  let last=null;try{last=sessionStorage.getItem('th_lastScreen');}catch(e){}
+  if(last==='s-market'){SS('s-market',true);iMkt();return;}
+  if(last==='s-cl'){SS('s-cl',true);rCL();return;}
+  if(last==='s-dash'&&p.type==='artisan'&&(p.status==='active'||p.status==='unsubscribed')){SS('s-dash',true);rDash();setTimeout(askPushPermission,2000);return;}
+  if(p.type==='customer'){SS('s-market',true);iMkt();}
   else if(p.type==='artisan'){
-    if(p.status==='pending')SS('s-pending');
-    else if(p.status==='active'||p.status==='unsubscribed'){SS('s-dash');rDash();setTimeout(askPushPermission,2000);}
-    else SS('s-paywall');
+    if(p.status==='pending')SS('s-pending',true);
+    else if(p.status==='active'||p.status==='unsubscribed'){SS('s-dash',true);rDash();setTimeout(askPushPermission,2000);}
+    else SS('s-paywall',true);
   }
 }
 
@@ -980,6 +1000,7 @@ window.doLogin=async function(){
 window.doLogout=async function(){
   await signOut(auth);
   S={u:null,p:null,ports:[],rcpt:null,idDoc:null,tier:null,ct:null,cu:null,fc:[],pv:'s-auth',at:'ap2',jobPhoto:null,jobDesc:''};
+  try{sessionStorage.removeItem('th_lastScreen');}catch(e){}
   toast('Signed out.');SS('s-auth');
 };
 window.doReg=async function(){
@@ -1000,7 +1021,7 @@ window.doReg=async function(){
     if(RT==='c'){
       const pd={uid,name:n,email:e,phone:ph,type:'customer',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),referredBy:getPendingRef()||null,createdAt:serverTimestamp()};
       await setDoc(doc(db,'users',uid),pd);S.p=pd;
-      processReferral(uid,n);
+      try{sessionStorage.removeItem('th_ref');}catch(e0){}
       toast('Welcome to Trusted Hands, '+n.split(' ')[0]+'! 🎉');
       SS('s-market');iMkt();
     }else{
@@ -1011,7 +1032,7 @@ window.doReg=async function(){
       if(S.ports.length<2){err.textContent='Please upload at least 2 portfolio photos.';err.style.display='block';$('rbtn').disabled=false;$('rbtn').textContent='Create Account';return;}
       const pd={uid,name:n,email:e,phone:ph,type:'artisan',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),trade:tr,bio,status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,timerStarted:false,graceEnd:null,portfolios:S.ports.slice(),idDocument:S.idDoc||null,idVerified:false,contract_signed_date:serverTimestamp(),createdAt:serverTimestamp(),tradePendingReview:isCustomTrade,referredBy:getPendingRef()||null};
       await setDoc(doc(db,'users',uid),pd);S.p=pd;
-      processReferral(uid,n);
+      try{sessionStorage.removeItem('th_ref');}catch(e0){}
       if(isCustomTrade){
         try{await addDoc(collection(db,'tradeRequests'),{artisanUid:uid,artisanName:n,trade:tr,status:'pending',createdAt:serverTimestamp()});}catch(e3){}
         toast('🎉 Account created! Your new trade "'+tr+'" was sent to admin for review.');
@@ -1124,8 +1145,16 @@ window.onFLGAChange=function(){
   hZone();
 };
 
+// A booking only counts as "today's" booking — this makes the one-booking-per-day rule
+// self-healing even if an artisan forgets to submit their completion feedback.
+function isBookedToday(u){
+  if(!u.daily_booked)return false;
+  const bAt=u.bookedAt?.toDate?u.bookedAt.toDate():(u.bookedAt?new Date(u.bookedAt):null);
+  if(!bAt)return true; // no timestamp on record (e.g. manual toggle) — trust the flag as-is
+  return bAt.toDateString()===new Date().toDateString();
+}
 function aC(u){
-  const iu=u.status==='unsubscribed';const ip=u.tier==='premium'&&u.status==='active';const ib=u.daily_booked;
+  const iu=u.status==='unsubscribed';const ip=u.tier==='premium'&&u.status==='active';const ib=isBookedToday(u);
   const cc=iu?'inact':ip?'prem':'act';const ac=ip?'avp':iu?'avi':'ava';
   const pi=ip?`<span class="tpill tpp">⭐ Premium</span>`:iu?`<span class="tpill tpi">Inactive</span>`:`<span class="tpill tpa">✓ Active</span>`;
   const idBadge=u.idVerified?`<span class="tpill" style="background:var(--blue3);color:var(--blue2);margin-left:4px">🪪 ID Verified</span>`:'';
@@ -1154,7 +1183,7 @@ async function sendWhatsAppNotification(artisanData, messageType){
   if(messageType === 'profile_view'){
     message = `🔔 *Trusted Hands Alert*\n\nA customer just viewed your ${artisanData.trade} profile and wants to book you!\n\n👉 Open the app to respond and secure the booking:\nhttps://trust-hand.vercel.app\n\n_Reply fast — customers book the first available artisan!_`;
   } else if(messageType === 'booking'){
-    message = `📅 *New Booking Alert!*\n\nA customer has booked you on Trusted Hands.\n\n✅ Open the app to see job details and chat with them:\nhttps://trust-hand.vercel.app\n\n_Trusted Hands — Ekpoma's Artisan Marketplace_`;
+    message = `📅 *New Booking Alert!*\n\nA customer has booked you on Trusted Hands.\n\n✅ Open the app to see job details and chat with them:\nhttps://trust-hand.vercel.app\n\n_Trusted Hands — Nigeria's Artisan Marketplace_`;
   }
 
   const encoded = encodeURIComponent(message);
@@ -1297,7 +1326,7 @@ window.oD=async function(uid){
         <a href="https://maps.google.com/maps?q=${encodeURIComponent((u.fullLocation||u.zone||'Nigeria')+', Nigeria')}" target="_blank" style="color:var(--blue2);text-decoration:none;font-weight:600">Open in Google Maps →</a>
       </div>
     </div>
-    ${u.daily_booked?'<div style="background:var(--amber2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--amber);font-weight:600;margin:12px 0">🔴 Currently booked for a job today</div>':''}
+    ${isBookedToday(u)?'<div style="background:var(--amber2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--amber);font-weight:600;margin:12px 0">🔴 Currently booked for a job today</div>':''}
     <div style="margin-top:16px"><div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:6px">📝 Describe your job (optional)</div>
       <textarea class="inp" id="jdesc" placeholder="e.g. Fix a leaking pipe in my bathroom…" style="min-height:70px;font-size:13px" oninput="S.jobDesc=this.value"></textarea>
     </div>
@@ -1307,10 +1336,10 @@ window.oD=async function(uid){
     </div>
     <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
       <button class="btn bp" style="flex:1;min-width:140px" onclick="oChat('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}','${sn(u.trade).replace(/'/g,"\\'")}')">💬 Chat & Book</button>
-      ${!u.daily_booked?`<button class="btn bs bsm" onclick="cBook('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}')">📅 Book Now</button>`:''}
+      ${!isBookedToday(u)?`<button class="btn bs bsm" onclick="cBook('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}')">📅 Book Now</button>`:''}
     </div>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <button style="flex:1;background:#25d366;color:#fff;padding:9px;border-radius:var(--r);font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit" onclick="sWA('${sn(u.name)}','${sn(u.trade)}','${sn(u.zone)}')">📲 WhatsApp</button>
+      <button style="flex:1;background:#25d366;color:#fff;padding:9px;border-radius:var(--r);font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit" onclick="openWAChat('${sn(u.phone||'')}','${sn(u.name).replace(/'/g,"\\'")}')">📲 WhatsApp</button>
       <button style="flex:1;background:#f1f5f9;color:#475569;padding:9px;border-radius:var(--r);font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit" onclick="oRat('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}')">⭐ Leave Review</button>
     </div>
     <button style="width:100%;background:var(--red2);color:var(--red);padding:9px;border-radius:var(--r);font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;margin-top:8px" onclick="openDispute('${u.uid}','${sn(u.name).replace(/'/g,"\\'")}')">🚨 Report a Problem</button>`;
@@ -1319,14 +1348,14 @@ window.oD=async function(uid){
 
 window.hJobPhoto=async function(e){const f=e.target.files[0];if(!f)return;S.jobPhoto=await compress(f,1200,.85);const lbl=$('jpLbl');if(lbl)lbl.textContent='✅ Photo attached — '+f.name;};
 window.closeD=function(){$('ov').classList.remove('open');$('drw').classList.remove('open');};
-window.sWA=function(n,t,z){window.open(`https://wa.me/?text=${encodeURIComponent('I found a '+t+' on Trusted Hands!\n\n👤 '+n+'\n📍 '+z+', Ekpoma\n\nhttps://trust-hand.vercel.app')}`,'_blank');};
+window.sWA=function(n,t,z){window.open(`https://wa.me/?text=${encodeURIComponent('I found a '+t+' on Trusted Hands!\n\n👤 '+n+'\n📍 '+z+'\n\nhttps://trust-hand.vercel.app')}`,'_blank');};
 window.cBook=async function(uid,name){
   if(!confirm('Confirm booking with '+name+' for today?'))return;
   try{
     await runTransaction(db,async txn=>{
       const r=doc(db,'users',uid);const s=await txn.get(r);
       if(!s.exists())throw new Error('Worker not found');
-      if(s.data().daily_booked)throw new Error(name+' is already booked today.');
+      if(isBookedToday(s.data()))throw new Error(name+' is already booked today.');
       txn.update(r,{daily_booked:true,bookedBy:S.u?.uid,bookedAt:serverTimestamp()});
     });
     await addDoc(collection(db,'bookings'),{artisanUid:uid,artisanName:name,customerUid:S.u?.uid,customerName:S.p?.name||'Customer',jobDescription:S.jobDesc||'',jobPhoto:S.jobPhoto||null,createdAt:serverTimestamp(),status:'confirmed'});
@@ -1537,18 +1566,18 @@ window.skipTut=function(){document.getElementById('tut')?.remove();try{localStor
 // ── DASHBOARD ──
 async function rDash(){
   if(!S.u||!S.p){SS('s-auth');return;}
-  try{const snap=await getDoc(doc(db,'users',S.u.uid));if(snap.exists())S.p=snap.data();}catch(e){}
+  // Run all 3 reads at the same time instead of one after another — this alone can cut
+  // load time roughly 2-3x on a slower connection, since they no longer wait in line.
+  const[profR,notesR,notifR]=await Promise.allSettled([
+    getDoc(doc(db,'users',S.u.uid)),
+    getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),orderBy('sentAt','desc'),limit(5))),
+    getDocs(query(collection(db,'notifications'),where('toUid','==',S.u.uid),where('type','==','profile_view_missed'),where('read','==',false),limit(1)))
+  ]);
+  if(profR.status==='fulfilled'&&profR.value.exists())S.p=profR.value.data();
   let notes=[];
-  try{
-    const notesSnap=await getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),orderBy('sentAt','desc'),limit(5)));
-    notes=notesSnap.docs.map(d=>d.data());
-  }catch(e){}
-  // Load missed view notifications (best-effort — never block the dashboard if this query fails)
+  if(notesR.status==='fulfilled')notes=notesR.value.docs.map(d=>d.data());
   let hasNotif=false;
-  try{
-    const notifSnap=await getDocs(query(collection(db,'notifications'),where('toUid','==',S.u.uid),where('type','==','profile_view_missed'),where('read','==',false),limit(1)));
-    hasNotif=!notifSnap.empty;
-  }catch(e){}
+  if(notifR.status==='fulfilled')hasNotif=!notifR.value.empty;
   const p=S.p;const b=$('db');
   const fn=sn(p.name||'').split(' ')[0];
   const ex=p.expiry?.toDate?p.expiry.toDate():p.expiry?new Date(p.expiry):null;
@@ -1642,7 +1671,7 @@ async function rDash(){
       <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--slate3)"><a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms & Privacy Policy</a></div>
     </div>`;
   } else {
-    const iu=p.status==='unsubscribed';const ib=p.daily_booked;
+    const iu=p.status==='unsubscribed';const ib=isBookedToday(p);
     // Grace period logic
     const timerStarted=p.timerStarted===true;
     const graceEnd=p.graceEnd?.toDate?p.graceEnd.toDate():p.graceEnd?new Date(p.graceEnd):null;
@@ -1715,7 +1744,7 @@ async function rDash(){
           <div onclick="copyRef()" style="background:linear-gradient(135deg,#78350f,#f59e0b);border-radius:var(--r2);padding:16px;cursor:pointer;text-align:center;box-shadow:0 4px 12px rgba(245,158,11,.3)">
             <div style="font-size:28px;margin-bottom:6px">🎁</div>
             <div style="font-weight:700;font-size:13px;color:#fff">Refer & Earn</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">5 refs = 3 free days</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">5 paying artisans = 7 free days</div>
           </div>
           <div onclick="showWASetup()" style="background:${p.waActivated?'linear-gradient(135deg,#065f46,#22c55e)':'linear-gradient(135deg,#374151,#6b7280)'};border-radius:var(--r2);padding:16px;cursor:pointer;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.15)">
             <div style="font-size:28px;margin-bottom:6px">${p.waActivated?'✅':'📱'}</div>
@@ -1748,7 +1777,7 @@ async function rDash(){
       </div>
       <div style="background:linear-gradient(135deg,#78350f,#f59e0b);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff">
         <div style="font-weight:700;font-size:14px;margin-bottom:8px">🎁 Refer & Earn — This Month</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.9);margin-bottom:10px">${(p.referralMonthKey===monthKey()?(p.referralMonthCount||0):0)} / 5 referrals${p.lastReferralRewardMonth===monthKey()?' — ✅ 3 free days already unlocked this month!':''}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.9);margin-bottom:10px">${(p.referralMonthKey===monthKey()?(p.referralMonthCount||0):0)} / 5 paying artisans referred${p.lastReferralRewardMonth===monthKey()?' — ✅ 7 free days already unlocked this month!':''}</div>
         <div style="background:rgba(255,255,255,.25);border-radius:20px;height:8px;overflow:hidden;margin-bottom:10px"><div style="height:100%;background:#fff;width:${Math.min(100,((p.referralMonthKey===monthKey()?(p.referralMonthCount||0):0)/5)*100)}%;border-radius:20px"></div></div>
         <div style="font-size:11px;color:rgba(255,255,255,.75);margin-bottom:10px">All-time referrals: ${p.referralCount||0}</div>
         <button onclick="copyRef()" style="width:100%;background:#fff;color:#78350f;border:none;padding:10px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📋 Copy My Referral Link</button>
@@ -1759,7 +1788,7 @@ async function rDash(){
           <div style="display:flex;gap:10px;align-items:flex-start"><span>📸</span><div style="font-size:13px;color:#166534;line-height:1.5">Upload clear photos of your best work — customers judge by portfolio first</div></div>
           <div style="display:flex;gap:10px;align-items:flex-start"><span>⚡</span><div style="font-size:13px;color:#166534;line-height:1.5">Reply to messages fast — first to respond usually gets the booking</div></div>
           <div style="display:flex;gap:10px;align-items:flex-start"><span>📝</span><div style="font-size:13px;color:#166534;line-height:1.5">Write a detailed bio with your years of experience and speciality</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><span>🎁</span><div style="font-size:13px;color:#166534;line-height:1.5">Refer 5 people in one month to unlock 3 free subscription days — resets every new month</div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><span>🎁</span><div style="font-size:13px;color:#166534;line-height:1.5">Refer 5 people who register as artisans and complete payment in one month to unlock 7 free subscription days — resets every new month</div></div>
         </div>
       </div>
       ${dl<=5&&dl>0?`<div style="background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff"><div style="font-weight:700;font-size:14px;margin-bottom:6px">⚠️ Expiring in ${dl} day${dl!==1?'s':''} — Renew Now!</div><div style="font-size:13px;color:rgba(255,255,255,.85);margin-bottom:10px">Your profile goes offline soon. Renew to stay visible to customers.</div><button onclick="SS('s-paywall')" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);padding:9px 18px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">🔄 Renew Subscription →</button></div>`:''}`:''}
@@ -1799,17 +1828,23 @@ window.showProfileMenu=function(){
 };
 window.copyRef=function(){const uid=S.u?.uid||'';const link='https://trust-hand.vercel.app?ref='+uid;navigator.clipboard?.writeText(link).then(()=>toast('🎁 Referral link copied!')).catch(()=>toast('Link: https://trust-hand.vercel.app?ref='+uid));};
 
-// ── REFERRALS ── 5 referrals in a calendar month = 3 free days (artisans only — customers can refer but don't earn, since they don't hold a paid subscription)
+// ── REFERRALS ── 5 referred people become PAYING artisans in the same calendar month = 7 free days.
+// (Only counts when the person you referred registers as an artisan AND completes payment — customers you
+// refer, or artisans who never pay, do not count. Customers can still refer people, but never earn this reward.)
 function monthKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 function getPendingRef(){try{return sessionStorage.getItem('th_ref')||null;}catch(e){return null;}}
-// Runs right after a NEW account finishes registering. Safe by design: wrapped in its own try/catch
-// so a referral hiccup can never block or break the new user's registration.
-async function processReferral(newUid,newName){
-  const refUid=getPendingRef();
-  if(!refUid||refUid===newUid)return;
+// Called the moment an artisan's payment is approved (admin/staff "Approve" action). Safe by design:
+// wrapped in its own try/catch so a referral hiccup can never block or break the approval itself.
+async function creditReferral(artisanUid){
   try{
+    const aSnap=await getDoc(doc(db,'users',artisanUid));
+    if(!aSnap.exists())return;
+    const aData=aSnap.data();
+    const refUid=aData.referredBy;
+    if(!refUid||refUid===artisanUid||aData.referralCredited)return;
     const rewarded=await runTransaction(db,async txn=>{
       const refDocRef=doc(db,'users',refUid);
+      const artDocRef=doc(db,'users',artisanUid);
       const snap=await txn.get(refDocRef);
       if(!snap.exists())return false;
       const d=snap.data();
@@ -1822,18 +1857,18 @@ async function processReferral(newUid,newName){
       if(d.type==='artisan'&&monthCount>=5&&d.lastReferralRewardMonth!==curMonth){
         const curExpiry=d.expiry?.toDate?d.expiry.toDate():(d.expiry?new Date(d.expiry):null);
         const base=(d.status==='active'&&curExpiry&&curExpiry>new Date())?curExpiry:new Date();
-        updates.expiry=new Date(base.getTime()+3*86400000);
+        updates.expiry=new Date(base.getTime()+7*86400000); // 7 free days
         updates.status='active';
         if(!d.tier)updates.tier='standard';
         updates.lastReferralRewardMonth=curMonth;
         didReward=true;
       }
       txn.update(refDocRef,updates);
+      txn.update(artDocRef,{referralCredited:true});
       return didReward;
     });
-    try{await addDoc(collection(db,'notifications'),{toUid:refUid,type:'referral_new',read:false,createdAt:serverTimestamp(),message:(newName||'Someone')+' joined using your referral link!'+(rewarded?' You just unlocked 3 free days! 🎉':'')});}catch(e2){}
-    try{sessionStorage.removeItem('th_ref');}catch(e3){}
-  }catch(e){/* never let a referral error affect the new account */}
+    try{await addDoc(collection(db,'notifications'),{toUid:refUid,type:'referral_new',read:false,createdAt:serverTimestamp(),message:(aData.name||'An artisan you referred')+' just completed payment and became an active artisan!'+(rewarded?' You just unlocked 7 free days! 🎉':'')});}catch(e2){}
+  }catch(e){/* never let a referral hiccup affect the approval action */}
 }
 window.hFbPhoto=async function(e){
   const f=e.target.files[0];if(!f)return;
@@ -1877,9 +1912,9 @@ window.subFB=async function(){
 };
 window.togBook=async function(){
   if(!S.u)return;
-  const nb=!S.p.daily_booked;
-  await updateDoc(doc(db,'users',S.u.uid),{daily_booked:nb});
-  S.p.daily_booked=nb;
+  const nb=!isBookedToday(S.p);
+  await updateDoc(doc(db,'users',S.u.uid),{daily_booked:nb,bookedAt:nb?serverTimestamp():null});
+  S.p.daily_booked=nb;S.p.bookedAt=nb?new Date():null;
   toast(nb?'🔴 You are now marked as booked.':'🟢 You are now available to customers!');
   rDash();
 };
@@ -2295,7 +2330,7 @@ window.rAdmin=async function(){
 
 window.fAdArts=function(q){const list=document.getElementById('adArtList');if(!list)return;const f=(window._adArts||[]).filter(a=>(a.name||'').toLowerCase().includes(q.toLowerCase())||(a.trade||'').toLowerCase().includes(q.toLowerCase())||(a.zone||'').toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="adArt('${a.uid}')"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(a.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.zone)}</div></div><span class="sp${a.status==='active'?'a':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${a.status||'—'}</span></div>`).join('');};
 window.fAdCusts=function(q){const list=document.getElementById('adCustList');if(!list)return;const f=(window._adCusts||[]).filter(c=>(c.name||'').toLowerCase().includes(q.toLowerCase())||(c.email||'').toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(c=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(c.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.zone||'—')}</div></div></div>`).join('');};
-window.apArt=async function(uid,did,tl){const tr=tl.toLowerCase().includes('premium')?'premium':'standard';const ex=new Date(Date.now()+2592000000);await runTransaction(db,async txn=>{txn.update(doc(db,'users',uid),{status:'active',tier:tr,expiry:ex,activatedAt:serverTimestamp()});txn.update(doc(db,'pendingApprovals',did),{reviewed:true,approvedAt:serverTimestamp()});});toast('✅ Activated for 30 days!');rAdmin();};
+window.apArt=async function(uid,did,tl){const tr=tl.toLowerCase().includes('premium')?'premium':'standard';const ex=new Date(Date.now()+2592000000);await runTransaction(db,async txn=>{txn.update(doc(db,'users',uid),{status:'active',tier:tr,expiry:ex,activatedAt:serverTimestamp()});txn.update(doc(db,'pendingApprovals',did),{reviewed:true,approvedAt:serverTimestamp()});});creditReferral(uid);toast('✅ Activated for 30 days!');rAdmin();};
 window.rjArt=async function(did){if(!confirm('Reject this submission?'))return;await updateDoc(doc(db,'pendingApprovals',did),{reviewed:true,rejected:true,rejectedAt:serverTimestamp()});toast('Rejected.');rAdmin();};
 window.apTradeReq=async function(did,tradeName){
   try{
@@ -2325,7 +2360,7 @@ window.adArt=async function(uid){
     <div class="ir"><span class="il">Tier</span><span style="font-weight:700;text-transform:capitalize;color:${a.tier==='premium'?'var(--amber)':'var(--blue2)'}">${a.tier||'None'}</span></div>
     <div class="ir"><span class="il">Rating</span><span>${a.rating?a.rating.toFixed(1)+' ⭐ ('+a.reviews+' reviews)':'No reviews'}</span></div>
     <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${a.status==='active'?dl+' days':'—'}</span></div>
-    <div class="ir"><span class="il">Booked Today</span><span>${a.daily_booked?'🔴 Yes':'🟢 No'}</span></div>
+    <div class="ir"><span class="il">Booked Today</span><span>${isBookedToday(a)?'🔴 Yes':'🟢 No'}</span></div>
   </div>
   ${(a.portfolios||[]).length?`<div class="ic"><h3>📷 Portfolio</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${a.portfolios.map(p=>`<img src="${p}" style="width:90px;height:70px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`).join('')}</div></div>`:''}
   <div class="ic"><h3>⚡ Admin Actions</h3>
@@ -2364,7 +2399,9 @@ async function renderAnalytics(){
     const users=uSnap.docs.map(d=>d.data());
     const arts=users.filter(u=>u.type==='artisan'),custs=users.filter(u=>u.type==='customer');
     const active=arts.filter(u=>u.status==='active');
-    const prem=active.filter(u=>u.tier==='premium'),std=active.filter(u=>u.tier==='standard');
+    const paidActive=active.filter(u=>!u.grantedByAdmin);
+    const prem=paidActive.filter(u=>u.tier==='premium'),std=paidActive.filter(u=>u.tier==='standard');
+    const grantedFree=arts.filter(u=>u.grantedByAdmin===true).length;
     const bookings=bSnap.docs.length;
     const rev=(prem.length*10000)+(std.length*5000);
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -2387,7 +2424,7 @@ async function renderAnalytics(){
       <div class="ic" style="margin-bottom:0;text-align:center"><div style="font-size:28px;font-weight:800;color:var(--navy)">${bookings}</div><div style="font-size:12px;color:var(--slate3)">Total Bookings</div></div>
     </div>
     <div class="ic"><h3>&#128200; Signups — Last 6 Months</h3><div style="display:flex;align-items:flex-end;gap:6px;height:150px;margin-bottom:10px;padding:0 4px">${bars}</div><div style="display:flex;gap:14px;font-size:12px"><div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--blue2);border-radius:3px"></div><span style="color:var(--slate3)">Artisans (${arts.length})</span></div><div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:#34d399;border-radius:3px"></div><span style="color:var(--slate3)">Customers (${custs.length})</span></div></div></div>
-    <div class="ic"><h3>&#128176; Revenue Breakdown</h3><div class="ir"><span class="il">Premium &#8358;10,000 &times; ${prem.length}</span><span style="font-weight:700;color:var(--amber)">&#8358;${(prem.length*10000).toLocaleString()}</span></div><div class="ir"><span class="il">Standard &#8358;5,000 &times; ${std.length}</span><span style="font-weight:700;color:var(--blue2)">&#8358;${(std.length*5000).toLocaleString()}</span></div><div class="ir" style="border-top:2px solid var(--border);padding-top:10px;margin-top:4px"><span class="il" style="font-weight:700">Monthly Total</span><span style="font-weight:800;font-size:18px;color:var(--emerald)">&#8358;${rev.toLocaleString()}</span></div></div>
+    <div class="ic"><h3>&#128176; Revenue Breakdown</h3><div class="ir"><span class="il">Premium &#8358;10,000 &times; ${prem.length}</span><span style="font-weight:700;color:var(--amber)">&#8358;${(prem.length*10000).toLocaleString()}</span></div><div class="ir"><span class="il">Standard &#8358;5,000 &times; ${std.length}</span><span style="font-weight:700;color:var(--blue2)">&#8358;${(std.length*5000).toLocaleString()}</span></div><div class="ir"><span class="il">Free Grants</span><span style="font-weight:700;color:var(--slate3)">${grantedFree} artisan${grantedFree!==1?'s':''} (&#8358;0)</span></div><div class="ir" style="border-top:2px solid var(--border);padding-top:10px;margin-top:4px"><span class="il" style="font-weight:700">Monthly Total</span><span style="font-weight:800;font-size:18px;color:var(--emerald)">&#8358;${rev.toLocaleString()}</span></div></div>
     <div class="ic"><h3>&#128295; Skilled Workers by Trade</h3>${tRows}</div>
     <div class="ic"><h3>&#128205; Skilled Workers by Zone</h3>${zRows}</div>`;
   }catch(e){b.innerHTML=`<div class="es">Error: ${sn(e.message)}<br/><button class="btn bo bsm" style="margin-top:12px" onclick="aTab('analytics')">Retry</button></div>`;}
