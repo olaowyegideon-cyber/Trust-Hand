@@ -330,7 +330,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
       <div style="font-size:13px;color:#475569">Top placement in your trade category for 30 days</div>
     </div>
     <div class="bp2">
-      <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Bank</div><div style="font-size:15px;font-weight:700;margin-bottom:14px">Moniepoint</div>
+      <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Bank</div><div style="font-size:15px;font-weight:700;margin-bottom:14px">Opay</div>
       <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Account Number</div><div style="font-size:24px;font-weight:800;letter-spacing:4px;margin:6px 0 14px">9071268570</div>
       <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Account Name</div><div style="font-size:15px;font-weight:700;margin-bottom:8px">Gideon Ayomide Olawoye</div>
       <button class="cbtn" onclick="navigator.clipboard&&navigator.clipboard.writeText('9071268570').then(()=>toast('Copied!'))">📋 Copy Account Number</button>
@@ -1570,15 +1570,12 @@ async function rDash(){
   // load time roughly 2-3x on a slower connection, since they no longer wait in line.
   const[profR,notesR,notifR]=await Promise.allSettled([
     getDoc(doc(db,'users',S.u.uid)),
-    getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),limit(20))),
+    getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),orderBy('sentAt','desc'),limit(5))),
     getDocs(query(collection(db,'notifications'),where('toUid','==',S.u.uid),where('type','==','profile_view_missed'),where('read','==',false),limit(1)))
   ]);
   if(profR.status==='fulfilled'&&profR.value.exists())S.p=profR.value.data();
   let notes=[];
-  if(notesR.status==='fulfilled')notes=notesR.value.docs.map(d=>d.data()).sort((a,b)=>{
-    const ta=a.sentAt?.toDate?a.sentAt.toDate():0,tb=b.sentAt?.toDate?b.sentAt.toDate():0;
-    return tb-ta;
-  }).slice(0,5);
+  if(notesR.status==='fulfilled')notes=notesR.value.docs.map(d=>d.data());
   let hasNotif=false;
   if(notifR.status==='fulfilled')hasNotif=!notifR.value.empty;
   const p=S.p;const b=$('db');
@@ -1591,13 +1588,8 @@ async function rDash(){
     // Load booking history
     let bookHTML='<div style="font-size:13px;color:var(--slate3);text-align:center;padding:16px">Loading your bookings...</div>';
     try{
-      const bSnap=await getDocs(query(collection(db,'bookings'),where('customerUid','==',S.u.uid),limit(30)));
-      const bDocs=bSnap.docs.slice().sort((x,y)=>{
-        const tx=x.data().createdAt?.toDate?x.data().createdAt.toDate():0;
-        const ty=y.data().createdAt?.toDate?y.data().createdAt.toDate():0;
-        return ty-tx;
-      }).slice(0,10);
-      if(bDocs.length===0){
+      const bSnap=await getDocs(query(collection(db,'bookings'),where('customerUid','==',S.u.uid),orderBy('createdAt','desc'),limit(10)));
+      if(bSnap.empty){
         bookHTML=`<div style="text-align:center;padding:16px 0">
           <div style="font-size:36px;margin-bottom:8px">🔍</div>
           <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:6px">No bookings yet</div>
@@ -1605,7 +1597,7 @@ async function rDash(){
           <button onclick="SS('s-market');iMkt()" style="background:var(--blue2);color:#fff;border:none;padding:10px 22px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔍 Browse Workers Now</button>
         </div>`;
       } else {
-        bookHTML=bDocs.map(d=>{
+        bookHTML=bSnap.docs.map(d=>{
           const bk=d.data();
           const dt=bk.createdAt?.toDate?bk.createdAt.toDate().toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}):'—';
           const stc=bk.status==='completed'?'#15803d':bk.status==='cancelled'?'#dc2626':'#1d4ed8';
@@ -1680,51 +1672,6 @@ async function rDash(){
     </div>`;
   } else {
     const iu=p.status==='unsubscribed';const ib=isBookedToday(p);
-    // My Booking History (jobs customers booked me for) + My Payment History (subscription payments)
-    let artBookHTML='<div style="font-size:13px;color:var(--slate3);text-align:center;padding:12px">No bookings yet.</div>';
-    let artPayHTML='<div style="font-size:13px;color:var(--slate3);text-align:center;padding:12px">No payments yet.</div>';
-    try{
-      const[abSnap,apSnap,aaSnap]=await Promise.allSettled([
-        getDocs(query(collection(db,'bookings'),where('artisanUid','==',S.u.uid),limit(30))),
-        getDocs(query(collection(db,'payments'),where('artisanUid','==',S.u.uid),limit(20))),
-        getDocs(query(collection(db,'pendingApprovals'),where('artisanUid','==',S.u.uid),limit(20)))
-      ]);
-      if(abSnap.status==='fulfilled'&&!abSnap.value.empty){
-        const bDocs=abSnap.value.docs.slice().sort((x,y)=>{
-          const tx=x.data().createdAt?.toDate?x.data().createdAt.toDate():0;
-          const ty=y.data().createdAt?.toDate?y.data().createdAt.toDate():0;
-          return ty-tx;
-        }).slice(0,10);
-        artBookHTML=bDocs.map(d=>{
-          const bk=d.data();
-          const dt=bk.createdAt?.toDate?bk.createdAt.toDate().toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}):'—';
-          const stc=bk.status==='completed'?'#15803d':bk.status==='cancelled'?'#dc2626':'#1d4ed8';
-          const stbg=bk.status==='completed'?'#f0fdf4':bk.status==='cancelled'?'#fef2f2':'#eff6ff';
-          return`<div style="background:#f8fafc;border-radius:var(--r);padding:12px;margin-bottom:8px">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-              <div><div style="font-weight:700;font-size:14px;color:var(--navy)">${sn(bk.customerName||'Customer')}</div>
-              <div style="font-size:11px;color:var(--slate3);margin-top:2px">📅 ${dt}</div></div>
-              <span style="background:${stbg};color:${stc};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${bk.status||'confirmed'}</span>
-            </div>
-            ${bk.jobDescription?`<div style="font-size:12px;color:#334155;line-height:1.5">"${sn(bk.jobDescription).substring(0,100)}"</div>`:''}
-          </div>`;
-        }).join('');
-      }
-      // Merge Paystack payments + admin-approved bank-transfer payments into one history
-      const combined=[];
-      if(apSnap.status==='fulfilled')apSnap.value.docs.forEach(d=>{const x=d.data();combined.push({amount:x.amount,tier:x.tier,method:'Paystack',date:x.paidAt,status:'success'});});
-      if(aaSnap.status==='fulfilled')aaSnap.value.docs.forEach(d=>{const x=d.data();if(x.reviewed&&!x.rejected){combined.push({amount:x.tier?.toLowerCase().includes('premium')?10000:5000,tier:x.tier,method:'Bank Transfer ('+(x.senderBank||'—')+')',date:x.approvedAt||x.submittedAt,status:'success'});}});
-      combined.sort((a,b)=>{const ta=a.date?.toDate?a.date.toDate():0,tb=b.date?.toDate?b.date.toDate():0;return tb-ta;});
-      if(combined.length){
-        artPayHTML=combined.slice(0,10).map(pay=>{
-          const dt=pay.date?.toDate?pay.date.toDate().toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}):'—';
-          return`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9">
-            <div><div style="font-weight:700;font-size:14px;color:var(--navy)">₦${(pay.amount||0).toLocaleString()} — ${sn(pay.tier||'')}</div><div style="font-size:11px;color:var(--slate3);margin-top:2px">${sn(pay.method)} · ${dt}</div></div>
-            <span style="background:#f0fdf4;color:#15803d;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">✓ Paid</span>
-          </div>`;
-        }).join('');
-      }
-    }catch(e){}
     // Grace period logic
     const timerStarted=p.timerStarted===true;
     const graceEnd=p.graceEnd?.toDate?p.graceEnd.toDate():p.graceEnd?new Date(p.graceEnd):null;
@@ -1828,14 +1775,6 @@ async function rDash(){
         <div class="ir"><span class="il">Rating</span><span>${p.rating?'★'.repeat(Math.round(p.rating))+' '+p.rating.toFixed(1)+' ('+p.reviews+' reviews)':'No reviews yet'}</span></div>
         <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${dl>0?dl+' days':p.timerStarted?'Expired — renew now':'Grace period'}</span></div>
       </div>
-      <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px">
-        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:12px">📅 My Booking History</div>
-        ${artBookHTML}
-      </div>
-      <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px">
-        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:6px">💰 My Payment History</div>
-        ${artPayHTML}
-      </div>
       <div style="background:linear-gradient(135deg,#78350f,#f59e0b);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff">
         <div style="font-weight:700;font-size:14px;margin-bottom:8px">🎁 Refer & Earn — This Month</div>
         <div style="font-size:13px;color:rgba(255,255,255,.9);margin-bottom:10px">${(p.referralMonthKey===monthKey()?(p.referralMonthCount||0):0)} / 5 paying artisans referred${p.lastReferralRewardMonth===monthKey()?' — ✅ 7 free days already unlocked this month!':''}</div>
@@ -1853,7 +1792,7 @@ async function rDash(){
         </div>
       </div>
       ${dl<=5&&dl>0?`<div style="background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff"><div style="font-weight:700;font-size:14px;margin-bottom:6px">⚠️ Expiring in ${dl} day${dl!==1?'s':''} — Renew Now!</div><div style="font-size:13px;color:rgba(255,255,255,.85);margin-bottom:10px">Your profile goes offline soon. Renew to stay visible to customers.</div><button onclick="SS('s-paywall')" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);padding:9px 18px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">🔄 Renew Subscription →</button></div>`:''}`:''}
-      ${iu?`<div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:var(--r2);padding:20px;margin-bottom:14px;color:#fff;text-align:center"><div style="font-size:44px;margin-bottom:12px">🚀</div><div style="font-weight:700;font-size:17px;margin-bottom:8px">Activate Your Profile</div><div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px">Your profile is ready but hidden. Subscribe to go live and start getting bookings today.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px"><div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px"><div style="font-size:18px;font-weight:800;color:#fff">₦5,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">Standard · 30 days</div></div><div style="background:rgba(255,255,255,.15);border-radius:12px;padding:14px;border:1.5px solid rgba(255,215,0,.5)"><div style="font-size:18px;font-weight:800;color:#fde68a">₦10,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">⭐ Premium · Top results</div></div></div><button onclick="SS('s-paywall')" style="background:#fff;color:#1e3a8a;border:none;padding:12px;border-radius:var(--r);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;width:100%">⚡ Subscribe & Go Live →</button></div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">📋 My Profile</div><div class="ir"><span class="il">Name</span><strong>${sn(p.name)}</strong></div><div class="ir"><span class="il">Trade</span><span style="color:var(--blue2);font-weight:600">${sn(p.trade||'—')}</span></div><div class="ir"><span class="il">Location</span><span style="font-size:13px">📍 ${sn(p.fullLocation||p.zone||'—')}</span></div></div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:12px">📅 My Booking History</div>${artBookHTML}</div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:6px">💰 My Payment History</div>${artPayHTML}</div>`:''
+      ${iu?`<div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:var(--r2);padding:20px;margin-bottom:14px;color:#fff;text-align:center"><div style="font-size:44px;margin-bottom:12px">🚀</div><div style="font-weight:700;font-size:17px;margin-bottom:8px">Activate Your Profile</div><div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px">Your profile is ready but hidden. Subscribe to go live and start getting bookings today.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px"><div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px"><div style="font-size:18px;font-weight:800;color:#fff">₦5,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">Standard · 30 days</div></div><div style="background:rgba(255,255,255,.15);border-radius:12px;padding:14px;border:1.5px solid rgba(255,215,0,.5)"><div style="font-size:18px;font-weight:800;color:#fde68a">₦10,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">⭐ Premium · Top results</div></div></div><button onclick="SS('s-paywall')" style="background:#fff;color:#1e3a8a;border:none;padding:12px;border-radius:var(--r);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;width:100%">⚡ Subscribe & Go Live →</button></div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">📋 My Profile</div><div class="ir"><span class="il">Name</span><strong>${sn(p.name)}</strong></div><div class="ir"><span class="il">Trade</span><span style="color:var(--blue2);font-weight:600">${sn(p.trade||'—')}</span></div><div class="ir"><span class="il">Location</span><span style="font-size:13px">📍 ${sn(p.fullLocation||p.zone||'—')}</span></div></div>`:''
       }
       <button class="btn bo" style="margin-top:4px;border-color:var(--red2);color:var(--red)" onclick="doLogout()">🚪 Sign Out</button>
       <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--slate3)"><a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms & Privacy Policy</a></div>
@@ -2379,7 +2318,7 @@ window.rAdmin=async function(){
     else{
       b.innerHTML=`<div class="ic"><h3>⚙️ Settings</h3>
         <div class="ir"><span class="il">Admin Email</span><span style="font-size:13px">${AE}</span></div>
-        <div class="ir"><span class="il">Payment Bank</span><span>Moniepoint · 9071268570</span></div>
+        <div class="ir"><span class="il">Payment Bank</span><span>Opay · 9071268570</span></div>
         <div class="ir"><span class="il">Account Name</span><span>Gideon Ayomide Olawoye</span></div>
         <div class="ir"><span class="il">Standard Plan</span><span style="font-weight:700;color:var(--blue2)">₦5,000 / 30 days</span></div>
         <div class="ir"><span class="il">Premium Plan</span><span style="font-weight:700;color:var(--amber)">₦10,000 / 30 days</span></div>
@@ -2568,11 +2507,15 @@ function updateMQ(text,audience){
 if('serviceWorker' in navigator){
   window.addEventListener('load',async()=>{
     try{
-      // Just register normally — sw.js already handles its own updates correctly
-      // (skipWaiting on install, clients.claim + old-cache cleanup on activate).
-      // We used to force-unregister and wipe every cache on every single page load,
-      // which meant the page never had a stable, controlling service worker for Chrome
-      // to check — and that's exactly what silently broke the "Install App" prompt.
+      // Unregister ALL old service workers
+      const regs=await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){await reg.unregister();}
+      // Delete ALL caches — no exceptions
+      if('caches' in window){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+      // Register fresh SW
       await navigator.serviceWorker.register('/sw.js');
     }catch(e){}
   });
@@ -2581,19 +2524,10 @@ if('serviceWorker' in navigator){
 runSplash();
 // ── PWA: Capture install prompt and show a friendly custom button ──
 let deferredInstallPrompt=null;
-// If the app is already running as an installed PWA, never even consider showing the banner
-const _alreadyInstalled=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-if(_alreadyInstalled){try{localStorage.setItem('th_install_dismissed','1');}catch(e){}}
 window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
-  if(_alreadyInstalled)return;
   deferredInstallPrompt=e;
   showInstallBanner();
-});
-// Covers the case where the person installs via the browser's own menu instead of our button
-window.addEventListener('appinstalled',()=>{
-  try{localStorage.setItem('th_install_dismissed','1');}catch(e){}
-  document.getElementById('installBanner')?.remove();
 });
 function showInstallBanner(){
   try{if(localStorage.getItem('th_install_dismissed'))return;}catch(err){}
@@ -2618,7 +2552,7 @@ window.installPWA=async function(){
   if(!deferredInstallPrompt)return;
   deferredInstallPrompt.prompt();
   const{outcome}=await deferredInstallPrompt.userChoice;
-  if(outcome==='accepted'){toast('🎉 Trusted Hands installed!');try{localStorage.setItem('th_install_dismissed','1');}catch(e){}}
+  if(outcome==='accepted')toast('🎉 Trusted Hands installed!');
   deferredInstallPrompt=null;
   document.getElementById('installBanner')?.remove();
 };
