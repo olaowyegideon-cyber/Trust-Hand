@@ -87,7 +87,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .notif-dot{position:absolute;top:5px;right:5px;width:9px;height:9px;background:var(--red);border-radius:50%;border:2px solid var(--white);display:none}
 .marquee-bar{background:var(--navy2);color:#fff;font-size:12px;padding:7px 0;overflow:hidden;white-space:nowrap;flex-shrink:0}
 .marquee-inner{display:inline-block;animation:marquee 22s linear infinite;padding-left:100%}
-.auth-bg{flex:1;display:flex;flex-direction:column;justify-content:safe center;padding:28px 20px;overflow-y:auto;background:linear-gradient(160deg,#f0f4ff,#f8fafc)}
+.auth-bg{flex:1;display:flex;flex-direction:column;justify-content:safe center;padding:28px 20px;overflow-y:auto;background:linear-gradient(160deg,#1e3a8a,#2563eb)}
 .auth-card{background:var(--white);border-radius:var(--r4);padding:30px 24px;box-shadow:var(--shadow2);margin:auto 0;width:100%;max-width:100%}
 /* Fallback for browsers without 'safe center' support: ensures tall artisan form never jams against top */
 @supports not (justify-content: safe center){
@@ -227,6 +227,28 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
       <p style="font-size:13px;color:var(--slate3);margin-top:5px">Nigeria's verified skilled worker marketplace</p>
     </div>
     <div class="tab-bar" id="atabs"><div class="tab active" onclick="stab('si')">Sign In</div><div class="tab" onclick="stab('reg')">Create Account</div></div>
+    <div id="quickAuthBox" style="margin-bottom:16px">
+      <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--border2);color:var(--navy);margin-bottom:8px" onclick="quickGoogle()">
+        <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.6H24v8.7h11.9c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.9 6.5-9.6 6.5-16.3z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9h-7.3v5.7C7.6 40.9 15.1 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.7-.7-4.1s.2-2.8.7-4.1v-5.7H4.5C3 17.3 2.2 20.5 2.2 24s.8 6.7 2.3 9.6z"/><path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.1 2 7.6 7.1 4.5 14.4l7.3 5.7c1.7-5.2 6.5-9 12.2-9z"/></svg>
+        Continue with Google
+      </button>
+      <div id="qphone-step0">
+        <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--border2);color:var(--navy)" onclick="$('qphone-step0').style.display='none';$('qphone-step1').style.display='block'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Continue with phone number
+        </button>
+      </div>
+      <div id="qphone-step1" style="display:none">
+        <div class="fg"><label>Phone Number</label><input class="inp" type="tel" id="qphone" placeholder="08012345678"/></div>
+        <button class="btn bp" onclick="quickPhoneStart()">Send Code</button>
+        <div id="qrecap" style="margin-top:8px"></div>
+      </div>
+      <div id="qphone-step2" style="display:none">
+        <div class="fg"><label>Enter the code sent to your phone</label><input class="inp" type="tel" id="qotp" placeholder="123456" maxlength="6"/></div>
+        <button class="btn bp" onclick="quickPhoneVerify()">Verify & Continue</button>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--slate3);margin:14px 0 2px">or continue with email below</div>
+    </div>
     <div id="si">
       <div class="fg"><label>Email Address</label><input class="inp" type="email" id="le" placeholder="example@gmail.com"/></div>
       <div class="fg"><label>Password</label><div class="pw-wrap"><input class="inp" type="password" id="lp" placeholder="••••••••"/><button class="pw-eye" type="button" onclick="tpw('lp',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
@@ -330,7 +352,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
       <div style="font-size:13px;color:#475569">Top placement in your trade category for 30 days</div>
     </div>
     <div class="bp2">
-      <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Bank</div><div style="font-size:15px;font-weight:700;margin-bottom:14px">Opay</div>
+      <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Bank</div><div style="font-size:15px;font-weight:700;margin-bottom:14px">Moniepoint</div>
       <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Account Number</div><div style="font-size:24px;font-weight:800;letter-spacing:4px;margin:6px 0 14px">9071268570</div>
       <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Account Name</div><div style="font-size:15px;font-weight:700;margin-bottom:8px">Gideon Ayomide Olawoye</div>
       <button class="cbtn" onclick="navigator.clipboard&&navigator.clipboard.writeText('9071268570').then(()=>toast('Copied!'))">📋 Copy Account Number</button>
@@ -600,7 +622,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
 </div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,browserSessionPersistence,setPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,browserSessionPersistence,setPersistence,GoogleAuthProvider,signInWithPopup,RecaptchaVerifier,signInWithPhoneNumber}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
@@ -812,6 +834,7 @@ onAuthStateChanged(auth,async user=>{
       try{
         const snap=await getDoc(doc(db,'users',user.uid));
         if(snap.exists()){S.p=snap.data();route();lMq();lUnread();startRTListener();}
+        else if(S._quickSignup){/* brand-new Google/Phone signup — profile form is showing, don't sign them out */}
         else{await signOut(auth);SS('s-auth');}
       }catch(e){SS('s-auth');}
     } else {
@@ -920,6 +943,59 @@ function startCountdown(){
   tick();setInterval(tick,1000);
 }
 startCountdown();
+// ── QUICK AUTH (Google + Phone) ── Both only handle authentication. A brand-new
+// signer is routed straight into the SAME registration form used today (trade,
+// location, portfolio, ID) — just with the password step skipped, since they're
+// already signed in. Returning users go straight to their existing dashboard.
+const googleProvider=new GoogleAuthProvider();
+async function handlePostAuth(user){
+  S.u=user;
+  let snap;
+  try{snap=await getDoc(doc(db,'users',user.uid));}catch(e){toast('Something went wrong. Please try again.');return;}
+  if(snap.exists()){
+    S.p=snap.data();route();lMq();lUnread();startRTListener();
+  }else{
+    // Brand-new account — jump straight into the existing Create Account form, prefilled
+    S._quickSignup=true;
+    SS('s-auth');stab('reg');
+    if($('rn')&&user.displayName)$('rn').value=user.displayName;
+    if($('re')&&user.email)$('re').value=user.email;
+    if($('rph')&&user.phoneNumber){$('rph').value=user.phoneNumber.replace('+234','0');}
+    const pwFg=$('rpw')?.closest('.fg');if(pwFg)pwFg.style.display='none';
+    const qb=$('quickAuthBox');if(qb)qb.style.display='none';
+    vr();
+    toast('✅ Signed in! Just a few more details to finish your profile.');
+  }
+}
+window.quickGoogle=async function(){
+  S._quickSignup=true; // set BEFORE the popup so onAuthStateChanged never races ahead of us
+  try{
+    const result=await signInWithPopup(auth,googleProvider);
+    await handlePostAuth(result.user);
+  }catch(e){S._quickSignup=false;if(e.code!=='auth/popup-closed-by-user')toast('Google sign-in failed. Please try again.');}
+};
+window.quickPhoneStart=async function(){
+  const raw=$('qphone').value.trim();
+  if(!raw){toast('Enter your phone number.');return;}
+  let p=raw.replace(/[\s\-()]/g,'');
+  if(p.startsWith('0'))p='+234'+p.substring(1);
+  else if(!p.startsWith('+'))p='+234'+p;
+  try{
+    if(!window._recaptchaV)window._recaptchaV=new RecaptchaVerifier(auth,'qrecap',{size:'invisible'});
+    window._phoneConfirmation=await signInWithPhoneNumber(auth,p,window._recaptchaV);
+    $('qphone-step1').style.display='none';$('qphone-step2').style.display='block';
+    toast('📲 Code sent via SMS');
+  }catch(e){toast('Could not send code. Check the number and try again.');}
+};
+window.quickPhoneVerify=async function(){
+  const code=$('qotp').value.trim();
+  if(code.length<4){toast('Enter the code sent to you.');return;}
+  S._quickSignup=true; // set BEFORE confirming so onAuthStateChanged never races ahead of us
+  try{
+    const result=await window._phoneConfirmation.confirm(code);
+    await handlePostAuth(result.user);
+  }catch(e){S._quickSignup=false;toast('Incorrect code. Please try again.');}
+};
 window.stab=function(t){
   $('atabs').querySelectorAll('.tab').forEach((e,i)=>e.classList.toggle('active',i===(t==='si'?0:1)));
   $('si').style.display=t==='si'?'block':'none';
@@ -936,7 +1012,7 @@ window.srt=function(t){
 window.vr=function(){
   const n=$('rn')?.value.trim(),e=$('re')?.value.trim(),ph=$('rph')?.value.trim(),pw=$('rpw')?.value;
   const st=$('rstate')?.value,lg=$('rlga')?.value,z=$('rz')?.value;
-  let ok=n&&e&&ph&&pw&&pw.length>=6&&st&&lg&&z;
+  let ok=n&&e&&ph&&(S._quickSignup||(pw&&pw.length>=6))&&st&&lg&&z;
   if(RT==='a'){
     const rtv=$('rt')?.value;
     const tradeOk=rtv&&(rtv!=='__other__'||($('rt_custom')?.value.trim().length>=2));
@@ -999,8 +1075,10 @@ window.doLogin=async function(){
 };
 window.doLogout=async function(){
   await signOut(auth);
-  S={u:null,p:null,ports:[],rcpt:null,idDoc:null,tier:null,ct:null,cu:null,fc:[],pv:'s-auth',at:'ap2',jobPhoto:null,jobDesc:''};
+  S={u:null,p:null,ports:[],rcpt:null,idDoc:null,tier:null,ct:null,cu:null,fc:[],pv:'s-auth',at:'ap2',jobPhoto:null,jobDesc:'',_quickSignup:false};
   try{sessionStorage.removeItem('th_lastScreen');}catch(e){}
+  const qb=$('quickAuthBox');if(qb)qb.style.display='block';
+  const pwFg=$('rpw')?.closest('.fg');if(pwFg)pwFg.style.display='';
   toast('Signed out.');SS('s-auth');
 };
 window.doReg=async function(){
@@ -1010,19 +1088,24 @@ window.doReg=async function(){
   if(n.length<2||n.length>80){err.textContent='Name must be 2–80 characters.';err.style.display='block';return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)||e.length>200){err.textContent='Enter a valid email.';err.style.display='block';return;}
   if(!/^[0-9+\s\-]{7,20}$/.test(ph)){err.textContent='Enter a valid phone number.';err.style.display='block';return;}
-  if(pw.length<6||pw.length>128){err.textContent='Password must be 6–128 characters.';err.style.display='block';return;}
+  if(!S._quickSignup&&(pw.length<6||pw.length>128)){err.textContent='Password must be 6–128 characters.';err.style.display='block';return;}
   if(!z){err.textContent='Please select your zone.';err.style.display='block';return;}
   // Block customer registration before launch
   // customers open
   $('rbtn').disabled=true;$('rbtn').textContent='Creating…';
   try{
-    const cr=await createUserWithEmailAndPassword(auth,e,pw);
-    const uid=cr.user.uid;
+    let uid;
+    if(S._quickSignup&&auth.currentUser){
+      uid=auth.currentUser.uid;
+    }else{
+      const cr=await createUserWithEmailAndPassword(auth,e,pw);
+      uid=cr.user.uid;
+    }
     if(RT==='c'){
       const pd={uid,name:n,email:e,phone:ph,type:'customer',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),referredBy:getPendingRef()||null,createdAt:serverTimestamp()};
       await setDoc(doc(db,'users',uid),pd);S.p=pd;
       try{sessionStorage.removeItem('th_ref');}catch(e0){}
-      toast('Welcome to Trusted Hands, '+n.split(' ')[0]+'! 🎉');
+      toast('Welcome to Trusted Hands, '+n.split(' ')[0]+'! 🎉');S._quickSignup=false;
       SS('s-market');iMkt();
     }else{
       let tr=$('rt').value;const bio=sn($('rb').value).substring(0,500);
@@ -1037,7 +1120,7 @@ window.doReg=async function(){
         try{await addDoc(collection(db,'tradeRequests'),{artisanUid:uid,artisanName:n,trade:tr,status:'pending',createdAt:serverTimestamp()});}catch(e3){}
         toast('🎉 Account created! Your new trade "'+tr+'" was sent to admin for review.');
       }
-      SS('s-paywall');setTimeout(()=>showArtisanTut(),800);
+      SS('s-paywall');S._quickSignup=false;setTimeout(()=>showArtisanTut(),800);
     }
   }catch(e2){
     $('rbtn').disabled=false;$('rbtn').textContent='Create Account';
@@ -1184,6 +1267,9 @@ async function sendWhatsAppNotification(artisanData, messageType){
     message = `🔔 *Trusted Hands Alert*\n\nA customer just viewed your ${artisanData.trade} profile and wants to book you!\n\n👉 Open the app to respond and secure the booking:\nhttps://trust-hand.vercel.app\n\n_Reply fast — customers book the first available artisan!_`;
   } else if(messageType === 'booking'){
     message = `📅 *New Booking Alert!*\n\nA customer has booked you on Trusted Hands.\n\n✅ Open the app to see job details and chat with them:\nhttps://trust-hand.vercel.app\n\n_Trusted Hands — Nigeria's Artisan Marketplace_`;
+  } else if(messageType === 'subscribe_nudge'){
+    const n=artisanData.missedViewsToday||1;
+    message = `😔 *You're missing customers!*\n\n${n} customer${n!==1?'s':''} tried to reach you today for ${artisanData.trade} work — but your profile isn't active, so they went to another artisan.\n\n💳 Subscribe for just ₦5,000/30 days and start getting bookings today:\nhttps://trust-hand.vercel.app\n\n_Don't lose another customer — activate now!_`;
   }
 
   const encoded = encodeURIComponent(message);
@@ -1247,7 +1333,7 @@ window.saveWASetup = async function(){
 };
 
 window.sLP=async function(uid,name,trade){
-  $('dc').innerHTML=`<div style="text-align:center;padding:10px 0 20px"><div class="avc avi" style="width:64px;height:64px;font-size:22px;margin:0 auto 12px">${ini(name)}</div><div style="font-weight:700;font-size:18px">${sn(name)}</div><div style="color:var(--blue2);font-weight:600;font-size:14px;margin-top:4px">${sn(trade)}</div></div><div style="background:#f8fafc;border:2px dashed var(--border2);border-radius:var(--r2);padding:24px;text-align:center;margin-bottom:16px"><div style="font-size:40px;margin-bottom:12px">🔒</div><div style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:8px">Profile Locked</div><div style="font-size:13px;color:var(--slate3);line-height:1.7">This artisan hasn't subscribed to a plan yet. Contact details and booking are unavailable.</div></div><div style="background:var(--amber2);border-radius:var(--r);padding:12px;text-align:center;font-size:13px;color:var(--amber);font-weight:600">⏳ Not available at the moment</div>`;
+  $('dc').innerHTML=`<div style="text-align:center;padding:10px 0 20px"><div class="avc avi" style="width:64px;height:64px;font-size:22px;margin:0 auto 12px">${ini(name)}</div><div style="font-weight:700;font-size:18px">${sn(name)}</div><div style="color:var(--blue2);font-weight:600;font-size:14px;margin-top:4px">${sn(trade)}</div></div><div style="background:#f8fafc;border:2px dashed var(--border2);border-radius:var(--r2);padding:24px;text-align:center;margin-bottom:16px"><div style="font-size:40px;margin-bottom:12px">😔</div><div style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:8px">Not Available Right Now</div><div style="font-size:13px;color:var(--slate3);line-height:1.7">Sorry for the inconvenience — this artisan isn't accepting new bookings at the moment. Please check out other ${sn(trade)} professionals nearby.</div></div><div style="background:var(--amber2);border-radius:var(--r);padding:12px;text-align:center;font-size:13px;color:var(--amber);font-weight:600">⏳ Try another professional nearby</div>`;
   $('ov').classList.add('open');$('drw').classList.add('open');
   // Only notify after customer launch is live
   if(!isLaunched())return;
@@ -1258,25 +1344,33 @@ window.sLP=async function(uid,name,trade){
     if(Date.now()-last<21600000)return; // 6 hour cooldown
     sessionStorage.setItem(rkey,String(Date.now()));
   }catch(e){return;}
-  // Write notification to Firestore and send email
+  // Write notification to Firestore, plus a real WhatsApp/SMS nudge so the artisan actually sees it
   try{
     const artSnap=await getDoc(doc(db,'users',uid));
     if(!artSnap.exists())return;
     const artData=artSnap.data();
     const newCount=(artData.missedViews||0)+1;
+    // Track a separate "missed today" count so the SMS can say "3 people tried to reach you today"
+    const today=new Date().toDateString();
+    const todayCount=(artData.missedViewsDate===today?(artData.missedViewsToday||0):0)+1;
     await updateDoc(doc(db,'users',uid),{
       missedViews:newCount,
-      lastMissedView:serverTimestamp()
+      lastMissedView:serverTimestamp(),
+      missedViewsToday:todayCount,
+      missedViewsDate:today
     });
     await addDoc(collection(db,'notifications'),{
       toUid:uid,toName:artData.name,type:'profile_view_missed',
-      message:'A potential customer just searched for a '+artData.trade+' and found your profile — but could not contact you because your subscription is not active. You are losing real customers right now. Subscribe today.',
+      message:'A potential customer just tried to reach you today but your profile isn\'t active — you are losing real customers right now. Subscribe for ₦5,000/30 days to start getting bookings today.',
       viewedAt:serverTimestamp(),read:false
     });
-    // Send email — only on first view and every 5th view after
-    if(newCount===1||newCount%5===0){
-      await sendMissedViewEmail({...artData,missedViews:newCount});
-      await sendWhatsAppNotification(artData,'profile_view');
+    // Real-time WhatsApp nudge (free, via CallMeBot — sent every time, since it costs nothing)
+    if(artData.waActivated)await sendWhatsAppNotification({...artData,missedViewsToday:todayCount},'subscribe_nudge');
+    // SMS fallback (costs money per message) — capped at ONCE PER DAY per artisan regardless of
+    // how many customers tried to reach them, so every artisan gets reached without runaway cost
+    if(artData.missedSmsDate!==today){
+      await updateDoc(doc(db,'users',uid),{missedSmsDate:today});
+      await sendMissedSMS({...artData,missedViewsToday:todayCount});
     }
   }catch(e){}
 };
@@ -1570,12 +1664,15 @@ async function rDash(){
   // load time roughly 2-3x on a slower connection, since they no longer wait in line.
   const[profR,notesR,notifR]=await Promise.allSettled([
     getDoc(doc(db,'users',S.u.uid)),
-    getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),orderBy('sentAt','desc'),limit(5))),
+    getDocs(query(collection(db,'supportNotes'),where('toUid','==',S.u.uid),limit(20))),
     getDocs(query(collection(db,'notifications'),where('toUid','==',S.u.uid),where('type','==','profile_view_missed'),where('read','==',false),limit(1)))
   ]);
   if(profR.status==='fulfilled'&&profR.value.exists())S.p=profR.value.data();
   let notes=[];
-  if(notesR.status==='fulfilled')notes=notesR.value.docs.map(d=>d.data());
+  if(notesR.status==='fulfilled')notes=notesR.value.docs.map(d=>d.data()).sort((a,b)=>{
+    const ta=a.sentAt?.toDate?a.sentAt.toDate():0,tb=b.sentAt?.toDate?b.sentAt.toDate():0;
+    return tb-ta;
+  }).slice(0,5);
   let hasNotif=false;
   if(notifR.status==='fulfilled')hasNotif=!notifR.value.empty;
   const p=S.p;const b=$('db');
@@ -1588,8 +1685,13 @@ async function rDash(){
     // Load booking history
     let bookHTML='<div style="font-size:13px;color:var(--slate3);text-align:center;padding:16px">Loading your bookings...</div>';
     try{
-      const bSnap=await getDocs(query(collection(db,'bookings'),where('customerUid','==',S.u.uid),orderBy('createdAt','desc'),limit(10)));
-      if(bSnap.empty){
+      const bSnap=await getDocs(query(collection(db,'bookings'),where('customerUid','==',S.u.uid),limit(30)));
+      const bDocs=bSnap.docs.slice().sort((x,y)=>{
+        const tx=x.data().createdAt?.toDate?x.data().createdAt.toDate():0;
+        const ty=y.data().createdAt?.toDate?y.data().createdAt.toDate():0;
+        return ty-tx;
+      }).slice(0,10);
+      if(bDocs.length===0){
         bookHTML=`<div style="text-align:center;padding:16px 0">
           <div style="font-size:36px;margin-bottom:8px">🔍</div>
           <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:6px">No bookings yet</div>
@@ -1597,7 +1699,7 @@ async function rDash(){
           <button onclick="SS('s-market');iMkt()" style="background:var(--blue2);color:#fff;border:none;padding:10px 22px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🔍 Browse Workers Now</button>
         </div>`;
       } else {
-        bookHTML=bSnap.docs.map(d=>{
+        bookHTML=bDocs.map(d=>{
           const bk=d.data();
           const dt=bk.createdAt?.toDate?bk.createdAt.toDate().toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}):'—';
           const stc=bk.status==='completed'?'#15803d':bk.status==='cancelled'?'#dc2626':'#1d4ed8';
@@ -1672,6 +1774,51 @@ async function rDash(){
     </div>`;
   } else {
     const iu=p.status==='unsubscribed';const ib=isBookedToday(p);
+    // My Booking History (jobs customers booked me for) + My Payment History (subscription payments)
+    let artBookHTML='<div style="font-size:13px;color:var(--slate3);text-align:center;padding:12px">No bookings yet.</div>';
+    let artPayHTML='<div style="font-size:13px;color:var(--slate3);text-align:center;padding:12px">No payments yet.</div>';
+    try{
+      const[abSnap,apSnap,aaSnap]=await Promise.allSettled([
+        getDocs(query(collection(db,'bookings'),where('artisanUid','==',S.u.uid),limit(30))),
+        getDocs(query(collection(db,'payments'),where('artisanUid','==',S.u.uid),limit(20))),
+        getDocs(query(collection(db,'pendingApprovals'),where('artisanUid','==',S.u.uid),limit(20)))
+      ]);
+      if(abSnap.status==='fulfilled'&&!abSnap.value.empty){
+        const bDocs=abSnap.value.docs.slice().sort((x,y)=>{
+          const tx=x.data().createdAt?.toDate?x.data().createdAt.toDate():0;
+          const ty=y.data().createdAt?.toDate?y.data().createdAt.toDate():0;
+          return ty-tx;
+        }).slice(0,10);
+        artBookHTML=bDocs.map(d=>{
+          const bk=d.data();
+          const dt=bk.createdAt?.toDate?bk.createdAt.toDate().toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}):'—';
+          const stc=bk.status==='completed'?'#15803d':bk.status==='cancelled'?'#dc2626':'#1d4ed8';
+          const stbg=bk.status==='completed'?'#f0fdf4':bk.status==='cancelled'?'#fef2f2':'#eff6ff';
+          return`<div style="background:#f8fafc;border-radius:var(--r);padding:12px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+              <div><div style="font-weight:700;font-size:14px;color:var(--navy)">${sn(bk.customerName||'Customer')}</div>
+              <div style="font-size:11px;color:var(--slate3);margin-top:2px">📅 ${dt}</div></div>
+              <span style="background:${stbg};color:${stc};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${bk.status||'confirmed'}</span>
+            </div>
+            ${bk.jobDescription?`<div style="font-size:12px;color:#334155;line-height:1.5">"${sn(bk.jobDescription).substring(0,100)}"</div>`:''}
+          </div>`;
+        }).join('');
+      }
+      // Merge Paystack payments + admin-approved bank-transfer payments into one history
+      const combined=[];
+      if(apSnap.status==='fulfilled')apSnap.value.docs.forEach(d=>{const x=d.data();combined.push({amount:x.amount,tier:x.tier,method:'Paystack',date:x.paidAt,status:'success'});});
+      if(aaSnap.status==='fulfilled')aaSnap.value.docs.forEach(d=>{const x=d.data();if(x.reviewed&&!x.rejected){combined.push({amount:x.tier?.toLowerCase().includes('premium')?10000:5000,tier:x.tier,method:'Bank Transfer ('+(x.senderBank||'—')+')',date:x.approvedAt||x.submittedAt,status:'success'});}});
+      combined.sort((a,b)=>{const ta=a.date?.toDate?a.date.toDate():0,tb=b.date?.toDate?b.date.toDate():0;return tb-ta;});
+      if(combined.length){
+        artPayHTML=combined.slice(0,10).map(pay=>{
+          const dt=pay.date?.toDate?pay.date.toDate().toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}):'—';
+          return`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9">
+            <div><div style="font-weight:700;font-size:14px;color:var(--navy)">₦${(pay.amount||0).toLocaleString()} — ${sn(pay.tier||'')}</div><div style="font-size:11px;color:var(--slate3);margin-top:2px">${sn(pay.method)} · ${dt}</div></div>
+            <span style="background:#f0fdf4;color:#15803d;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">✓ Paid</span>
+          </div>`;
+        }).join('');
+      }
+    }catch(e){}
     // Grace period logic
     const timerStarted=p.timerStarted===true;
     const graceEnd=p.graceEnd?.toDate?p.graceEnd.toDate():p.graceEnd?new Date(p.graceEnd):null;
@@ -1775,6 +1922,14 @@ async function rDash(){
         <div class="ir"><span class="il">Rating</span><span>${p.rating?'★'.repeat(Math.round(p.rating))+' '+p.rating.toFixed(1)+' ('+p.reviews+' reviews)':'No reviews yet'}</span></div>
         <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${dl>0?dl+' days':p.timerStarted?'Expired — renew now':'Grace period'}</span></div>
       </div>
+      <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:12px">📅 My Booking History</div>
+        ${artBookHTML}
+      </div>
+      <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:6px">💰 My Payment History</div>
+        ${artPayHTML}
+      </div>
       <div style="background:linear-gradient(135deg,#78350f,#f59e0b);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff">
         <div style="font-weight:700;font-size:14px;margin-bottom:8px">🎁 Refer & Earn — This Month</div>
         <div style="font-size:13px;color:rgba(255,255,255,.9);margin-bottom:10px">${(p.referralMonthKey===monthKey()?(p.referralMonthCount||0):0)} / 5 paying artisans referred${p.lastReferralRewardMonth===monthKey()?' — ✅ 7 free days already unlocked this month!':''}</div>
@@ -1792,7 +1947,7 @@ async function rDash(){
         </div>
       </div>
       ${dl<=5&&dl>0?`<div style="background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:var(--r2);padding:16px;margin-bottom:14px;color:#fff"><div style="font-weight:700;font-size:14px;margin-bottom:6px">⚠️ Expiring in ${dl} day${dl!==1?'s':''} — Renew Now!</div><div style="font-size:13px;color:rgba(255,255,255,.85);margin-bottom:10px">Your profile goes offline soon. Renew to stay visible to customers.</div><button onclick="SS('s-paywall')" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);padding:9px 18px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">🔄 Renew Subscription →</button></div>`:''}`:''}
-      ${iu?`<div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:var(--r2);padding:20px;margin-bottom:14px;color:#fff;text-align:center"><div style="font-size:44px;margin-bottom:12px">🚀</div><div style="font-weight:700;font-size:17px;margin-bottom:8px">Activate Your Profile</div><div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px">Your profile is ready but hidden. Subscribe to go live and start getting bookings today.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px"><div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px"><div style="font-size:18px;font-weight:800;color:#fff">₦5,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">Standard · 30 days</div></div><div style="background:rgba(255,255,255,.15);border-radius:12px;padding:14px;border:1.5px solid rgba(255,215,0,.5)"><div style="font-size:18px;font-weight:800;color:#fde68a">₦10,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">⭐ Premium · Top results</div></div></div><button onclick="SS('s-paywall')" style="background:#fff;color:#1e3a8a;border:none;padding:12px;border-radius:var(--r);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;width:100%">⚡ Subscribe & Go Live →</button></div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">📋 My Profile</div><div class="ir"><span class="il">Name</span><strong>${sn(p.name)}</strong></div><div class="ir"><span class="il">Trade</span><span style="color:var(--blue2);font-weight:600">${sn(p.trade||'—')}</span></div><div class="ir"><span class="il">Location</span><span style="font-size:13px">📍 ${sn(p.fullLocation||p.zone||'—')}</span></div></div>`:''
+      ${iu?`<div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:var(--r2);padding:20px;margin-bottom:14px;color:#fff;text-align:center"><div style="font-size:44px;margin-bottom:12px">🚀</div><div style="font-weight:700;font-size:17px;margin-bottom:8px">Activate Your Profile</div><div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px">Your profile is ready but hidden. Subscribe to go live and start getting bookings today.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px"><div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px"><div style="font-size:18px;font-weight:800;color:#fff">₦5,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">Standard · 30 days</div></div><div style="background:rgba(255,255,255,.15);border-radius:12px;padding:14px;border:1.5px solid rgba(255,215,0,.5)"><div style="font-size:18px;font-weight:800;color:#fde68a">₦10,000</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">⭐ Premium · Top results</div></div></div><button onclick="SS('s-paywall')" style="background:#fff;color:#1e3a8a;border:none;padding:12px;border-radius:var(--r);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;width:100%">⚡ Subscribe & Go Live →</button></div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">📋 My Profile</div><div class="ir"><span class="il">Name</span><strong>${sn(p.name)}</strong></div><div class="ir"><span class="il">Trade</span><span style="color:var(--blue2);font-weight:600">${sn(p.trade||'—')}</span></div><div class="ir"><span class="il">Location</span><span style="font-size:13px">📍 ${sn(p.fullLocation||p.zone||'—')}</span></div></div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:12px">📅 My Booking History</div>${artBookHTML}</div><div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:6px">💰 My Payment History</div>${artPayHTML}</div>`:''
       }
       <button class="btn bo" style="margin-top:4px;border-color:var(--red2);color:var(--red)" onclick="doLogout()">🚪 Sign Out</button>
       <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--slate3)"><a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms & Privacy Policy</a></div>
@@ -1857,7 +2012,7 @@ async function creditReferral(artisanUid){
       if(d.type==='artisan'&&monthCount>=5&&d.lastReferralRewardMonth!==curMonth){
         const curExpiry=d.expiry?.toDate?d.expiry.toDate():(d.expiry?new Date(d.expiry):null);
         const base=(d.status==='active'&&curExpiry&&curExpiry>new Date())?curExpiry:new Date();
-        updates.expiry=new Date(base.getTime()+7*86400000); // 7 free days
+        updates.expiry=new Date(base.getTime()+7*86400000);updates.timerStarted=true;updates.graceEnd=null; // 7 free days
         updates.status='active';
         if(!d.tier)updates.tier='standard';
         updates.lastReferralRewardMonth=curMonth;
@@ -2318,7 +2473,7 @@ window.rAdmin=async function(){
     else{
       b.innerHTML=`<div class="ic"><h3>⚙️ Settings</h3>
         <div class="ir"><span class="il">Admin Email</span><span style="font-size:13px">${AE}</span></div>
-        <div class="ir"><span class="il">Payment Bank</span><span>Opay · 9071268570</span></div>
+        <div class="ir"><span class="il">Payment Bank</span><span>Moniepoint · 9071268570</span></div>
         <div class="ir"><span class="il">Account Name</span><span>Gideon Ayomide Olawoye</span></div>
         <div class="ir"><span class="il">Standard Plan</span><span style="font-weight:700;color:var(--blue2)">₦5,000 / 30 days</span></div>
         <div class="ir"><span class="il">Premium Plan</span><span style="font-weight:700;color:var(--amber)">₦10,000 / 30 days</span></div>
@@ -2330,7 +2485,7 @@ window.rAdmin=async function(){
 
 window.fAdArts=function(q){const list=document.getElementById('adArtList');if(!list)return;const f=(window._adArts||[]).filter(a=>(a.name||'').toLowerCase().includes(q.toLowerCase())||(a.trade||'').toLowerCase().includes(q.toLowerCase())||(a.zone||'').toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="adArt('${a.uid}')"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(a.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.zone)}</div></div><span class="sp${a.status==='active'?'a':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${a.status||'—'}</span></div>`).join('');};
 window.fAdCusts=function(q){const list=document.getElementById('adCustList');if(!list)return;const f=(window._adCusts||[]).filter(c=>(c.name||'').toLowerCase().includes(q.toLowerCase())||(c.email||'').toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(c=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc"><div class="avc ava" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${ini(c.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(c.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(c.email)} · 📍 ${sn(c.zone||'—')}</div></div></div>`).join('');};
-window.apArt=async function(uid,did,tl){const tr=tl.toLowerCase().includes('premium')?'premium':'standard';const ex=new Date(Date.now()+2592000000);await runTransaction(db,async txn=>{txn.update(doc(db,'users',uid),{status:'active',tier:tr,expiry:ex,activatedAt:serverTimestamp()});txn.update(doc(db,'pendingApprovals',did),{reviewed:true,approvedAt:serverTimestamp()});});creditReferral(uid);toast('✅ Activated for 30 days!');rAdmin();};
+window.apArt=async function(uid,did,tl){const tr=tl.toLowerCase().includes('premium')?'premium':'standard';const ex=new Date(Date.now()+2592000000);await runTransaction(db,async txn=>{txn.update(doc(db,'users',uid),{status:'active',tier:tr,expiry:ex,timerStarted:true,graceEnd:null,activatedAt:serverTimestamp()});txn.update(doc(db,'pendingApprovals',did),{reviewed:true,approvedAt:serverTimestamp()});});creditReferral(uid);toast('✅ Activated for 30 days!');rAdmin();};
 window.rjArt=async function(did){if(!confirm('Reject this submission?'))return;await updateDoc(doc(db,'pendingApprovals',did),{reviewed:true,rejected:true,rejectedAt:serverTimestamp()});toast('Rejected.');rAdmin();};
 window.apTradeReq=async function(did,tradeName){
   try{
@@ -2379,13 +2534,13 @@ window.adArt=async function(uid){
     <button class="btn bp bsm" onclick="sNote('${uid}','${sn(a.name).replace(/'/g,"\\'")}')">Send Note</button>
   </div>`;
 };
-window.fAct=async function(u){await updateDoc(doc(db,'users',u),{status:'active',expiry:new Date(Date.now()+2592000000),activatedAt:serverTimestamp()});toast('✅ Activated 30 days!');adArt(u);};
+window.fAct=async function(u){await updateDoc(doc(db,'users',u),{status:'active',expiry:new Date(Date.now()+2592000000),timerStarted:true,graceEnd:null,activatedAt:serverTimestamp()});toast('✅ Activated 30 days!');adArt(u);};
 window.rBk=async function(u){await updateDoc(doc(db,'users',u),{daily_booked:false});toast('✅ Booking reset!');adArt(u);};
 window.sPr=async function(u){await updateDoc(doc(db,'users',u),{tier:'premium'});toast('⭐ Set Premium!');adArt(u);};
 window.sSt=async function(u){await updateDoc(doc(db,'users',u),{tier:'standard'});toast('Set Standard.');adArt(u);};
 window.sUs=async function(u){await updateDoc(doc(db,'users',u),{status:'unsubscribed'});toast('Set Unsubscribed.');adArt(u);};
 window.bUser=async function(u){if(!confirm('Ban this account?'))return;await updateDoc(doc(db,'users',u),{status:'banned'});toast('Banned.');aTab('art');};
-window.extS=async function(u){const d=parseInt($('exd')?.value||0);if(!d||d<1){toast('Enter valid days.');return;}const snap=await getDoc(doc(db,'users',u));const cur=snap.data().expiry?.toDate?snap.data().expiry.toDate():new Date(snap.data().expiry||Date.now());const ne=new Date(Math.max(cur.getTime(),Date.now())+d*86400000);await updateDoc(doc(db,'users',u),{expiry:ne,status:'active'});toast(`Extended ${d} days ✅`);adArt(u);};
+window.extS=async function(u){const d=parseInt($('exd')?.value||0);if(!d||d<1){toast('Enter valid days.');return;}const snap=await getDoc(doc(db,'users',u));const cur=snap.data().expiry?.toDate?snap.data().expiry.toDate():new Date(snap.data().expiry||Date.now());const ne=new Date(Math.max(cur.getTime(),Date.now())+d*86400000);await updateDoc(doc(db,'users',u),{expiry:ne,status:'active',timerStarted:true,graceEnd:null});toast(`Extended ${d} days ✅`);adArt(u);};
 window.sNote=async function(u,n){const t=$('ntxt')?.value?.trim();if(!t){toast('Please type a message.');return;}await addDoc(collection(db,'supportNotes'),{toUid:u,toName:n,message:t,sentAt:serverTimestamp(),sentBy:'Admin'});toast('Note sent ✅');$('ntxt').value='';};
 window.sdBC=async function(){const m=$('bctxt')?.value?.trim();if(!m){toast('Please type a message.');return;}await setDoc(doc(db,'config','broadcast'),{text:m,updatedAt:serverTimestamp()});toast('📢 Broadcast sent!');};
 window.clBC=async function(){await setDoc(doc(db,'config','broadcast'),{text:'',updatedAt:serverTimestamp()});if($('bctxt'))$('bctxt').value='';toast('Cleared.');};
@@ -2507,15 +2662,11 @@ function updateMQ(text,audience){
 if('serviceWorker' in navigator){
   window.addEventListener('load',async()=>{
     try{
-      // Unregister ALL old service workers
-      const regs=await navigator.serviceWorker.getRegistrations();
-      for(const reg of regs){await reg.unregister();}
-      // Delete ALL caches — no exceptions
-      if('caches' in window){
-        const keys=await caches.keys();
-        await Promise.all(keys.map(k=>caches.delete(k)));
-      }
-      // Register fresh SW
+      // Just register normally — sw.js already handles its own updates correctly
+      // (skipWaiting on install, clients.claim + old-cache cleanup on activate).
+      // We used to force-unregister and wipe every cache on every single page load,
+      // which meant the page never had a stable, controlling service worker for Chrome
+      // to check — and that's exactly what silently broke the "Install App" prompt.
       await navigator.serviceWorker.register('/sw.js');
     }catch(e){}
   });
@@ -2524,10 +2675,19 @@ if('serviceWorker' in navigator){
 runSplash();
 // ── PWA: Capture install prompt and show a friendly custom button ──
 let deferredInstallPrompt=null;
+// If the app is already running as an installed PWA, never even consider showing the banner
+const _alreadyInstalled=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+if(_alreadyInstalled){try{localStorage.setItem('th_install_dismissed','1');}catch(e){}}
 window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
+  if(_alreadyInstalled)return;
   deferredInstallPrompt=e;
   showInstallBanner();
+});
+// Covers the case where the person installs via the browser's own menu instead of our button
+window.addEventListener('appinstalled',()=>{
+  try{localStorage.setItem('th_install_dismissed','1');}catch(e){}
+  document.getElementById('installBanner')?.remove();
 });
 function showInstallBanner(){
   try{if(localStorage.getItem('th_install_dismissed'))return;}catch(err){}
@@ -2552,7 +2712,7 @@ window.installPWA=async function(){
   if(!deferredInstallPrompt)return;
   deferredInstallPrompt.prompt();
   const{outcome}=await deferredInstallPrompt.userChoice;
-  if(outcome==='accepted')toast('🎉 Trusted Hands installed!');
+  if(outcome==='accepted'){toast('🎉 Trusted Hands installed!');try{localStorage.setItem('th_install_dismissed','1');}catch(e){}}
   deferredInstallPrompt=null;
   document.getElementById('installBanner')?.remove();
 };
@@ -2628,6 +2788,17 @@ async function sendSMS(art,cname,job){
   if(ph.startsWith('0'))ph='234'+ph.substring(1);
   if(!ph.startsWith('234'))ph='234'+ph;
   const msg='TRUSTED HANDS: New booking!\nCustomer: '+cname+(job?'\nJob: '+job.substring(0,40):'')+'\nOpen: https://trust-hand.vercel.app';
+  try{await fetch('https://v3.api.termii.com/api/sms/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:ph,from:'TrstHands',sms:msg,type:'plain',api_key:TERMII_KEY,channel:'generic'})});}catch(e){}
+}
+// "You're missing customers, subscribe now" SMS — the caller (sLP) already caps this to once per
+// day per artisan, so this never fires more than once/day no matter how many people view them.
+async function sendMissedSMS(art){
+  if(!art.phone)return;
+  let ph=art.phone.replace(/[\s\-\(\)]/g,'');
+  if(ph.startsWith('0'))ph='234'+ph.substring(1);
+  if(!ph.startsWith('234'))ph='234'+ph;
+  const n=art.missedViewsToday||1;
+  const msg='TRUSTED HANDS: '+n+' customer'+(n!==1?'s':'')+' tried to reach you today but your profile is not active. Subscribe for N5,000/30 days: https://trust-hand.vercel.app';
   try{await fetch('https://v3.api.termii.com/api/sms/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:ph,from:'TrstHands',sms:msg,type:'plain',api_key:TERMII_KEY,channel:'generic'})});}catch(e){}
 }
 
