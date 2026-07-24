@@ -220,7 +220,23 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
 
 <!-- AUTH -->
 <div class="screen" id="s-auth">
-  <div class="auth-bg sb"><div class="auth-card">
+  <div class="auth-bg sb" style="position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;opacity:.55;pointer-events:none">
+      <div style="background:#1d4ed8;border-radius:8px;padding:10px;color:#dbeafe;font-size:11px">⚡<div style="font-weight:700;margin-top:6px;color:#fff">Chidi O.</div><div>Electrician</div></div>
+      <div style="background:#047857;border-radius:8px;padding:10px;color:#d1fae5;font-size:11px">🔧<div style="font-weight:700;margin-top:6px;color:#fff">Amaka T.</div><div>Tailor</div></div>
+      <div style="background:#92400e;border-radius:8px;padding:10px;color:#fef3c7;font-size:11px">🔩<div style="font-weight:700;margin-top:6px;color:#fff">Musa I.</div><div>Mechanic</div></div>
+      <div style="background:#a21caf;border-radius:8px;padding:10px;color:#fae8ff;font-size:11px">💇<div style="font-weight:700;margin-top:6px;color:#fff">Ngozi E.</div><div>Hairdresser</div></div>
+      <div style="background:#374151;border-radius:8px;padding:10px;color:#f3f4f6;font-size:11px">💈<div style="font-weight:700;margin-top:6px;color:#fff">Tunde A.</div><div>Barber</div></div>
+      <div style="background:#0e7490;border-radius:8px;padding:10px;color:#cffafe;font-size:11px">🔧<div style="font-weight:700;margin-top:6px;color:#fff">Emeka N.</div><div>Plumber</div></div>
+      <div style="background:#be185d;border-radius:8px;padding:10px;color:#fce7f3;font-size:11px">📷<div style="font-weight:700;margin-top:6px;color:#fff">Chioma K.</div><div>Photographer</div></div>
+      <div style="background:#78350f;border-radius:8px;padding:10px;color:#fde68a;font-size:11px">🪚<div style="font-weight:700;margin-top:6px;color:#fff">Ikenna B.</div><div>Carpenter</div></div>
+      <div style="background:#1e3a8a;border-radius:8px;padding:10px;color:#dbeafe;font-size:11px">🔥<div style="font-weight:700;margin-top:6px;color:#fff">Yusuf D.</div><div>Welder</div></div>
+      <div style="background:#166534;border-radius:8px;padding:10px;color:#dcfce7;font-size:11px">🎨<div style="font-weight:700;margin-top:6px;color:#fff">Uche P.</div><div>Painter</div></div>
+      <div style="background:#7c2d12;border-radius:8px;padding:10px;color:#fed7aa;font-size:11px">👨‍🍳<div style="font-weight:700;margin-top:6px;color:#fff">Ada M.</div><div>Cook</div></div>
+      <div style="background:#4c1d95;border-radius:8px;padding:10px;color:#ede9fe;font-size:11px">🛋️<div style="font-weight:700;margin-top:6px;color:#fff">Femi R.</div><div>Decorator</div></div>
+    </div>
+    <div style="position:absolute;inset:0;background:rgba(15,23,42,.62);pointer-events:none"></div>
+    <div class="auth-card" style="position:relative;z-index:1">
     <div style="text-align:center;margin-bottom:26px">
       <div style="width:64px;height:64px;background:var(--blue2);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 24px rgba(37,99,235,.3)"><svg width="36" height="36" viewBox="0 0 56 56" fill="none"><rect x="14" y="13" width="28" height="7" rx="3" fill="white"/><rect x="24.5" y="13" width="7" height="22" fill="white"/><rect x="22" y="29" width="12" height="8" rx="4" fill="white"/></svg></div>
       <h1 style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--navy)">Trusted <span style="color:var(--blue2)">Hands</span></h1>
@@ -562,16 +578,16 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
       <h3>🔒 Privacy Policy</h3>
       <div style="font-size:13px;color:#334155;line-height:1.9">
         <p style="font-weight:700;color:var(--navy);margin-bottom:6px">What We Collect</p>
-        <p style="margin-bottom:12px">We collect: full name, email address, phone number, location zone, profile photo, portfolio photos, payment receipt images, and chat messages. For artisans, we also collect trade category, bio, and booking history.</p>
+        <p style="margin-bottom:12px">We collect: full name, email address, phone number, location zone, profile photo, portfolio photos, payment receipt images, and chat messages. For artisans, we also collect trade category, bio, booking history, and a government-issued ID document used solely to verify identity before a profile can accept bookings. We also record technical information — IP address, approximate location (city/region/country), and device/browser type — at registration and each login. This technical information exists purely for fraud prevention and customer safety (for example, supporting a police report if an artisan is reported for fraud or serious harm) and is never sold, shared with advertisers, or used to target you with content.</p>
 
         <p style="font-weight:700;color:var(--navy);margin-bottom:6px">How We Use Your Data</p>
-        <p style="margin-bottom:12px">Your data is used exclusively to: display your profile on the marketplace, facilitate communication between users, process subscription payments, improve platform features, and send you important platform notifications. We do not sell your data to any third party.</p>
+        <p style="margin-bottom:12px">Your data is used exclusively to: display your profile on the marketplace, facilitate communication between users, process subscription payments, verify artisan identity, investigate safety reports, improve platform features, and send you important platform notifications. We do not sell your data to any third party.</p>
 
         <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Data Storage & Security</p>
-        <p style="margin-bottom:12px">All data is stored securely on Google Firebase (Firestore) with authentication required for all reads and writes. Images are stored as compressed base64 strings. No raw passwords are stored — authentication is handled by Firebase Auth.</p>
+        <p style="margin-bottom:12px">All data is stored securely on Google Firebase (Firestore) with authentication required for all reads and writes, and server-side security rules restricting exactly what each account type can access. Images are stored as compressed base64 strings. No raw passwords are stored — authentication is handled by Firebase Auth.</p>
 
         <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Your Rights</p>
-        <p style="margin-bottom:12px">You may request deletion of your account and all associated data at any time by contacting support. Profile data can be updated at any time through the Edit Profile screen. Chat history is retained for platform safety.</p>
+        <p style="margin-bottom:12px">You can request deletion of your account and all associated data at any time from your Profile page ("Delete My Account"), or by contacting support. Requests are processed within a reasonable time. Profile data can be updated at any time through the Edit Profile screen.</p>
 
         <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Cookies & Sessions</p>
         <p style="margin-bottom:12px">We use browser session storage for login state only. Sessions expire when you close the browser. We do not use tracking cookies or advertising cookies of any kind.</p>
@@ -624,9 +640,10 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,browserSessionPersistence,setPersistence,GoogleAuthProvider,signInWithPopup,RecaptchaVerifier,signInWithPhoneNumber}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFunctions,httpsCallable}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
 
 const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
-const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
+const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app),fns=getFunctions(app);
 // Capture a referral code from the URL (?ref=UID) the moment the app loads, so it survives
 // browsing/splash all the way through to registration, even if the user signs up minutes later.
 (function(){try{const p=new URLSearchParams(location.search).get('ref');if(p)sessionStorage.setItem('th_ref',p);}catch(e){}})();
@@ -728,6 +745,22 @@ window.onTradeSelectChange=function(selectId){
   box.style.display=sel.value==='__other__'?'block':'none';
 };
 
+// ── SAFETY: capture IP/location/device on key account events (registration + login) so that
+// if an artisan scams or harms a customer, admin has a real evidence trail to hand to police —
+// a private app can't unmask an IP itself, but law enforcement can, WITH this kind of record.
+// Always best-effort: a failed lookup (offline, blocked, etc.) never blocks login/registration.
+let _clientMetaCache=null;
+async function getClientMeta(){
+  if(_clientMetaCache)return _clientMetaCache;
+  try{
+    const res=await fetch('https://ipapi.co/json/');
+    const d=await res.json();
+    _clientMetaCache={ip:d.ip||null,city:d.city||null,region:d.region||null,country:d.country_name||null,userAgent:navigator.userAgent};
+  }catch(e){
+    _clientMetaCache={ip:null,city:null,region:null,country:null,userAgent:navigator.userAgent};
+  }
+  return _clientMetaCache;
+}
 function toast(m,d=3000){const t=$('T');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
 
 // ── DARK MODE TOGGLE ──
@@ -827,13 +860,20 @@ onAuthStateChanged(auth,async user=>{
   const doRoute=async()=>{
     if(user){
       S.u=user;
-      if(user.email.toLowerCase()===AE){
+      if(user.email&&user.email.toLowerCase()===AE){
         S.p={uid:user.uid,type:'admin',email:user.email,name:'Admin'};
         SS('s-admin');aTab('ap2');lMq();return;
       }
       try{
         const snap=await getDoc(doc(db,'users',user.uid));
-        if(snap.exists()){S.p=snap.data();route();lMq();lUnread();startRTListener();}
+        if(snap.exists()){
+          S.p=snap.data();route();lMq();lUnread();startRTListener();
+          // Best-effort safety log: last known IP/location/device on this account.
+          // Never awaited here — must never delay or block a normal login.
+          getClientMeta().then(meta=>{
+            updateDoc(doc(db,'users',user.uid),{lastAccessIP:meta.ip,lastAccessLocation:[meta.city,meta.region,meta.country].filter(Boolean).join(', '),lastAccessDevice:meta.userAgent,lastAccessAt:serverTimestamp()}).catch(()=>{});
+          }).catch(()=>{});
+        }
         else if(S._quickSignup){/* brand-new Google/Phone signup — profile form is showing, don't sign them out */}
         else{await signOut(auth);SS('s-auth');}
       }catch(e){SS('s-auth');}
@@ -910,11 +950,14 @@ window.initPaystack=function(){
         // Security: check reference not reused
         const ex=await getDocs(query(collection(db,'payments'),where('reference','==',response.reference)));
         if(!ex.empty){toast('⚠️ Reference already used. Contact support.');$('payBtn').disabled=false;$('payBtn').textContent='Pay Now with Paystack';return;}
-        await addDoc(collection(db,'payments'),{artisanUid:S.u.uid,name:S.p.name,trade:S.p.trade||'',tier:S.tier,amount:amount/100,reference:response.reference,status:'success',paidAt:serverTimestamp(),verified:true});
+        // Note: this is NOT server-verified yet (that upgrade is ready to switch on once
+        // Cloud Functions are deployed — see verifyPaystackPayment). For now, admin manually
+        // checks the reference against the real Paystack dashboard before approving.
+        await addDoc(collection(db,'payments'),{artisanUid:S.u.uid,name:S.p.name,trade:S.p.trade||'',tier:S.tier,amount:amount/100,reference:response.reference,status:'success',paidAt:serverTimestamp(),verified:false});
         await updateDoc(doc(db,'users',S.u.uid),{status:'pending',tier:S.tier,paystackRef:response.reference});
-        await addDoc(collection(db,'pendingApprovals'),{artisanUid:S.u.uid,name:S.p.name||'',trade:S.p.trade||'',zone:S.p.zone||'',lga:S.p.lga||'',state:S.p.state||'',fullLocation:S.p.fullLocation||'',tier:S.tier==='premium'?'Premium (₦10,000)':'Standard (₦5,000)',paymentMethod:'paystack',paystackRef:response.reference,amount:amount/100,submittedAt:serverTimestamp(),reviewed:false,senderBank:'Paystack — Auto-verified ✅',receiptBase64:null});
+        await addDoc(collection(db,'pendingApprovals'),{artisanUid:S.u.uid,name:S.p.name||'',trade:S.p.trade||'',zone:S.p.zone||'',lga:S.p.lga||'',state:S.p.state||'',fullLocation:S.p.fullLocation||'',tier:S.tier==='premium'?'Premium (₦10,000)':'Standard (₦5,000)',paymentMethod:'paystack',paystackRef:response.reference,amount:amount/100,submittedAt:serverTimestamp(),reviewed:false,senderBank:'Paystack ref: '+response.reference+' — ⚠️ verify on your Paystack dashboard before approving',receiptBase64:null});
         S.p={...S.p,status:'pending'};SS('s-pending');toast('✅ Payment confirmed! Profile activating shortly.');
-      }catch(e){toast('Payment received but error occurred. Share ref '+response.reference+' with support.');}
+      }catch(e){toast('Payment received but an error occurred. Share ref '+response.reference+' with support.');}
       $('payBtn').disabled=false;$('payBtn').textContent='Pay Now with Paystack';
     },
     onClose:function(){$('payBtn').disabled=false;$('payBtn').textContent='Pay Now with Paystack';toast('Payment cancelled. Complete payment to activate.');}
@@ -1037,6 +1080,11 @@ window.hIdDoc=async function(e){
   S.idDoc=await compress(f,1200,.85);
   const p=$('idprev');if(p)p.innerHTML=`<img src="${S.idDoc}" style="width:100%;border-radius:var(--r);border:2px solid var(--blue2);max-height:180px;object-fit:cover"/><div style="font-size:12px;color:var(--blue2);font-weight:600;margin-top:6px">✅ ID uploaded — will be reviewed by admin</div>`;
 };
+window.hIdDocEdit=async function(e){
+  const f=e.target.files[0];if(!f)return;
+  S._newIdDoc=await compress(f,1200,.85);
+  const p=$('ep_idprev');if(p)p.innerHTML=`<img src="${S._newIdDoc}" style="width:100%;border-radius:var(--r);border:2px solid var(--blue2);max-height:180px;object-fit:cover"/><div style="font-size:12px;color:var(--blue2);font-weight:600;margin-top:6px">✅ New ID selected — will be reviewed again after you save</div>`;
+};
 window.hrcpt=async function(e){
   const f=e.target.files[0];if(!f)return;
   S.rcpt=await compress(f,1200,.85);
@@ -1105,6 +1153,7 @@ window.doReg=async function(){
       const pd={uid,name:n,email:e,phone:ph,type:'customer',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),referredBy:getPendingRef()||null,createdAt:serverTimestamp()};
       await setDoc(doc(db,'users',uid),pd);S.p=pd;
       try{sessionStorage.removeItem('th_ref');}catch(e0){}
+      getClientMeta().then(meta=>{updateDoc(doc(db,'users',uid),{lastAccessIP:meta.ip,lastAccessLocation:[meta.city,meta.region,meta.country].filter(Boolean).join(', '),lastAccessDevice:meta.userAgent,lastAccessAt:serverTimestamp()}).catch(()=>{});}).catch(()=>{});
       toast('Welcome to Trusted Hands, '+n.split(' ')[0]+'! 🎉');S._quickSignup=false;
       SS('s-market');iMkt();
     }else{
@@ -1116,6 +1165,7 @@ window.doReg=async function(){
       const pd={uid,name:n,email:e,phone:ph,type:'artisan',state:st,lga:lg,zone:z,fullLocation:locStr(st,lg,z),trade:tr,bio,status:'unsubscribed',tier:null,rating:0,reviews:0,daily_booked:false,expiry:null,timerStarted:false,graceEnd:null,portfolios:S.ports.slice(),idDocument:S.idDoc||null,idVerified:false,contract_signed_date:serverTimestamp(),createdAt:serverTimestamp(),tradePendingReview:isCustomTrade,referredBy:getPendingRef()||null};
       await setDoc(doc(db,'users',uid),pd);S.p=pd;
       try{sessionStorage.removeItem('th_ref');}catch(e0){}
+      getClientMeta().then(meta=>{updateDoc(doc(db,'users',uid),{lastAccessIP:meta.ip,lastAccessLocation:[meta.city,meta.region,meta.country].filter(Boolean).join(', '),lastAccessDevice:meta.userAgent,lastAccessAt:serverTimestamp()}).catch(()=>{});}).catch(()=>{});
       if(isCustomTrade){
         try{await addDoc(collection(db,'tradeRequests'),{artisanUid:uid,artisanName:n,trade:tr,status:'pending',createdAt:serverTimestamp()});}catch(e3){}
         toast('🎉 Account created! Your new trade "'+tr+'" was sent to admin for review.');
@@ -1178,7 +1228,7 @@ async function pFeed(){
     const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));
     const all=snap.docs.map(d=>d.data()).filter(a=>a.status!=='pending'&&a.status!=='banned');
     const fz=S.p?.zone||ZZ[0];
-    const srt=arr=>arr.sort((a,b)=>{const w={premium:0,standard:1,unsubscribed:2};const ta=w[a.status==='unsubscribed'?'unsubscribed':(a.tier||'standard')]??2;const tb=w[b.status==='unsubscribed'?'unsubscribed':(b.tier||'standard')]??2;return ta!==tb?ta-tb:(b.rating||0)-(a.rating||0);});
+    const srt=arr=>arr.sort((a,b)=>{const w={premium:0,standard:1,unsubscribed:2};const ta=w[!isLive(a)?'unsubscribed':(a.tier||'standard')]??2;const tb=w[!isLive(b)?'unsubscribed':(b.tier||'standard')]??2;return ta!==tb?ta-tb:(b.rating||0)-(a.rating||0);});
     const s=all.filter(a=>a.zone===fz),n=all.filter(a=>a.zone!==fz&&nbAreas(fz).includes(a.zone)),r=all.filter(a=>!s.includes(a)&&!n.includes(a));
     S.fc=[...srt(s),...srt(n),...srt(r)];
   }catch(e){}
@@ -1230,6 +1280,10 @@ window.onFLGAChange=function(){
 
 // A booking only counts as "today's" booking — this makes the one-booking-per-day rule
 // self-healing even if an artisan forgets to submit their completion feedback.
+// An artisan is only truly "live" (bookable by customers) once BOTH are true: an active paid
+// subscription AND their ID has been reviewed and approved by admin/staff. Paying alone is not
+// enough anymore — this is the actual trust & safety gate for the whole marketplace.
+function isLive(u){return u.status==='active'&&u.idVerified===true;}
 function isBookedToday(u){
   if(!u.daily_booked)return false;
   const bAt=u.bookedAt?.toDate?u.bookedAt.toDate():(u.bookedAt?new Date(u.bookedAt):null);
@@ -1237,7 +1291,7 @@ function isBookedToday(u){
   return bAt.toDateString()===new Date().toDateString();
 }
 function aC(u){
-  const iu=u.status==='unsubscribed';const ip=u.tier==='premium'&&u.status==='active';const ib=isBookedToday(u);
+  const iu=!isLive(u);const ip=u.tier==='premium'&&isLive(u);const ib=isBookedToday(u);
   const cc=iu?'inact':ip?'prem':'act';const ac=ip?'avp':iu?'avi':'ava';
   const pi=ip?`<span class="tpill tpp">⭐ Premium</span>`:iu?`<span class="tpill tpi">Inactive</span>`:`<span class="tpill tpa">✓ Active</span>`;
   const idBadge=u.idVerified?`<span class="tpill" style="background:var(--blue3);color:var(--blue2);margin-left:4px">🪪 ID Verified</span>`:'';
@@ -1245,7 +1299,7 @@ function aC(u){
   const st=u.rating?`<span style="color:var(--amber)">${'★'.repeat(Math.round(u.rating))}</span><span style="font-size:12px;color:var(--slate3);margin-left:3px">${u.rating.toFixed(1)} (${u.reviews})</span>`:`<span style="font-size:12px;color:var(--slate3)">No reviews yet</span>`;
   const ph=u.profilePhoto?`<img src="${u.profilePhoto}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0"/>`:`<div class="avc ${ac}">${ini(u.name)}</div>`;
   const uid=u.uid;const nm=u.name.replace(/'/g,"\\'");const tr=u.trade.replace(/'/g,"\\'");
-  return`<div class="acard ${cc}" onclick="${iu?`sLP('${uid}','${nm}','${tr}')`:`oD('${uid}')`}"><div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px">${ph}<div style="flex:1"><div style="font-weight:700;font-size:15px;color:var(--navy)">${sn(u.name)}</div><div style="font-size:13px;color:var(--blue2);font-weight:600">${sn(u.trade)}</div><div style="font-size:12px;color:var(--slate3)">📍 ${sn(u.fullLocation||u.zone||u.lga||'—')}</div><div style="margin-top:4px">${pi}${idBadge}</div>${respBadge}</div></div><div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f1f5f9"><div style="display:flex;align-items:center;gap:4px">${st}</div><div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--slate3)"><div class="adot" style="background:${iu?'#94a3b8':ib?'var(--amber)':'var(--emerald)'}"></div>${iu?'Inactive':ib?'Booked today':'Available'}</div></div>${iu?'<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:8px">🔒 Subscribe to unlock profile & contact</div>':''}</div>`;
+  return`<div class="acard ${cc}" onclick="${iu?`sLP('${uid}','${nm}','${tr}')`:`oD('${uid}')`}"><div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px">${ph}<div style="flex:1"><div style="font-weight:700;font-size:15px;color:var(--navy)">${sn(u.name)}</div><div style="font-size:13px;color:var(--blue2);font-weight:600">${sn(u.trade)}</div><div style="font-size:12px;color:var(--slate3)">📍 ${sn(u.fullLocation||u.zone||u.lga||'—')}</div><div style="margin-top:4px">${pi}${idBadge}</div>${respBadge}</div></div><div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f1f5f9"><div style="display:flex;align-items:center;gap:4px">${st}</div><div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--slate3)"><div class="adot" style="background:${iu?'#94a3b8':ib?'var(--amber)':'var(--emerald)'}"></div>${iu?'Inactive':ib?'Booked today':'Available'}</div></div>${iu?'<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:8px">🔒 Not accepting bookings right now</div>':''}</div>`;
 }
 
 // ── WHATSAPP NOTIFICATION via CallMeBot (free, no API cost) ──
@@ -1842,10 +1896,11 @@ async function rDash(){
         <div><div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff">Hello, ${fn} 👋</div>
         <div style="font-size:13px;color:rgba(255,255,255,.7)">${sn(p.trade||'Skilled Worker')} · 📍 ${sn(p.fullLocation||p.zone||'—')}</div>
         <div style="margin-top:4px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px">
-          <div style="width:7px;height:7px;border-radius:50%;background:${p.status==='active'?'#4ade80':'#f87171'}"></div>
-          <span style="font-size:11px;color:#fff;font-weight:600">${p.status==='active'?'Active on marketplace':'Not visible on marketplace'}</span>
+          <div style="width:7px;height:7px;border-radius:50%;background:${isLive(p)?'#4ade80':p.status==='active'?'#fbbf24':'#f87171'}"></div>
+          <span style="font-size:11px;color:#fff;font-weight:600">${isLive(p)?'Active on marketplace':p.status==='active'?'ID verification pending':'Not visible on marketplace'}</span>
         </div></div>
       </div>
+      ${p.status==='active'&&!p.idVerified?`<div style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:12px;margin-bottom:14px"><div style="font-weight:700;font-size:13px;color:#fde68a;margin-bottom:3px">🪪 Payment confirmed! Just verifying your ID</div><div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.5">Your subscription is active, but customers can't see or book you until we finish reviewing your ID — usually within a few hours. No action needed from you.</div></div>`:''}
       ${p.status==='active'?`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
         <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:#fff">${p.reviews||0}</div><div style="font-size:11px;color:rgba(255,255,255,.65)">Reviews</div></div>
         <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:#fff">${p.rating?p.rating.toFixed(1):'—'}</div><div style="font-size:11px;color:rgba(255,255,255,.65)">Rating</div></div>
@@ -1997,19 +2052,25 @@ async function creditReferral(artisanUid){
     const aData=aSnap.data();
     const refUid=aData.referredBy;
     if(!refUid||refUid===artisanUid||aData.referralCredited)return;
+    let flaggedSameIP=false;
     const rewarded=await runTransaction(db,async txn=>{
       const refDocRef=doc(db,'users',refUid);
       const artDocRef=doc(db,'users',artisanUid);
       const snap=await txn.get(refDocRef);
       if(!snap.exists())return false;
       const d=snap.data();
+      // Fraud check: if the referrer and the person they "referred" share the same
+      // last-known IP, this is very likely one person farming the reward with fake
+      // accounts. We still count it (so a real shared-network case isn't just lost),
+      // but we withhold the automatic reward and flag it for a human to check.
+      if(aData.lastAccessIP&&d.lastAccessIP&&aData.lastAccessIP===d.lastAccessIP)flaggedSameIP=true;
       const curMonth=monthKey();
       const monthCount=(d.referralMonthKey===curMonth?(d.referralMonthCount||0):0)+1;
       const totalCount=(d.referralCount||0)+1;
       const updates={referralCount:totalCount,referralMonthKey:curMonth,referralMonthCount:monthCount};
       let didReward=false;
       // Only artisans earn the reward, only once per calendar month, only once they hit 5 in that month
-      if(d.type==='artisan'&&monthCount>=5&&d.lastReferralRewardMonth!==curMonth){
+      if(!flaggedSameIP&&d.type==='artisan'&&monthCount>=5&&d.lastReferralRewardMonth!==curMonth){
         const curExpiry=d.expiry?.toDate?d.expiry.toDate():(d.expiry?new Date(d.expiry):null);
         const base=(d.status==='active'&&curExpiry&&curExpiry>new Date())?curExpiry:new Date();
         updates.expiry=new Date(base.getTime()+7*86400000);updates.timerStarted=true;updates.graceEnd=null; // 7 free days
@@ -2022,7 +2083,10 @@ async function creditReferral(artisanUid){
       txn.update(artDocRef,{referralCredited:true});
       return didReward;
     });
-    try{await addDoc(collection(db,'notifications'),{toUid:refUid,type:'referral_new',read:false,createdAt:serverTimestamp(),message:(aData.name||'An artisan you referred')+' just completed payment and became an active artisan!'+(rewarded?' You just unlocked 7 free days! 🎉':'')});}catch(e2){}
+    if(flaggedSameIP){
+      try{await addDoc(collection(db,'referralFlags'),{referrerUid:refUid,artisanUid,sharedIP:aData.lastAccessIP,createdAt:serverTimestamp(),reviewed:false,note:'Referrer and referred artisan share the same last-known IP address — reward withheld pending review.'});}catch(e4){}
+    }
+    try{await addDoc(collection(db,'notifications'),{toUid:refUid,type:'referral_new',read:false,createdAt:serverTimestamp(),message:(aData.name||'An artisan you referred')+' just completed payment and became an active artisan!'+(rewarded?' You just unlocked 7 free days! 🎉':flaggedSameIP?' (Reward under review by admin.)':'')});}catch(e2){}
   }catch(e){/* never let a referral hiccup affect the approval action */}
 }
 window.hFbPhoto=async function(e){
@@ -2181,11 +2245,21 @@ function buildProfileEditor(isArtisan){
         <textarea class="inp" id="ep_bio" style="min-height:90px" placeholder="Describe your skills, experience and years of work…" maxlength="500">${sn(p.bio||'')}</textarea>
         <div style="font-size:11px;color:var(--slate3);margin-top:4px">Max 500 characters</div>
       </div>
+      <div class="fg"><label>🪪 ID Verification</label>
+        ${p.idVerified?`<div style="background:var(--emerald2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--emerald);font-weight:600">✅ Your ID has been verified — you're fully live on the marketplace.</div>`
+          :p.idDocument?`<div style="background:var(--amber2);border-radius:var(--r);padding:12px;font-size:13px;color:#92400e;font-weight:600">🕐 Your ID is under review. Usually takes a few hours.</div>`
+          :`<div style="background:var(--red2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--red);font-weight:600;margin-bottom:10px">⚠️ No valid ID on file — please upload one to go live, or re-upload if yours was rejected.</div>`}
+        <label class="upl" style="margin-top:10px;display:block">
+          <input type="file" accept="image/*" onchange="hIdDocEdit(event)" style="display:none"/>
+          <div id="ep_idprev" style="text-align:center;padding:14px;border:2px dashed var(--border2);border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--slate3)">📎 Tap to upload a clear photo of a valid government ID</div>
+        </label>
+      </div>
     </div>`:''}
 
     <div id="ep_err" style="display:none;margin-bottom:12px" class="alert aw"></div>
     <button class="btn bp" id="ep_savebtn" onclick="saveFullProfile(${isArtisan})">💾 Save All Changes</button>
     <button class="btn bo" style="margin-top:10px;border-color:var(--border2);color:var(--slate3)" onclick="document.getElementById('profileEditor').remove()">Cancel</button>
+    <button class="btn bo" style="margin-top:18px;border-color:#fecaca;color:var(--red)" onclick="requestAccountDeletion()">🗑️ Delete My Account</button>
   </div>`;
   document.body.appendChild(el);
   el.addEventListener('click',e=>{if(e.target===el)el.remove();});
@@ -2204,6 +2278,20 @@ window.previewProfilePhoto=async function(e){
   if(status)status.textContent='✅ Photo ready — tap Save to apply';
 };
 
+window.requestAccountDeletion=async function(){
+  if(!confirm('This will request permanent deletion of your account and data. Your profile will be hidden immediately and fully removed by our team shortly. This cannot be undone. Continue?'))return;
+  try{
+    await addDoc(collection(db,'deletionRequests'),{
+      uid:S.u.uid,name:S.p?.name||'',email:S.p?.email||'',type:S.p?.type||'',
+      requestedAt:serverTimestamp(),status:'pending'
+    });
+    // Hide the profile immediately so nobody can contact/book them while the request is processed
+    await updateDoc(doc(db,'users',S.u.uid),{status:'unsubscribed',idVerified:false,daily_booked:false});
+    toast('✅ Deletion requested. Your profile is hidden now and your data will be fully removed shortly.');
+    document.getElementById('profileEditor')?.remove();
+    await signOut(auth);
+  }catch(e){toast('Could not submit request. Please try again or contact support.');}
+};
 window.saveFullProfile=async function(isArtisan){
   const err=document.getElementById('ep_err');err.style.display='none';
   const name=sn(document.getElementById('ep_name')?.value?.trim()||'');
@@ -2228,6 +2316,7 @@ window.saveFullProfile=async function(isArtisan){
     updates={...updates,trade,bio};
     if(isCustomTrade)updates.tradePendingReview=true;
     S._customTradeRequested=isCustomTrade?trade:null;
+    if(S._newIdDoc){updates.idDocument=S._newIdDoc;updates.idVerified=false;}
   }
   if(S._newPhoto){updates.profilePhoto=S._newPhoto;}
   const btn=document.getElementById('ep_savebtn');
@@ -2236,10 +2325,13 @@ window.saveFullProfile=async function(isArtisan){
     await updateDoc(doc(db,'users',S.u.uid),updates);
     S.p={...S.p,...updates};
     S._newPhoto=null;
+    const idReuploaded=!!S._newIdDoc;S._newIdDoc=null;
     if(S._customTradeRequested){
       try{await addDoc(collection(db,'tradeRequests'),{artisanUid:S.u.uid,artisanName:S.p?.name||'',trade:S._customTradeRequested,status:'pending',createdAt:serverTimestamp()});}catch(e3){}
       toast('✅ Profile updated! Your new trade "'+S._customTradeRequested+'" was sent to admin for review.');
       S._customTradeRequested=null;
+    } else if(idReuploaded){
+      toast('✅ Profile updated! Your new ID will be reviewed shortly.');
     } else {
       toast('✅ Profile updated successfully!');
     }
@@ -2360,9 +2452,18 @@ window.submitDispute=async function(artisanUid,artisanName){
     sessionStorage.setItem(key,String(count+1));
   }catch(e){}
   try{
+    // Pull the reported artisan's last known access info (best-effort, never blocks submission)
+    let artMeta={};
+    try{
+      const artSnap=await getDoc(doc(db,'users',artisanUid));
+      if(artSnap.exists()){const ad=artSnap.data();artMeta={artisanLastIP:ad.lastAccessIP||null,artisanLastLocation:ad.lastAccessLocation||null,artisanLastAccessAt:ad.lastAccessAt||null,artisanPhone:ad.phone||null,artisanIdVerified:ad.idVerified||false};}
+    }catch(e){}
+    // Reporter's own live IP/location/device at the moment of filing — corroborates the report itself
+    const reporterMeta=await getClientMeta().catch(()=>({ip:null,city:null,region:null,country:null,userAgent:navigator.userAgent}));
     await addDoc(collection(db,'disputes'),{
       reporterUid:S.u.uid,reporterName:S.p?.name||'',reporterEmail:S.p?.email||'',
-      artisanUid,artisanName,type,description:desc,
+      reporterIP:reporterMeta.ip,reporterLocation:[reporterMeta.city,reporterMeta.region,reporterMeta.country].filter(Boolean).join(', '),reporterDevice:reporterMeta.userAgent,
+      artisanUid,artisanName,...artMeta,type,description:desc,
       amountInvolved:amount||0,status:'open',
       createdAt:serverTimestamp(),adminNote:'',resolved:false
     });
@@ -2781,25 +2882,20 @@ window.openWAChat=function(phone,name){
   window.open('https://wa.me/'+p+'?text='+msg,'_blank');
 };
 
-const TERMII_KEY='TLwqNrHiSVKFJKMhsbuGOHvLIHFLwlTtGBHBfFnsscqeWsjliYOTgNDVkDwLNL';
+// SMS now goes through a Cloud Function — the Termii key lives only on the server,
+// never in this file, so it can no longer be copied out of the browser.
 async function sendSMS(art,cname,job){
   if(!art.phone)return;
-  let ph=art.phone.replace(/[\s\-\(\)]/g,'');
-  if(ph.startsWith('0'))ph='234'+ph.substring(1);
-  if(!ph.startsWith('234'))ph='234'+ph;
   const msg='TRUSTED HANDS: New booking!\nCustomer: '+cname+(job?'\nJob: '+job.substring(0,40):'')+'\nOpen: https://trust-hand.vercel.app';
-  try{await fetch('https://v3.api.termii.com/api/sms/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:ph,from:'TrstHands',sms:msg,type:'plain',api_key:TERMII_KEY,channel:'generic'})});}catch(e){}
+  try{await httpsCallable(fns,'sendSMS')({phone:art.phone,message:msg});}catch(e){}
 }
 // "You're missing customers, subscribe now" SMS — the caller (sLP) already caps this to once per
 // day per artisan, so this never fires more than once/day no matter how many people view them.
 async function sendMissedSMS(art){
   if(!art.phone)return;
-  let ph=art.phone.replace(/[\s\-\(\)]/g,'');
-  if(ph.startsWith('0'))ph='234'+ph.substring(1);
-  if(!ph.startsWith('234'))ph='234'+ph;
   const n=art.missedViewsToday||1;
   const msg='TRUSTED HANDS: '+n+' customer'+(n!==1?'s':'')+' tried to reach you today but your profile is not active. Subscribe for N5,000/30 days: https://trust-hand.vercel.app';
-  try{await fetch('https://v3.api.termii.com/api/sms/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:ph,from:'TrstHands',sms:msg,type:'plain',api_key:TERMII_KEY,channel:'generic'})});}catch(e){}
+  try{await httpsCallable(fns,'sendSMS')({phone:art.phone,message:msg});}catch(e){}
 }
 
 function startRTListener(){
