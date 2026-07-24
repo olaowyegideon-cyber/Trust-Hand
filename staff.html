@@ -109,6 +109,7 @@ textarea.inp{resize:vertical;min-height:80px}
       <div class="at" onclick="aTab('pauses')">⏸️ Pauses</div>
       <div class="at" onclick="aTab('support')">🆘 Support</div>
       <div class="at" onclick="aTab('payments')">💰 Payments</div>
+      <div class="at" onclick="aTab('idverify')">🪪 ID Verify</div>
     </div>
   </div>
   <div class="sb"><div style="padding:14px 12px 80px" id="content"></div></div>
@@ -153,7 +154,7 @@ async function creditReferral(artisanUid){
       if(d.type==='artisan'&&monthCount>=5&&d.lastReferralRewardMonth!==curMonth){
         const curExpiry=d.expiry?.toDate?d.expiry.toDate():(d.expiry?new Date(d.expiry):null);
         const base=(d.status==='active'&&curExpiry&&curExpiry>new Date())?curExpiry:new Date();
-        updates.expiry=new Date(base.getTime()+7*86400000);
+        updates.expiry=new Date(base.getTime()+7*86400000);updates.timerStarted=true;updates.graceEnd=null;
         updates.status='active';
         if(!d.tier)updates.tier='standard';
         updates.lastReferralRewardMonth=curMonth;
@@ -254,7 +255,7 @@ window.aTab=function(t){
     return;
   }
   CUR_TAB=t;
-  const keys=['overview','approvals','artisans','customers','analytics','disputes','pauses','support','payments'];
+  const keys=['overview','approvals','artisans','customers','analytics','disputes','pauses','support','payments','idverify'];
   $('tabs').querySelectorAll('.at').forEach((el,i)=>el.classList.toggle('active',keys[i]===t));
   renderTab();
 };
@@ -276,6 +277,7 @@ window.renderTab=async function(){
     else if(CUR_TAB==='pauses') await renderPauses();
     else if(CUR_TAB==='support') await renderSupport();
     else if(CUR_TAB==='payments') await renderPayments();
+    else if(CUR_TAB==='idverify') await renderIDVerify();
   }catch(e){b.innerHTML=`<div class="es">⚠️ Error: ${sn(e.message)}<br/><button class="btn bo bsm" style="margin-top:12px" onclick="renderTab()">Retry</button></div>`;}
 };
 
@@ -298,6 +300,7 @@ async function renderOverview(){
   const rev=(prem.length*10000)+(std.length*5000);
   const pendingAp=apSnap.docs.length;
   const openTk=tkSnap.docs.length;
+  const pendingID=active.filter(u=>!u.idVerified).length;
   const totalBk=bkSnap.docs.length;
   const expiringSoon=active.filter(u=>{const ex=u.expiry?.toDate?u.expiry.toDate():u.expiry?new Date(u.expiry):null;return ex&&Math.round((ex-Date.now())/86400000)<=3;});
   const graceArtisans=active.filter(u=>u.timerStarted===false);
@@ -316,6 +319,7 @@ async function renderOverview(){
     <p style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;text-align:center">Only tap this on your official customer launch day. It starts all 30-day subscriptions at once.</p>
   </div>
   ${pendingAp>0?`<div style="background:var(--amber2);border:1.5px solid #fde68a;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('approvals')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:#92400e">🕐 ${pendingAp} Pending Approval${pendingAp!==1?'s':''}</div><div style="font-size:12px;color:#b45309;margin-top:2px">Tap to review payment receipts</div></div><span style="font-size:20px">→</span></div></div>`:''}
+  ${pendingID>0?`<div style="background:var(--blue3);border:1.5px solid #93c5fd;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('idverify')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:#1e3a8a">🪪 ${pendingID} Artisan${pendingID!==1?'s':''} Awaiting ID Verification</div><div style="font-size:12px;color:#1e40af;margin-top:2px">Paid and waiting to go live — review now</div></div><span style="font-size:20px">→</span></div></div>`:''}
   ${openTk>0?`<div style="background:var(--red2);border:1.5px solid #fca5a5;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('support')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:var(--red)">🆘 ${openTk} Open Support Ticket${openTk!==1?'s':''}</div><div style="font-size:12px;color:#b91c1c;margin-top:2px">Tap to respond</div></div><span style="font-size:20px">→</span></div></div>`:''}
   ${expiringSoon.length>0?`<div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:var(--r2);padding:14px;margin-bottom:12px"><div style="font-weight:700;font-size:14px;color:#c2410c;margin-bottom:8px">⏰ ${expiringSoon.length} Artisan${expiringSoon.length!==1?'s':''} Expiring Soon</div>${expiringSoon.map(a=>`<div style="font-size:13px;color:#7c2d12;padding:4px 0;border-bottom:1px solid #fed7aa">${sn(a.name)} — ${sn(a.trade)}</div>`).join('')}</div>`:''}
   <div class="ic"><h3>📊 Platform Summary</h3>
@@ -361,13 +365,40 @@ async function renderArtisans(filter=''){
   </div>`).join('')+'</div>';
 }
 
+let PAY_STATE_FILTER='';
 async function renderPayments(){
   const b=$('content');
-  const snap=await getDocs(query(collection(db,'pendingApprovals'),orderBy('submittedAt','desc'),limit(50)));
+  const[snap,usersSnap,paySnap]=await Promise.all([
+    getDocs(query(collection(db,'pendingApprovals'),orderBy('submittedAt','desc'),limit(50))),
+    getDocs(collection(db,'users')),
+    getDocs(collection(db,'payments'))
+  ]);
   const all=snap.docs.map(d=>({id:d.id,...d.data()}));
   const pending=all.filter(p=>!p.reviewed);
-  const approved=all.filter(p=>p.reviewed&&p.approved);
-  const rejected=all.filter(p=>p.reviewed&&!p.approved);
+  const approved=all.filter(p=>p.reviewed&&!p.rejected);
+  const rejected=all.filter(p=>p.reviewed&&p.rejected);
+  // Map artisan uid -> state, for the per-state breakdown below
+  const artisanMap={};
+  usersSnap.docs.forEach(d=>{const u=d.data();if(u.type==='artisan')artisanMap[d.id]={state:u.state||'Unknown'};});
+  const combined=[];
+  approved.forEach(p=>{const a=artisanMap[p.artisanUid]||{};combined.push({name:p.name,state:a.state||'Unknown',amount:p.tier?.toLowerCase().includes('premium')?10000:5000,method:'Bank Transfer',date:p.approvedAt||p.submittedAt});});
+  paySnap.docs.forEach(d=>{const x=d.data();const a=artisanMap[x.artisanUid]||{};combined.push({name:x.name,state:a.state||'Unknown',amount:x.amount||0,method:'Paystack',date:x.paidAt});});
+  combined.sort((x,y)=>{const tx=x.date?.toDate?x.date.toDate():0,ty=y.date?.toDate?y.date.toDate():0;return ty-tx;});
+  const byState={};
+  combined.forEach(p=>{if(!byState[p.state])byState[p.state]={count:0,revenue:0};byState[p.state].count++;byState[p.state].revenue+=p.amount;});
+  const states=Object.keys(byState).sort((x,y)=>byState[y].revenue-byState[x].revenue);
+  const filtered=PAY_STATE_FILTER?combined.filter(p=>p.state===PAY_STATE_FILTER):combined;
+  const stateCardsHTML=states.map(st=>`<div onclick="filterPayState('${st.replace(/'/g,"\\'")}')" style="cursor:pointer;background:${PAY_STATE_FILTER===st?'var(--blue3)':'#f8fafc'};border:1.5px solid ${PAY_STATE_FILTER===st?'var(--blue2)':'transparent'};border-radius:var(--r);padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-weight:700;font-size:14px;color:var(--navy)">${sn(st)}</div><div style="font-size:11px;color:var(--slate3)">${byState[st].count} payment${byState[st].count!==1?'s':''}</div></div>
+    <div style="font-weight:800;font-size:15px;color:var(--emerald)">₦${byState[st].revenue.toLocaleString()}</div>
+  </div>`).join('')||'<div class="es">No payment data yet.</div>';
+  const listHTML=filtered.slice(0,50).map(p=>{
+    const dt=p.date?.toDate?p.date.toDate().toLocaleDateString('en-NG'):'—';
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f8fafc">
+      <div><div style="font-size:13px;font-weight:600">${sn(p.name)}</div><div style="font-size:11px;color:var(--slate3)">📍 ${sn(p.state)} · ${sn(p.method)} · ${dt}</div></div>
+      <span style="font-size:13px;font-weight:700;color:var(--emerald)">₦${p.amount.toLocaleString()}</span>
+    </div>`;
+  }).join('')||'<div class="es">No payments for this filter.</div>';
   b.innerHTML=`
   <div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px">
     <h3 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px">💳 Payment Summary</h3>
@@ -406,13 +437,78 @@ async function renderPayments(){
       <button class="btn bd bsm" style="flex:1" onclick="rjArt('${p.id}')">✕ Reject</button>
     </div>
   </div>`).join(''):'<div class="es" style="padding:20px">✅ No pending payments</div>'}
-  ${approved.length?`<div style="font-size:13px;font-weight:700;color:var(--emerald);margin-top:16px;margin-bottom:10px">✅ Recently Approved (${approved.length})</div>`+
-  approved.slice(0,10).map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f8fafc">
-    <div><div style="font-size:13px;font-weight:600">${sn(p.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(p.tier)} · ${p.submittedAt?.toDate?p.submittedAt.toDate().toLocaleDateString('en-NG'):'—'}</div></div>
-    <span style="font-size:13px;font-weight:700;color:var(--emerald)">₦${p.tier==='premium'?'10,000':'5,000'}</span>
-  </div>`).join(''):''}`;
+  <div class="ic" style="margin-top:16px"><h3>📍 By State</h3><p style="font-size:12px;color:var(--slate3);margin-bottom:10px">Tap a state to filter the history below</p>${stateCardsHTML}
+    ${PAY_STATE_FILTER?`<button class="btn bo bsm" style="margin-top:8px;width:100%" onclick="filterPayState('')">✕ Clear filter (${sn(PAY_STATE_FILTER)})</button>`:''}
+  </div>
+  <div id="refFlagsBox"></div>
+  <div class="ic"><h3>🧾 ${PAY_STATE_FILTER?sn(PAY_STATE_FILTER)+' — ':''}Full Payment History</h3>${listHTML}</div>`;
+  renderReferralFlags();
 }
 window.renderPayments=renderPayments;
+window.filterPayState=function(st){PAY_STATE_FILTER=st;renderPayments();};
+
+async function renderReferralFlags(){
+  const box=$('refFlagsBox');if(!box)return;
+  const snap=await getDocs(query(collection(db,'referralFlags'),where('reviewed','==',false)));
+  if(snap.empty){box.innerHTML='';return;}
+  const usersSnap=await getDocs(collection(db,'users'));
+  const nameOf={};usersSnap.docs.forEach(d=>{nameOf[d.id]=d.data().name||'—';});
+  box.innerHTML=`<div class="ic" style="border:1.5px solid #fca5a5"><h3>🚩 ${snap.docs.length} Flagged Referral${snap.docs.length!==1?'s':''} — Same IP Detected</h3>
+    <p style="font-size:12px;color:var(--slate3);margin-bottom:10px">These referral rewards were automatically withheld because the referrer and the referred artisan share the same last-known IP address — a strong sign of one person using fake accounts to farm the reward. Review and decide.</p>
+    ${snap.docs.map(d=>{const f=d.data();return`<div class="pi"><div style="font-size:13px;line-height:1.8">
+      <strong>Referrer:</strong> ${sn(nameOf[f.referrerUid]||f.referrerUid)}<br/>
+      <strong>Referred artisan:</strong> ${sn(nameOf[f.artisanUid]||f.artisanUid)}<br/>
+      <strong>Shared IP:</strong> ${sn(f.sharedIP)}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn bs bsm" style="flex:1" onclick="grantFlaggedReferral('${d.id}','${f.referrerUid}')">✓ Looks legit — grant 7 days</button>
+      <button class="btn bd bsm" style="flex:1" onclick="dismissReferralFlag('${d.id}')">✕ Dismiss (no reward)</button>
+    </div></div>`;}).join('')}
+  </div>`;
+}
+window.grantFlaggedReferral=async function(flagId,refUid){
+  const ex=new Date(Date.now()+7*86400000);
+  const snap=await getDoc(doc(db,'users',refUid));
+  const d=snap.exists()?snap.data():{};
+  const curExpiry=d.expiry?.toDate?d.expiry.toDate():(d.expiry?new Date(d.expiry):null);
+  const base=(d.status==='active'&&curExpiry&&curExpiry>new Date())?curExpiry:new Date();
+  await updateDoc(doc(db,'users',refUid),{expiry:new Date(base.getTime()+7*86400000),status:'active',timerStarted:true,graceEnd:null,tier:d.tier||'standard'});
+  await updateDoc(doc(db,'referralFlags',flagId),{reviewed:true,decision:'granted'});
+  toast('✅ 7 days granted manually.');renderTab();
+};
+window.dismissReferralFlag=async function(flagId){
+  await updateDoc(doc(db,'referralFlags',flagId),{reviewed:true,decision:'dismissed'});
+  toast('Dismissed — no reward given.');renderTab();
+};
+
+async function renderIDVerify(){
+  const b=$('content');
+  const snap=await getDocs(collection(db,'users'));
+  const pending=snap.docs.map(d=>({uid:d.id,...d.data()})).filter(u=>u.type==='artisan'&&u.status==='active'&&!u.idVerified);
+  if(!pending.length){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No one is waiting on ID verification.</div>`;return;}
+  b.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px;font-weight:600">${pending.length} artisan${pending.length!==1?'s':''} paid and waiting to go live</div>`+
+  pending.map(u=>`<div class="pi">
+    <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(u.name)}</div>
+    <div style="font-size:12px;color:var(--slate3);line-height:1.8">🔧 ${sn(u.trade)} · 📍 ${sn(u.fullLocation||u.zone||'—')}<br/>📞 ${sn(u.phone)} · Paid: <strong style="color:var(--emerald)">${sn(u.tier)}</strong></div>
+    ${u.idDocument?`<img src="${u.idDocument}" class="ri" style="cursor:pointer" onclick="window.open(this.src,'_blank')"/>`:'<div style="background:#fef2f2;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--red);margin:10px 0">⚠️ No ID document was uploaded</div>'}
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn bs bsm" style="flex:1" onclick="approveID('${u.uid}')">✓ Verify ID</button>
+      <button class="btn bd bsm" style="flex:1" onclick="rejectID('${u.uid}')">✕ Reject — ask to re-upload</button>
+    </div>
+  </div>`).join('');
+}
+window.approveID=async function(uid){
+  await updateDoc(doc(db,'users',uid),{idVerified:true,idVerifiedAt:serverTimestamp()});
+  try{await addDoc(collection(db,'notifications'),{toUid:uid,type:'id_verified',read:false,createdAt:serverTimestamp(),message:'🎉 Your ID has been verified! You are now fully live and bookable on Trusted Hands.'});}catch(e){}
+  toast('✅ ID verified — artisan is now live!');renderTab();
+};
+window.rejectID=async function(uid){
+  if(!confirm('Reject this ID and ask them to re-upload? They will stay hidden from customers until a new ID is reviewed.'))return;
+  await updateDoc(doc(db,'users',uid),{idDocument:null,idVerified:false});
+  try{await addDoc(collection(db,'notifications'),{toUid:uid,type:'id_rejected',read:false,createdAt:serverTimestamp(),message:'Your ID document could not be verified. Please re-upload a clear photo of a valid government ID from your profile to go live.'});}catch(e){}
+  toast('ID rejected — artisan notified to re-upload.');renderTab();
+};
+
 
 window.renderArtisans=renderArtisans;
 
@@ -750,6 +846,15 @@ async function renderDisputes(){
         <span class="sp${tk.resolved?'a':'b'}" style="font-size:11px">${tk.resolved?'Resolved':'Open'}</span>
       </div>
       <div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap">${sn(tk.description)}</div>
+      <details style="margin-bottom:10px"><summary style="font-size:12px;color:var(--blue2);font-weight:600;cursor:pointer">🛡️ Safety evidence trail</summary>
+        <div style="font-size:11px;color:var(--slate3);line-height:1.9;margin-top:6px;padding:8px;background:#fffbeb;border-radius:8px">
+          <strong style="color:var(--navy)">Artisan (${sn(tk.artisanName||'—')}):</strong> ${tk.artisanIdVerified?'🪪 ID verified':'⚠️ ID not verified'} · 📞 ${sn(tk.artisanPhone||'—')}<br/>
+          Last known access: ${sn(tk.artisanLastLocation||'unknown')} · IP ${sn(tk.artisanLastIP||'unknown')} · ${tk.artisanLastAccessAt?.toDate?tk.artisanLastAccessAt.toDate().toLocaleString():'—'}<br/><br/>
+          <strong style="color:var(--navy)">Reporter (${sn(tk.reporterName||'—')}) at time of report:</strong><br/>
+          ${sn(tk.reporterLocation||'unknown')} · IP ${sn(tk.reporterIP||'unknown')}<br/>
+          Device: ${sn((tk.reporterDevice||'unknown').substring(0,80))}
+        </div>
+      </details>
       ${!tk.resolved?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
         <button class="btn bd bsm" onclick="freezeArtisan('${tk.artisanUid}','${d.id}')">🔒 Freeze Artisan Profile</button>
         <button class="btn bs bsm" onclick="resolveDispute('${d.id}')">✓ Mark Resolved</button>
