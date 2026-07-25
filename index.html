@@ -220,7 +220,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
 
 <!-- AUTH -->
 <div class="screen" id="s-auth">
-  <div class="auth-bg sb" style="position:relative;overflow:hidden">
+  <div class="auth-bg sb" style="position:relative;overflow-x:hidden">
     <div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;opacity:.55;pointer-events:none">
       <div style="background:#1d4ed8;border-radius:8px;padding:10px;color:#dbeafe;font-size:11px">⚡<div style="font-weight:700;margin-top:6px;color:#fff">Chidi O.</div><div>Electrician</div></div>
       <div style="background:#047857;border-radius:8px;padding:10px;color:#d1fae5;font-size:11px">🔧<div style="font-weight:700;margin-top:6px;color:#fff">Amaka T.</div><div>Tailor</div></div>
@@ -243,7 +243,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
       <p style="font-size:13px;color:var(--slate3);margin-top:5px">Nigeria's verified skilled worker marketplace</p>
     </div>
     <div class="tab-bar" id="atabs"><div class="tab active" onclick="stab('si')">Sign In</div><div class="tab" onclick="stab('reg')">Create Account</div></div>
-    <div id="quickAuthBox" style="margin-bottom:16px">
+    <div id="quickAuthBox" style="margin-bottom:16px;display:none">
       <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--border2);color:var(--navy);margin-bottom:8px" onclick="quickGoogle()">
         <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.6H24v8.7h11.9c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.9 6.5-9.6 6.5-16.3z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9h-7.3v5.7C7.6 40.9 15.1 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.7-.7-4.1s.2-2.8.7-4.1v-5.7H4.5C3 17.3 2.2 20.5 2.2 24s.8 6.7 2.3 9.6z"/><path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.1 2 7.6 7.1 4.5 14.4l7.3 5.7c1.7-5.2 6.5-9 12.2-9z"/></svg>
         Continue with Google
@@ -1015,7 +1015,13 @@ window.quickGoogle=async function(){
   try{
     const result=await signInWithPopup(auth,googleProvider);
     await handlePostAuth(result.user);
-  }catch(e){S._quickSignup=false;if(e.code!=='auth/popup-closed-by-user')toast('Google sign-in failed. Please try again.');}
+  }catch(e){
+    S._quickSignup=false;
+    if(e.code!=='auth/popup-closed-by-user'){
+      console.error('Google sign-in error:',e.code,e.message);
+      toast('Google sign-in failed: '+(e.code||e.message||'unknown error'),6000);
+    }
+  }
 };
 window.quickPhoneStart=async function(){
   const raw=$('qphone').value.trim();
@@ -1028,7 +1034,10 @@ window.quickPhoneStart=async function(){
     window._phoneConfirmation=await signInWithPhoneNumber(auth,p,window._recaptchaV);
     $('qphone-step1').style.display='none';$('qphone-step2').style.display='block';
     toast('📲 Code sent via SMS');
-  }catch(e){toast('Could not send code. Check the number and try again.');}
+  }catch(e){
+    console.error('Phone sign-in error:',e.code,e.message);
+    toast('Could not send code: '+(e.code||e.message||'unknown error'),6000);
+  }
 };
 window.quickPhoneVerify=async function(){
   const code=$('qotp').value.trim();
@@ -1037,7 +1046,11 @@ window.quickPhoneVerify=async function(){
   try{
     const result=await window._phoneConfirmation.confirm(code);
     await handlePostAuth(result.user);
-  }catch(e){S._quickSignup=false;toast('Incorrect code. Please try again.');}
+  }catch(e){
+    S._quickSignup=false;
+    console.error('Phone verify error:',e.code,e.message);
+    toast('Incorrect code or error: '+(e.code||e.message||'unknown error'),6000);
+  }
 };
 window.stab=function(t){
   $('atabs').querySelectorAll('.tab').forEach((e,i)=>e.classList.toggle('active',i===(t==='si'?0:1)));
@@ -1253,11 +1266,20 @@ window.showF=async function(trade,title){
   }catch(e){l.innerHTML=`<div class="es">Failed to load. <button class="btn bo bsm" onclick="showF('${trade}','${title}')">Retry</button></div>`;}
 };
 window.showC=function(){$('catView').style.display='block';$('feedView').style.display='none';$('si2').value='';};
-window.hSrch=function(q){
+window.hSrch=async function(q){
   if(!q.trim()){showC();return;}
   $('catView').style.display='none';$('feedView').style.display='block';$('ftitle').textContent='Search: "'+q+'"';
-  const f=S.fc.filter(a=>(a.name||'').toLowerCase().includes(q.toLowerCase())||(a.trade||'').toLowerCase().includes(q.toLowerCase())||(a.zone||'').toLowerCase().includes(q.toLowerCase()));
   const l=$('fl');
+  let items=S.fc;
+  if(!items.length){
+    l.innerHTML=`<div style="text-align:center;padding:32px"><div class="spinner"></div></div>`;
+    try{
+      const snap=await getDocs(query(collection(db,'users'),where('type','==','artisan')));
+      items=snap.docs.map(d=>d.data()).filter(a=>a.status!=='pending'&&a.status!=='banned');
+      S.fc=items;
+    }catch(e){}
+  }
+  const f=items.filter(a=>(a.name||'').toLowerCase().includes(q.toLowerCase())||(a.trade||'').toLowerCase().includes(q.toLowerCase())||(a.zone||'').toLowerCase().includes(q.toLowerCase()));
   if(!f.length){l.innerHTML=`<div class="es">No results for "${sn(q)}"</div>`;return;}
   l.innerHTML=f.map(a=>aC(a)).join('');
 };
