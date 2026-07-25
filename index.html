@@ -87,7 +87,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .notif-dot{position:absolute;top:5px;right:5px;width:9px;height:9px;background:var(--red);border-radius:50%;border:2px solid var(--white);display:none}
 .marquee-bar{background:var(--navy2);color:#fff;font-size:12px;padding:7px 0;overflow:hidden;white-space:nowrap;flex-shrink:0}
 .marquee-inner{display:inline-block;animation:marquee 22s linear infinite;padding-left:100%}
-.auth-bg{flex:1;display:flex;flex-direction:column;justify-content:safe center;padding:28px 20px;overflow-y:auto;background:linear-gradient(160deg,#1e3a8a,#2563eb)}
+.auth-bg{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:40px 20px 28px;overflow-y:auto;background:linear-gradient(160deg,#1e3a8a,#2563eb)}
 .auth-card{background:var(--white);border-radius:var(--r4);padding:30px 24px;box-shadow:var(--shadow2);margin:auto 0;width:100%;max-width:100%}
 /* Fallback for browsers without 'safe center' support: ensures tall artisan form never jams against top */
 @supports not (justify-content: safe center){
@@ -243,28 +243,6 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
       <p style="font-size:13px;color:var(--slate3);margin-top:5px">Nigeria's verified skilled worker marketplace</p>
     </div>
     <div class="tab-bar" id="atabs"><div class="tab active" onclick="stab('si')">Sign In</div><div class="tab" onclick="stab('reg')">Create Account</div></div>
-    <div id="quickAuthBox" style="margin-bottom:16px;display:none">
-      <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--border2);color:var(--navy);margin-bottom:8px" onclick="quickGoogle()">
-        <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.6H24v8.7h11.9c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.9 6.5-9.6 6.5-16.3z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9h-7.3v5.7C7.6 40.9 15.1 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.7-.7-4.1s.2-2.8.7-4.1v-5.7H4.5C3 17.3 2.2 20.5 2.2 24s.8 6.7 2.3 9.6z"/><path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.1 2 7.6 7.1 4.5 14.4l7.3 5.7c1.7-5.2 6.5-9 12.2-9z"/></svg>
-        Continue with Google
-      </button>
-      <div id="qphone-step0">
-        <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--border2);color:var(--navy)" onclick="$('qphone-step0').style.display='none';$('qphone-step1').style.display='block'">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          Continue with phone number
-        </button>
-      </div>
-      <div id="qphone-step1" style="display:none">
-        <div class="fg"><label>Phone Number</label><input class="inp" type="tel" id="qphone" placeholder="08012345678"/></div>
-        <button class="btn bp" onclick="quickPhoneStart()">Send Code</button>
-        <div id="qrecap" style="margin-top:8px"></div>
-      </div>
-      <div id="qphone-step2" style="display:none">
-        <div class="fg"><label>Enter the code sent to your phone</label><input class="inp" type="tel" id="qotp" placeholder="123456" maxlength="6"/></div>
-        <button class="btn bp" onclick="quickPhoneVerify()">Verify & Continue</button>
-      </div>
-      <div style="text-align:center;font-size:12px;color:var(--slate3);margin:14px 0 2px">or continue with email below</div>
-    </div>
     <div id="si">
       <div class="fg"><label>Email Address</label><input class="inp" type="email" id="le" placeholder="example@gmail.com"/></div>
       <div class="fg"><label>Password</label><div class="pw-wrap"><input class="inp" type="password" id="lp" placeholder="••••••••"/><button class="pw-eye" type="button" onclick="tpw('lp',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
@@ -1138,7 +1116,6 @@ window.doLogout=async function(){
   await signOut(auth);
   S={u:null,p:null,ports:[],rcpt:null,idDoc:null,tier:null,ct:null,cu:null,fc:[],pv:'s-auth',at:'ap2',jobPhoto:null,jobDesc:'',_quickSignup:false};
   try{sessionStorage.removeItem('th_lastScreen');}catch(e){}
-  const qb=$('quickAuthBox');if(qb)qb.style.display='block';
   const pwFg=$('rpw')?.closest('.fg');if(pwFg)pwFg.style.display='';
   toast('Signed out.');SS('s-auth');
 };
