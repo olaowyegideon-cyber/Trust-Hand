@@ -1696,13 +1696,15 @@ let TI=0;
 function showTut(){try{if(localStorage.getItem('th_t'))return;}catch(e){}TI=0;rTut();}
 window.showTutorial=showTut;
 window.openHowItWorks=function(){TI=0;rTut();};
+window.tutNext=function(){TI++;rTut();};
+window.tutPrev=function(){TI--;rTut();};
 function rTut(){
   document.getElementById('tut')?.remove();
   const s=TT[TI];const il=TI===TT.length-1;
   const gs=['linear-gradient(145deg,#0f172a,#1e3a8a)','linear-gradient(145deg,#065f46,#059669)','linear-gradient(145deg,#1d4ed8,#6366f1)','linear-gradient(145deg,#7c3aed,#a855f7)','linear-gradient(145deg,#be185d,#ec4899)'];
   const el=document.createElement('div');el.id='tut';
   el.style.cssText='position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;background:'+gs[TI];
-  el.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;position:relative"><button onclick="skipTut()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);border:none;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Skip</button><div style="position:absolute;top:20px;left:20px;font-size:11px;color:rgba(255,255,255,.5);font-weight:600">${TI+1} / ${TT.length}</div><div style="width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:52px;margin-bottom:28px">${s.i}</div><h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:14px">${s.t}</h2><p style="font-size:15px;color:rgba(255,255,255,.85);line-height:1.8;max-width:300px">${s.d}</p></div><div style="padding:24px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:14px"><div style="display:flex;gap:8px">${TT.map((_,i)=>`<div style="width:${i===TI?'24px':'8px'};height:8px;border-radius:20px;background:${i===TI?'#fff':'rgba(255,255,255,.3)'};transition:all .3s"></div>`).join('')}</div><button onclick="${il?'skipTut()':'TI++;rTut()'}" style="width:100%;max-width:320px;background:#fff;color:#1d4ed8;padding:15px;border-radius:14px;font-weight:800;font-size:16px;border:none;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(0,0,0,.2)">${il?'🚀 Start Finding Workers!':'Continue →'}</button>${TI>0?'<button onclick="TI--;rTut()" style="background:none;color:rgba(255,255,255,.6);border:none;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600">← Back</button>':''}</div>`;
+  el.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;position:relative"><button onclick="skipTut()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);border:none;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Skip</button><div style="position:absolute;top:20px;left:20px;font-size:11px;color:rgba(255,255,255,.5);font-weight:600">${TI+1} / ${TT.length}</div><div style="width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:52px;margin-bottom:28px">${s.i}</div><h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:14px">${s.t}</h2><p style="font-size:15px;color:rgba(255,255,255,.85);line-height:1.8;max-width:300px">${s.d}</p></div><div style="padding:24px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:14px"><div style="display:flex;gap:8px">${TT.map((_,i)=>`<div style="width:${i===TI?'24px':'8px'};height:8px;border-radius:20px;background:${i===TI?'#fff':'rgba(255,255,255,.3)'};transition:all .3s"></div>`).join('')}</div><button onclick="${il?'skipTut()':'tutNext()'}" style="width:100%;max-width:320px;background:#fff;color:#1d4ed8;padding:15px;border-radius:14px;font-weight:800;font-size:16px;border:none;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(0,0,0,.2)">${il?'🚀 Start Finding Workers!':'Continue →'}</button>${TI>0?'<button onclick="tutPrev()" style="background:none;color:rgba(255,255,255,.6);border:none;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600">← Back</button>':''}</div>`;
   document.body.appendChild(el);
   let sx=0;
   el.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
@@ -2150,6 +2152,8 @@ function showArtisanTut(){
   try{if(localStorage.getItem('th_at'))return;}catch(e){}
   ATI=0;rATut();
 }
+window.aTutNext=function(){ATI++;rATut();};
+window.aTutPrev=function(){ATI--;rATut();};
 function rATut(){
   document.getElementById('atut')?.remove();
   const s=ATT[ATI];const il=ATI===ATT.length-1;
@@ -2165,8 +2169,8 @@ function rATut(){
   </div>
   <div style="padding:24px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:14px">
     <div style="display:flex;gap:8px">${ATT.map((_,i)=>`<div style="width:${i===ATI?'24px':'8px'};height:8px;border-radius:20px;background:${i===ATI?'#fff':'rgba(255,255,255,.3)'};transition:all .3s"></div>`).join('')}</div>
-    <button onclick="${il?'skipATut()':"ATI++;rATut()"}" style="width:100%;max-width:320px;background:#fff;color:#1d4ed8;padding:15px;border-radius:14px;font-weight:800;font-size:16px;border:none;cursor:pointer;font-family:inherit">${il?'🚀 Start Getting Bookings!':'Continue →'}</button>
-    ${ATI>0?'<button onclick="ATI--;rATut()" style="background:none;color:rgba(255,255,255,.6);border:none;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600">← Back</button>':''}
+    <button onclick="${il?'skipATut()':'aTutNext()'}" style="width:100%;max-width:320px;background:#fff;color:#1d4ed8;padding:15px;border-radius:14px;font-weight:800;font-size:16px;border:none;cursor:pointer;font-family:inherit">${il?'🚀 Start Getting Bookings!':'Continue →'}</button>
+    ${ATI>0?'<button onclick="aTutPrev()" style="background:none;color:rgba(255,255,255,.6);border:none;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600">← Back</button>':''}
   </div>`;
   document.body.appendChild(el);
 }
