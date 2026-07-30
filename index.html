@@ -69,7 +69,7 @@ body{transition:background .3s ease,color .3s ease}
 .theme-toggle:active{transform:scale(.9)}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--navy);font-size:15px}
-#app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow:hidden;background:var(--bg)}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow:hidden;background:var(--bg)}
 .screen{display:none;height:100%;flex-direction:column;overflow:hidden}
 .screen.active{display:flex}
 .sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -1106,8 +1106,18 @@ window.doLogin=async function(){
     attempts.push(now);try{sessionStorage.setItem('_la',JSON.stringify(attempts));}catch(e2){}
     if(e.message==='timeout'){
       err.textContent='Connection timed out. Please check your internet and try again.';
+    } else if(e.code==='auth/too-many-requests'){
+      err.textContent='Too many failed attempts on this account. Try again later, or use "Forgot password" to reset it.';
+    } else if(e.code==='auth/user-disabled'){
+      err.textContent='This account has been disabled. Contact support.';
+    } else if(e.code==='auth/user-not-found'){
+      err.textContent='No account found with this email.';
+    } else if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'){
+      err.textContent='Incorrect email or password. If you signed up with Google or phone number before, use "Forgot password" to set one, or contact support.';
+    } else if(e.code==='auth/network-request-failed'){
+      err.textContent='Network error. Please check your internet connection.';
     } else {
-      err.textContent=e.code==='auth/too-many-requests'?'Too many failed attempts. Try again later.':'Incorrect email or password.';
+      err.textContent='Sign-in error ('+(e.code||'unknown')+'). Please try again or contact support.';
     }
     err.style.display='block';
   }
