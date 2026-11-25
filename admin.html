@@ -913,7 +913,9 @@ window.reactivateStaff=async function(uid,name){
 };
 
 function renderSettings(){
-  $('content').innerHTML=`<div class="ic"><h3>⚙️ Platform Settings</h3>
+  setTimeout(loadPromoCard,0);
+  $('content').innerHTML=`<div class="ic" id="promoCard"><h3>🎁 Free Launch Offer</h3><div style="text-align:center;padding:12px"><div class="spinner"></div></div></div>
+  <div class="ic"><h3>⚙️ Platform Settings</h3>
     <div class="ir"><span class="il">Admin Email</span><span style="font-size:13px">${AE}</span></div>
     <div class="ir"><span class="il">Payment Bank</span><span>Moniepoint</span></div>
     <div class="ir"><span class="il">Account Number</span><span style="font-weight:700;letter-spacing:2px">9071268570</span></div>
@@ -933,92 +935,298 @@ function renderSettings(){
   </div>
   <div class="ic"><h3>🔐 Firestore Security Rules</h3>
     <p style="font-size:13px;color:var(--slate3);margin-bottom:10px">Paste these into Firebase Console → Firestore → Rules tab:</p>
-    <div style="background:#0f172a;border-radius:var(--r);padding:12px;font-family:monospace;font-size:10px;color:#e2e8f0;line-height:1.8;overflow-x:auto" id="fbRules">rules_version = '2';
+    <div style="background:#0f172a;border-radius:var(--r);padding:12px;font-family:monospace;font-size:10px;color:#e2e8f0;line-height:1.8;overflow-x:auto;white-space:pre" id="fbRules">rules_version = '2';
+// Trusted Hands (trust-hands-5c299) - Firestore security rules
+// Default: DENY. Every collection the apps use is listed below. There is NO catch-all.
+// Owner admin  = the account signed in as olaowyegideon@gmail.com (admin.html + in-app admin console).
+// Staff        = signed-in user with staffAccounts/{uid}.active == true (staff.html).
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth.uid == userId;
-      // Artisans/customers can only update their own profile fields —
-      // never admin-controlled fields like status, tier, idVerified, etc.
-      allow update: if request.auth.uid == userId
-        && !request.resource.data.diff(resource.data)
-           .affectedKeys().hasAny(['type','status','tier',
-           'expiry','timerStarted','graceEnd','idVerified',
-           'idDocument','missedViews','avgResponseMin',
-           'responseCount','pauseDaysUsed','pauseUsed',
-           'grantedByAdmin','grantReason','daily_booked',
-           'rating','reviews']);
-      // Admin (matched by email) can update any field
-      allow update: if request.auth != null
-        && request.auth.token.email == 'olaowyegideon@gmail.com';
+
+    // ---------- helpers ----------
+    function signedIn() { return request.auth != null; }
+    function isOwner() {
+      return signedIn() &amp;&amp; request.auth.token.get('email', '') == 'olaowyegideon@gmail.com';
     }
-    match /chats/{roomId} {
-      allow read, write: if request.auth != null
-        && request.auth.uid in resource.data.participants;
-      match /messages/{msgId} {
-        allow read, write: if request.auth != null;
+    function isStaff() {
+      return signedIn()
+        &amp;&amp; exists(/databases/$(database)/documents/staffAccounts/$(request.auth.uid))
+        &amp;&amp; get(/databases/$(database)/documents/staffAccounts/$(request.auth.uid)).data.active == true;
+    }
+    function isAdmin() { return isOwner() || isStaff(); }
+    function newData() { return request.resource.data; }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+    // value missing, null, false or 0 (safe initial value)
+    function blankOrZero(k) {
+      return !(k in newData()) || newData()[k] == null || newData()[k] == false || newData()[k] == 0;
+    }
+
+    // Fields a user may never change on their own users doc (admin/staff-managed).
+    // status / tier / idVerified / freeLaunch have narrow exceptions in selfUpdateOk().
+    function adminOnlyUserFields() {
+      return ['type', 'uid', 'expiry', 'timerStarted', 'timerStartedAt', 'graceEnd',
+              'idVerifiedAt', 'idRejectedAt', 'grantedByAdmin', 'grantReason', 'grantedAt',
+              'activatedAt', 'rating', 'reviews', 'referralCredited', 'referralCount',
+              'referralMonthKey', 'referralMonthCount', 'lastReferralRewardMonth',
+              'pauseUsed', 'pauseDaysUsed', 'frozenAt', 'frozenReason'];
+    }
+
+    // ----- self-update of own users doc -----
+    function statusChangeOk() {
+      return !('status' in changed())
+        || (
+             // never self-activate; never escape a ban/freeze
+             !(resource.data.get('status', '') in ['banned', 'frozen'])
+             &amp;&amp; newData().status in ['pending', 'unsubscribed']
+           );
+    }
+    function tierChangeOk() {
+      // tier may only change together with submitting a payment (status -&gt; 'pending')
+      return !('tier' in changed())
+        || (newData().get('status', '') == 'pending' &amp;&amp; newData().tier in ['standard', 'premium']);
+    }
+    function idVerifiedChangeOk() {
+      // a user can only ever clear their own verification (re-upload ID / delete account)
+      return !('idVerified' in changed()) || newData().idVerified == false;
+    }
+    function freeLaunchChangeOk() {
+      return !('freeLaunch' in changed()) || newData().freeLaunch == true;
+    }
+    function selfUpdateOk() {
+      return !changed().hasAny(adminOnlyUserFields())
+        &amp;&amp; statusChangeOk() &amp;&amp; tierChangeOk() &amp;&amp; idVerifiedChangeOk() &amp;&amp; freeLaunchChangeOk();
+    }
+
+    // ----- writes another signed-in user may make to an ARTISAN's users doc -----
+    function missedViewUpdate() {
+      return changed().hasOnly(['missedViews', 'lastMissedView', 'missedViewsToday', 'missedViewsDate', 'missedSmsDate'])
+        &amp;&amp; (!('missedViews' in changed()) || (newData().missedViews is int
+              &amp;&amp; newData().missedViews &lt;= resource.data.get('missedViews', 0) + 1))
+        &amp;&amp; (!('missedViewsToday' in changed()) || (newData().missedViewsToday is int
+              &amp;&amp; newData().missedViewsToday &lt;= resource.data.get('missedViewsToday', 0) + 1));
+    }
+    function bookingUpdate() {
+      return changed().hasOnly(['daily_booked', 'bookedBy', 'bookedAt'])
+        &amp;&amp; newData().daily_booked == true
+        &amp;&amp; newData().bookedBy == request.auth.uid;
+    }
+    function ratingUpdate() {
+      // recomputed average written by a reviewer right after creating their review
+      return changed().hasOnly(['rating', 'reviews'])
+        &amp;&amp; newData().rating is number &amp;&amp; newData().rating &gt;= 1 &amp;&amp; newData().rating &lt;= 5
+        &amp;&amp; newData().reviews is int &amp;&amp; newData().reviews &gt;= 1
+        &amp;&amp; newData().reviews &lt;= resource.data.get('reviews', 0) + 3;
+    }
+    function crossUserUpdateOk() {
+      return resource.data.get('type', '') == 'artisan'
+        &amp;&amp; changed().size() &gt; 0
+        &amp;&amp; (missedViewUpdate() || bookingUpdate() || ratingUpdate());
+    }
+
+    // ----- staff edits to users docs: everything except owner-only fields -----
+    function staffUserUpdateOk() {
+      return resource.data.get('type', '') != 'admin'
+        &amp;&amp; !changed().hasAny(['type', 'uid', 'grantedByAdmin', 'grantReason', 'grantedAt']);
+    }
+
+    // ----- new users doc (sign-up) -----
+    function validNewUser(uid) {
+      return newData().uid == uid
+        &amp;&amp; newData().type in ['customer', 'artisan']
+        &amp;&amp; (!('status' in newData()) || newData().status == 'unsubscribed')
+        &amp;&amp; blankOrZero('tier') &amp;&amp; blankOrZero('expiry') &amp;&amp; blankOrZero('timerStarted')
+        &amp;&amp; blankOrZero('graceEnd') &amp;&amp; blankOrZero('idVerified') &amp;&amp; blankOrZero('rating')
+        &amp;&amp; blankOrZero('reviews') &amp;&amp; blankOrZero('freeLaunch') &amp;&amp; blankOrZero('daily_booked')
+        &amp;&amp; !newData().keys().hasAny(['grantedByAdmin', 'grantReason', 'grantedAt', 'activatedAt',
+              'referralCredited', 'referralCount', 'referralMonthCount', 'lastReferralRewardMonth',
+              'pauseUsed', 'pauseDaysUsed', 'idVerifiedAt', 'timerStartedAt']);
+    }
+
+    // ---------- users ----------
+    match /users/{uid} {
+      // Any signed-in user can open a single profile (marketplace, chat list, booking, disputes).
+      allow get: if signedIn();
+      // Lists: owner/staff see everyone. Others only the queries the app runs:
+      //   where('type','==','artisan')  (marketplace feed / search)
+      //   where('freeLaunch','==',true), where('state','==',X)  (free-launch spots counter)
+      allow list: if isAdmin()
+        || (signedIn() &amp;&amp; (resource.data.type == 'artisan' || resource.data.freeLaunch == true));
+      allow create: if isOwner()
+        || (signedIn() &amp;&amp; request.auth.uid == uid &amp;&amp; validNewUser(uid));
+      allow update: if isOwner()
+        || (isStaff() &amp;&amp; staffUserUpdateOk())
+        || (signedIn() &amp;&amp; request.auth.uid == uid &amp;&amp; selfUpdateOk())
+        || (signedIn() &amp;&amp; request.auth.uid != uid &amp;&amp; crossUserUpdateOk());
+      allow delete: if isOwner();
+    }
+
+    // ---------- config (broadcasts, launchPromo, customTrades, ...) ----------
+    match /config/{docId} {
+      allow read: if true;            // launchPromo is read before sign-in
+      allow write: if isOwner();      // broadcast/settings/customTrades: owner only
+    }
+
+    // ---------- staff accounts ----------
+    match /staffAccounts/{staffUid} {
+      allow read: if isOwner() || (signedIn() &amp;&amp; request.auth.uid == staffUid);
+      allow create, delete: if isOwner();
+      allow update: if isOwner()
+        || (signedIn() &amp;&amp; request.auth.uid == staffUid
+            &amp;&amp; resource.data.active == true
+            &amp;&amp; changed().hasOnly(['lastLogin']));
+    }
+
+    // ---------- free-plan grant audit log ----------
+    match /adminGrants/{id} {
+      allow read, write: if isOwner();
+    }
+
+    // ---------- payment submissions ----------
+    match /pendingApprovals/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.artisanUid == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().artisanUid == request.auth.uid
+        &amp;&amp; newData().reviewed == false
+        &amp;&amp; !newData().keys().hasAny(['approvedAt', 'rejected', 'rejectedAt']);
+      allow update, delete: if isAdmin();
+    }
+
+    match /payments/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.artisanUid == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().artisanUid == request.auth.uid
+        &amp;&amp; newData().get('verified', false) == false;
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------- bookings ----------
+    match /bookings/{id} {
+      allow read: if isAdmin() || (signedIn()
+        &amp;&amp; (resource.data.customerUid == request.auth.uid || resource.data.artisanUid == request.auth.uid));
+      allow create: if signedIn() &amp;&amp; newData().customerUid == request.auth.uid
+        &amp;&amp; newData().artisanUid != request.auth.uid
+        &amp;&amp; newData().status == 'confirmed';
+      allow update: if isAdmin()
+        || (signedIn() &amp;&amp; resource.data.artisanUid == request.auth.uid
+            &amp;&amp; changed().hasOnly(['status', 'completedAt'])
+            &amp;&amp; newData().status == 'completed');
+      allow delete: if isOwner();
+    }
+
+    // ---------- reviews (public to signed-in users) ----------
+    match /reviews/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn() &amp;&amp; newData().reviewerUid == request.auth.uid
+        &amp;&amp; newData().artisanUid != request.auth.uid
+        &amp;&amp; newData().rating is number &amp;&amp; newData().rating &gt;= 1 &amp;&amp; newData().rating &lt;= 5;
+      allow update, delete: if isOwner();
+    }
+
+    // ---------- chats: only the two participants (room id = sorted uids joined by '_') ----------
+    function chatMember(rid) {
+      return signedIn() &amp;&amp; rid.split('_').size() == 2
+        &amp;&amp; (rid.split('_')[0] == request.auth.uid || rid.split('_')[1] == request.auth.uid);
+    }
+    function chatParticipantsOk(rid) {
+      return !('participants' in newData())
+        || (newData().participants is list
+            &amp;&amp; newData().participants.size() == 2
+            &amp;&amp; newData().participants.hasOnly(rid.split('_'))
+            &amp;&amp; request.auth.uid in newData().participants);
+    }
+    match /chats/{rid} {
+      allow get: if chatMember(rid);
+      // rCL / unread badge: where('participants','array-contains', myUid)
+      allow list: if signedIn() &amp;&amp; request.auth.uid in resource.data.participants;
+      // setDoc(...,{merge:true}) can create the room (resource == null) or update it
+      allow create, update: if chatMember(rid) &amp;&amp; chatParticipantsOk(rid);
+      allow delete: if isOwner();
+
+      match /messages/{mid} {
+        allow read: if chatMember(rid);
+        allow create: if chatMember(rid) &amp;&amp; newData().senderId == request.auth.uid;
+        allow update: if chatMember(rid)
+          &amp;&amp; resource.data.senderId != request.auth.uid
+          &amp;&amp; changed().hasOnly(['read']);
+        allow delete: if isOwner();
       }
     }
-    match /bookings/{id} {
-      allow create: if request.auth != null;
-      allow read, update: if request.auth != null;
+
+    // ---------- notifications ----------
+    match /notifications/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.toUid == request.auth.uid);
+      allow create: if isAdmin()
+        || (signedIn() &amp;&amp; newData().type == 'profile_view_missed'
+            &amp;&amp; newData().toUid is string &amp;&amp; newData().toUid != request.auth.uid);
+      allow update: if isAdmin()
+        || (signedIn() &amp;&amp; resource.data.toUid == request.auth.uid &amp;&amp; changed().hasOnly(['read']));
+      allow delete: if isAdmin() || (signedIn() &amp;&amp; resource.data.toUid == request.auth.uid);
     }
-    match /reviews/{id} {
-      // Only the signed-in reviewer can create their own review
-      allow create: if request.auth != null
-        && request.resource.data.reviewerUid == request.auth.uid;
-      allow read: if request.auth != null;
-      allow update, delete: if request.auth != null
-        && request.auth.token.email == 'olaowyegideon@gmail.com';
+
+    // ---------- support notes (admin/staff -&gt; user, plus artisan "please review" note) ----------
+    match /supportNotes/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.toUid == request.auth.uid);
+      allow create: if isAdmin()
+        || (signedIn() &amp;&amp; newData().sentBy == 'System' &amp;&amp; newData().type == 'review_request'
+            &amp;&amp; newData().toUid is string &amp;&amp; newData().toUid != request.auth.uid);
+      allow update, delete: if isAdmin();
     }
-    match /completedJobs/{id} {
-      allow create: if request.auth != null
-        && request.resource.data.artisanUid == request.auth.uid;
-      allow read: if request.auth != null;
+
+    // ---------- support tickets ----------
+    match /supportTickets/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.userId == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().userId == request.auth.uid
+        &amp;&amp; newData().get('resolved', false) == false
+        &amp;&amp; !newData().keys().hasAny(['adminReply', 'resolvedAt']);
+      allow update, delete: if isAdmin();
     }
+
+    // ---------- disputes ----------
     match /disputes/{id} {
-      allow create: if request.auth != null
-        && request.resource.data.reporterUid == request.auth.uid;
-      allow read, update: if request.auth != null;
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.reporterUid == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().reporterUid == request.auth.uid
+        &amp;&amp; newData().get('resolved', false) == false
+        &amp;&amp; newData().get('adminNote', '') == ''
+        &amp;&amp; !newData().keys().hasAny(['resolvedAt', 'artisanFrozen', 'warningIssued', 'warningAt']);
+      allow update, delete: if isAdmin();
     }
-    match /payments/{id} {
-      allow create: if request.auth != null
-        && request.resource.data.artisanUid == request.auth.uid;
-      allow read: if request.auth != null;
+
+    // ---------- pause requests ----------
+    match /pauseRequests/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.artisanUid == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().artisanUid == request.auth.uid
+        &amp;&amp; newData().reviewed == false &amp;&amp; newData().status == 'pending'
+        &amp;&amp; !newData().keys().hasAny(['approved', 'approvedAt']);
+      allow update, delete: if isAdmin();
     }
-    match /config/broadcast {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null
-        && request.auth.token.email == 'olaowyegideon@gmail.com';
+
+    // ---------- custom trade requests ----------
+    match /tradeRequests/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.artisanUid == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().artisanUid == request.auth.uid
+        &amp;&amp; newData().status == 'pending';
+      allow update, delete: if isAdmin();
     }
-    match /config/broadcast_artisan {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null
-        && request.auth.token.email == 'olaowyegideon@gmail.com';
+
+    // ---------- completed jobs (proof of work) ----------
+    match /completedJobs/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.artisanUid == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().artisanUid == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
-    match /config/broadcast_customer {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null
-        && request.auth.token.email == 'olaowyegideon@gmail.com';
+
+    // ---------- account deletion requests ----------
+    match /deletionRequests/{id} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; resource.data.uid == request.auth.uid);
+      allow create: if signedIn() &amp;&amp; newData().uid == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
-    match /staffAccounts/{staffUid} {
-      // Staff can read their OWN account (to verify they're active) and update their own lastLogin.
-      // Only the main admin can create, deactivate, or modify permissions.
-      allow read: if request.auth != null
-        && (request.auth.uid == staffUid
-            || request.auth.token.email == 'olaowyegideon@gmail.com');
-      allow update: if request.auth != null
-        && request.auth.uid == staffUid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin']);
-      allow create, delete: if request.auth != null
-        && request.auth.token.email == 'olaowyegideon@gmail.com';
-      allow update: if request.auth != null
-        && request.auth.token.email == 'olaowyegideon@gmail.com';
+
+    // ---------- referral fraud flags (written during owner/staff approval) ----------
+    match /referralFlags/{id} {
+      allow read, create, update: if isAdmin();
+      allow delete: if isOwner();
     }
-    match /{document=**} {
-      allow read, write: if request.auth != null;
-    }
+
+    // Anything not listed above is denied by default.
   }
 }</div>
     <button class="btn bo bsm" style="margin-top:8px" onclick="navigator.clipboard?.writeText(document.getElementById('fbRules').textContent).then(()=>toast('Rules copied! Paste in Firebase Console.'))">📋 Copy Rules</button>
@@ -1280,7 +1488,36 @@ window.startAllTimers=async function(){
   await Promise.all(batch);
   toast('🚀 All '+snap.docs.length+' artisan timers started! Platform is now LIVE!');renderTab();
 };
-window.rjArt=async function(did){if(!confirm('Reject this payment?'))return;await updateDoc(doc(db,'pendingApprovals',did),{reviewed:true,rejected:true,rejectedAt:serverTimestamp()});toast('Rejected.');renderTab();};
+window.rjArt=async function(did){if(!confirm('Reject this application?'))return;await updateDoc(doc(db,'pendingApprovals',did),{reviewed:true,rejected:true,rejectedAt:serverTimestamp()});
+  // If it was a free-launch claim, release the spot so the artisan goes back to the plans screen
+  try{const pa=await getDoc(doc(db,'pendingApprovals',did));const d=pa.data();if(d&&d.freeLaunch&&d.artisanUid)await updateDoc(doc(db,'users',d.artisanUid),{freeLaunch:false,status:'unsubscribed'});}catch(e){}
+  toast('Rejected.');renderTab();}
+
+// ── FREE LAUNCH OFFER CONTROL (config/launchPromo) ──
+const PROMO_STATES=['Lagos State','Ogun State','Edo State','Delta State','Rivers State'];
+window.loadPromoCard=async function(){
+  const c=$('promoCard');if(!c)return;
+  let active=true,lim=50;
+  try{const s=await getDoc(doc(db,'config','launchPromo'));if(s.exists()){active=s.data().active!==false;lim=s.data().limit||50;}}catch(e){}
+  let counts={};
+  try{const s=await getDocs(query(collection(db,'users'),where('freeLaunch','==',true)));s.docs.forEach(d=>{const st=d.data().state||'Unknown';counts[st]=(counts[st]||0)+1;});}catch(e){}
+  const rows=PROMO_STATES.map(st=>`<div class="ir"><span class="il">${st.replace(' State','')}</span><span style="font-weight:700">${counts[st]||0} / ${lim} claimed</span></div>`).join('');
+  c.innerHTML=`<h3>🎁 Free Launch Offer</h3>
+    <div style="background:${active?'var(--emerald2)':'var(--red2)'};color:${active?'var(--emerald)':'var(--red)'};border-radius:var(--r);padding:10px 12px;margin-bottom:12px;font-size:13px;font-weight:700">${active?'🟢 ON: new skilled workers see FREE registration (first '+lim+' per state)':'🔴 OFF: new skilled workers must pay to register'}</div>
+    ${rows}
+    <div class="fg" style="margin-top:12px"><label style="font-size:12px;font-weight:600">Free spots per state</label><input class="inp" type="number" id="promoLim" value="${lim}" min="1"/></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn ${active?'bd':'bs'} bsm" onclick="setPromo(${!active})">${active?'⏹ Stop Free Offer':'▶️ Start Free Offer'}</button>
+      <button class="btn bo bsm" onclick="setPromo(${active})">💾 Save Limit</button>
+    </div>`;
+};
+window.setPromo=async function(on){
+  if(auth.currentUser?.email?.toLowerCase()!==AE){toast('Only the main admin can change this.');return;}
+  if(!on&&!confirm('Stop the free offer? New skilled workers will have to pay to register.'))return;
+  const lim=Math.max(1,parseInt($('promoLim')?.value||50)||50);
+  try{await setDoc(doc(db,'config','launchPromo'),{active:on,limit:lim,updatedAt:serverTimestamp()},{merge:true});toast(on?'✅ Free offer is ON':'⏹ Free offer stopped');loadPromoCard();}
+  catch(e){toast('Error: '+e.message);}
+};;
 window.fAct=async function(u){await updateDoc(doc(db,'users',u),{status:'active',expiry:new Date(Date.now()+2592000000),activatedAt:serverTimestamp()});toast('✅ Activated 30 days!');artDetail(u);};
 window.rBk=async function(u){await updateDoc(doc(db,'users',u),{daily_booked:false});toast('✅ Booking reset!');artDetail(u);};
 window.sPr=async function(u){await updateDoc(doc(db,'users',u),{tier:'premium'});toast('⭐ Set Premium!');artDetail(u);};
