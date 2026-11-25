@@ -335,6 +335,19 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
 <div class="screen" id="s-paywall">
   <div class="sb"><div style="padding:24px 20px 40px">
     <div style="text-align:center;margin-bottom:24px"><div style="font-size:40px;margin-bottom:10px">🚀</div><h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy);margin-bottom:6px">Activate Your Profile</h2><p style="font-size:13px;color:var(--slate3)">Choose a plan to go live on the marketplace</p></div>
+    <div id="freePromo" style="display:none">
+      <div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:var(--r2);padding:20px;color:#fff;text-align:center;margin-bottom:16px">
+        <div style="font-size:38px;margin-bottom:6px">🎉</div>
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.9">Launch Offer</div>
+        <div style="font-size:22px;font-weight:800;margin:6px 0">FREE for the first 50 skilled workers in each state</div>
+        <div style="font-size:14px;opacity:.95" id="fpLeft">Checking spots in your state…</div>
+      </div>
+      <div style="font-size:13px;color:#334155;line-height:2;background:var(--white);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:14px">✅ No payment needed<br/>✅ Your profile goes live after a quick admin check<br/>✅ Customers in your area can find and book you</div>
+      <div id="fperr2" style="display:none;margin-bottom:12px" class="alert aw"></div>
+      <button class="btn bp" id="fpBtn" onclick="claimFree()">🎁 Claim My Free Spot</button>
+      <p style="text-align:center;font-size:12px;color:var(--slate3);margin-top:10px">By joining you agree to our <a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms of Service</a>.</p>
+    </div>
+    <div id="paidSection">
     <div class="tc" id="tcs" onclick="selT('standard')">
       <div style="font-weight:700;font-size:16px;color:var(--navy)">Standard Listing</div>
       <div style="font-size:28px;font-weight:800;color:var(--blue2);margin:6px 0">&#8358;5,000</div>
@@ -382,6 +395,7 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
     <button class="btn bp" onclick="subProof()">Submit Manual Receipt</button>
     <p style="text-align:center;font-size:12px;color:var(--slate3);margin-top:12px">Reviewed and activated within 24 hours</p>
     <p style="text-align:center;font-size:12px;color:var(--slate3);margin-top:6px">By subscribing you agree to our <a href="#" onclick="SS('s-tos');return false" style="color:var(--blue2);font-weight:600">Terms of Service</a>. Subscriptions are non-refundable.</p>
+    </div><!-- /paidSection -->
   </div></div>
 </div>
 
@@ -390,10 +404,10 @@ textarea.inp{resize:vertical;min-height:80px;cursor:auto}
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;text-align:center">
     <div style="font-size:60px;margin-bottom:18px">⏳</div>
     <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy)">Under Review</h2>
-    <p style="color:var(--slate3);font-size:14px;margin-top:10px;line-height:1.8;max-width:300px">Your payment proof has been submitted. Admin will verify and activate your account within 24 hours.</p>
+    <p style="color:var(--slate3);font-size:14px;margin-top:10px;line-height:1.8;max-width:300px">Your application has been submitted. Admin will verify and activate your account within 24 hours.</p>
     <div style="background:var(--white);border-radius:var(--r2);padding:18px;margin-top:22px;width:100%;text-align:left;box-shadow:var(--shadow)">
       <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">What happens next:</div>
-      <div style="font-size:13px;color:#334155;line-height:2.2">✅ Admin reviews your payment receipt<br/>✅ Account activated with 30-day timer<br/>✅ Profile goes live on marketplace<br/>✅ Clients in your zone start finding you</div>
+      <div style="font-size:13px;color:#334155;line-height:2.2">✅ Admin reviews your application<br/>✅ Account activated with 30-day timer<br/>✅ Profile goes live on marketplace<br/>✅ Clients in your zone start finding you</div>
     </div>
     <button class="btn bo" style="margin-top:24px" onclick="chkPend()">🔄 Check Status</button>
     <button class="btn bo" style="margin-top:10px;border-color:var(--border2);color:var(--slate3)" onclick="doLogout()">Sign Out</button>
@@ -771,6 +785,7 @@ function SS(id,replace){
   if(id!=='s-splash'&&c)navH.push(c.id);
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const el=$(id);if(el)el.classList.add('active');
+  if(id==='s-paywall'&&typeof prepPaywall==='function')prepPaywall();
   if(replace)history.replaceState({s:id},'',location.pathname);
   else history.pushState({s:id},'',location.pathname);
   if(RESTORABLE.includes(id)){try{sessionStorage.setItem('th_lastScreen',id);}catch(e){}}
@@ -792,7 +807,7 @@ async function compress(f,mx=900,q=0.78){return new Promise(r=>{const fr=new Fil
 
 // ── SPLASH ──
 const MSGS=['🔧 Find electricians, plumbers & more in your zone','⭐ Verified skilled workers with real portfolios and reviews'];
-const SPLASH_MS=7000; // total splash duration
+const SPLASH_MS=2500; // total splash duration
 const SPLASH_START=800; // when the first message appears
 const SPLASH_CYCLE=Math.round((SPLASH_MS-SPLASH_START)/MSGS.length); // each message gets an even share of the remaining time
 function runSplash(){
@@ -877,7 +892,7 @@ function route(){
   if(last==='s-dash'&&p.type==='artisan'&&(p.status==='active'||p.status==='unsubscribed')){SS('s-dash',true);rDash();setTimeout(askPushPermission,2000);return;}
   if(p.type==='customer'){SS('s-market',true);iMkt();}
   else if(p.type==='artisan'){
-    if(p.status==='pending')SS('s-pending',true);
+    if(p.status==='pending'||(p.freeLaunch&&p.status==='unsubscribed'&&!p.activatedAt))SS('s-pending',true);
     else if(p.status==='active'||p.status==='unsubscribed'){SS('s-dash',true);rDash();setTimeout(askPushPermission,2000);}
     else SS('s-paywall',true);
   }
@@ -910,6 +925,50 @@ function validateWrite(data,allowedKeys){
 const PAYSTACK_KEY='YOUR_PAYSTACK_PUBLIC_KEY'; // get from paystack.com/dashboard
 const PRICES={standard:500000,premium:1000000}; // kobo: ₦5,000 & ₦10,000
 
+// ── FREE LAUNCH OFFER (first N skilled workers per state) ──
+// Controlled by the admin from admin.html → Settings (Firestore doc config/launchPromo).
+// If the doc is missing the offer is ON by default.
+const PROMO_DEFAULT_LIMIT=50;
+async function getPromo(){
+  try{const s=await getDoc(doc(db,'config','launchPromo'));if(s.exists()){const d=s.data();return{active:d.active!==false,limit:d.limit||PROMO_DEFAULT_LIMIT};}}catch(e){}
+  return{active:true,limit:PROMO_DEFAULT_LIMIT};
+}
+async function freeSpotsLeft(state,lim){
+  if(!state)return lim;
+  try{const s=await getDocs(query(collection(db,'users'),where('freeLaunch','==',true),where('state','==',state)));return Math.max(0,lim-s.size);}
+  catch(e){return lim;}
+}
+window.promoOn=async function(){const pr=await getPromo();if(!pr.active)return false;return(await freeSpotsLeft(S.p?.state,pr.limit))>0;};
+async function prepPaywall(){
+  const fp=$('freePromo'),ps=$('paidSection');if(!fp||!ps)return;
+  // Hide Paystack until a real key is added
+  const pk=$('paystackSection');if(pk)pk.style.display=(PAYSTACK_KEY==='YOUR_PAYSTACK_PUBLIC_KEY'||!PAYSTACK_KEY)?'none':'';
+  // Already claimed a free spot and waiting for approval
+  if(S.p?.freeLaunch&&!S.p?.activatedAt&&S.p?.status!=='active'){SS('s-pending');return;}
+  fp.style.display='none';ps.style.display='';
+  const pr=await getPromo();if(!pr.active)return;
+  const left=await freeSpotsLeft(S.p?.state,pr.limit);
+  if(left<=0)return;
+  const st=(S.p?.state||'your state').replace(' State','');
+  $('fpLeft').textContent=left+' of '+pr.limit+' free spots left in '+st;
+  fp.style.display='block';ps.style.display='none';
+}
+window.prepPaywall=prepPaywall;
+window.claimFree=async function(){
+  const err=$('fperr2');err.style.display='none';
+  if(!S.u){SS('s-auth');return;}
+  const btn=$('fpBtn');btn.disabled=true;btn.textContent='Claiming…';
+  try{
+    const pr=await getPromo();
+    const left=pr.active?await freeSpotsLeft(S.p?.state,pr.limit):0;
+    if(left<=0){err.textContent='Sorry, the free spots in your state are all taken. Please choose a plan below.';err.style.display='block';$('freePromo').style.display='none';$('paidSection').style.display='';btn.disabled=false;btn.textContent='🎁 Claim My Free Spot';return;}
+    await updateDoc(doc(db,'users',S.u.uid),{freeLaunch:true,freeLaunchAt:serverTimestamp()});
+    await addDoc(collection(db,'pendingApprovals'),{artisanUid:S.u.uid,name:S.p?.name||'',trade:S.p?.trade||'',zone:S.p?.zone||'',lga:S.p?.lga||'',state:S.p?.state||'',fullLocation:S.p?.fullLocation||'',tier:'Free Launch (₦0)',freeLaunch:true,senderBank:'Free launch offer',submittedAt:serverTimestamp(),reviewed:false});
+    try{await updateDoc(doc(db,'users',S.u.uid),{status:'pending'});}catch(e){/* status may be admin-only in rules — freeLaunch flag still routes to pending */}
+    S.p={...S.p,freeLaunch:true,status:'pending'};SS('s-pending');toast('🎉 Free spot claimed! Admin will activate you shortly.');
+  }catch(e){err.textContent='Error: '+e.message;err.style.display='block';btn.disabled=false;btn.textContent='🎁 Claim My Free Spot';}
+};
+
 window.initPaystack=function(){
   const err=$('pwerr');err.style.display='none';
   if(!S.tier){err.textContent='Please select a plan first.';err.style.display='block';return;}
@@ -928,7 +987,7 @@ window.initPaystack=function(){
       $('payBtn').textContent='Verifying…';
       try{
         // Security: check reference not reused
-        const ex=await getDocs(query(collection(db,'payments'),where('reference','==',response.reference)));
+        const ex=await getDocs(query(collection(db,'payments'),where('artisanUid','==',S.u.uid),where('reference','==',response.reference)));
         if(!ex.empty){toast('⚠️ Reference already used. Contact support.');$('payBtn').disabled=false;$('payBtn').textContent='Pay Now with Paystack';return;}
         // Note: this is NOT server-verified yet (that upgrade is ready to switch on once
         // Cloud Functions are deployed — see verifyPaystackPayment). For now, admin manually
@@ -1334,7 +1393,7 @@ async function sendWhatsAppNotification(artisanData, messageType){
     message = `📅 *New Booking Alert!*\n\nA customer has booked you on Trusted Hands.\n\n✅ Open the app to see job details and chat with them:\nhttps://trust-hand.vercel.app\n\n_Trusted Hands — Nigeria's Artisan Marketplace_`;
   } else if(messageType === 'subscribe_nudge'){
     const n=artisanData.missedViewsToday||1;
-    message = `😔 *You're missing customers!*\n\n${n} customer${n!==1?'s':''} tried to reach you today for ${artisanData.trade} work — but your profile isn't active, so they went to another artisan.\n\n💳 Subscribe for just ₦5,000/30 days and start getting bookings today:\nhttps://trust-hand.vercel.app\n\n_Don't lose another customer — activate now!_`;
+    message = `😔 *You're missing customers!*\n\n${n} customer${n!==1?'s':''} tried to reach you today for ${artisanData.trade} work — but your profile isn't active, so they went to another artisan.\n\n🎁 Activate your profile now (free launch spots may still be open in your state):\nhttps://trust-hand.vercel.app\n\n_Don't lose another customer — activate now!_`;
   }
 
   const encoded = encodeURIComponent(message);
@@ -1426,7 +1485,7 @@ window.sLP=async function(uid,name,trade){
     });
     await addDoc(collection(db,'notifications'),{
       toUid:uid,toName:artData.name,type:'profile_view_missed',
-      message:'A potential customer just tried to reach you today but your profile isn\'t active — you are losing real customers right now. Subscribe for ₦5,000/30 days to start getting bookings today.',
+      message:'A potential customer just tried to reach you today but your profile isn\'t active — you are losing real customers right now. Activate your profile now — free launch spots may still be open in your state.',
       viewedAt:serverTimestamp(),read:false
     });
     // Real-time WhatsApp nudge (free, via CallMeBot — sent every time, since it costs nothing)
@@ -2844,6 +2903,7 @@ window.dismissInstallBanner=function(){
 // Replace YOUR_VAPID_KEY below with your real key
 const VAPID_KEY='YOUR_VAPID_KEY';
 
+window.initPushNotifications=function(){return initPushNotifications();};
 async function initPushNotifications(){
   if(!S.u||!S.p)return;
   try{
@@ -2868,6 +2928,7 @@ async function initPushNotifications(){
 
 // Ask for push permission after user logs in and is settled
 function askPushPermission(){
+  if(!VAPID_KEY||VAPID_KEY==='YOUR_VAPID_KEY')return; // push not set up yet — don't show a button that does nothing
   if(!S.u||!S.p)return;
   const key='_push_asked_'+S.u.uid;
   try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1');}catch(e){return;}
@@ -2910,7 +2971,7 @@ async function sendSMS(art,cname,job){
 async function sendMissedSMS(art){
   if(!art.phone)return;
   const n=art.missedViewsToday||1;
-  const msg='TRUSTED HANDS: '+n+' customer'+(n!==1?'s':'')+' tried to reach you today but your profile is not active. Subscribe for N5,000/30 days: https://trust-hand.vercel.app';
+  const msg='TRUSTED HANDS: '+n+' customer'+(n!==1?'s':'')+' tried to reach you today but your profile is not active. Activate now (free launch spots may be open): https://trust-hand.vercel.app';
   try{await httpsCallable(fns,'sendSMS')({phone:art.phone,message:msg});}catch(e){}
 }
 
