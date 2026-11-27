@@ -121,7 +121,7 @@ textarea.inp{resize:vertical;min-height:80px}
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,browserSessionPersistence,setPersistence,createUserWithEmailAndPassword}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,getDocs,onSnapshot,addDoc,serverTimestamp,runTransaction,limit,deleteField,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const FC={apiKey:"AIzaSyDXRdfuazcvHct7ZFlTSQY2JgV7b82lYm0",authDomain:"trust-hands-5c299.firebaseapp.com",projectId:"trust-hands-5c299",storageBucket:"trust-hands-5c299.firebasestorage.app",messagingSenderId:"481016620760",appId:"1:481016620760:web:092f40a5b74a6bc55f59ad"};
 const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
@@ -129,12 +129,25 @@ const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
 // signing the main admin out of their own session (Firebase Auth quirk)
 const secondaryApp=initializeApp(FC,'staffCreator');
 const secondaryAuth=getAuth(secondaryApp);
+// ── FIREBASE APP CHECK ── OFF while empty. Use the SAME reCAPTCHA v3 site key as index.html (see SECURITY-SETUP.txt).
+const APP_CHECK_SITE_KEY='';
+if(APP_CHECK_SITE_KEY){import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js').then(m=>{[app,secondaryApp].forEach(a=>{try{m.initializeAppCheck(a,{provider:new m.ReCaptchaV3Provider(APP_CHECK_SITE_KEY),isTokenAutoRefreshEnabled:true});}catch(e){console.warn('App Check',e);}});}).catch(e=>console.warn('App Check not started',e));}
 setPersistence(auth,browserSessionPersistence).catch(()=>{});
 const AE='olaowyegideon@gmail.com';
 function locStr(st,lg,ar){if(ar&&lg&&st)return ar+', '+lg;if(ar&&st)return ar+', '+st;return ar||lg||st||'—';}
 let CUR_TAB='overview';
 const $=id=>document.getElementById(id);
 const sn=s=>String(s||'').replace(/[<>"'&]/g,c=>({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'}[c])).trim();
+// ja(): user text placed inside a quoted JS argument of an inline onclick handler, e.g. sNote('${ja(name)}').
+// Escapes for JavaScript first, then for HTML, so the value arrives in the function exactly as stored.
+const ja=s=>sn(String(s??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/[\r\n\u2028\u2029]+/g,' '));
+// su(): only let safe image addresses from user data into src="" (https: or data:image/...;base64) - blocks javascript: and friends.
+const su=u=>{const v=String(u||'').trim();return /^(https:\/\/|data:image\/(png|jpe?g|gif|webp|bmp);base64,)/i.test(v)?v.replace(/["'<>\s]/g,c=>encodeURIComponent(c)):'';};
+// num(): a number that came from user data, safe to print in HTML
+const num=v=>{const n=Number(v);return isFinite(n)?n:0;};
+// ── PRIVATE DATA (users/{uid}/private/info) ── ID photo + last IP/location/device. Falls back to the old users-doc fields.
+async function getPrivate(uid){try{const s=await getDoc(doc(db,'users',uid,'private','info'));return s.exists()?s.data():{};}catch(e){return{};}}
+async function idDocPrivateOn(){try{const s=await getDoc(doc(db,'config','privacy'));return s.exists()&&s.data().idDocPrivate===true;}catch(e){return false;}}
 // ── REFERRALS ── 5 referred people become PAYING artisans in the same calendar month = 7 free days.
 // Credited right here, the moment an artisan's payment is approved — never at signup.
 function monthKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
@@ -172,7 +185,7 @@ async function creditReferral(artisanUid){
     try{await addDoc(collection(db,'notifications'),{toUid:refUid,type:'referral_new',read:false,createdAt:serverTimestamp(),message:(aData.name||'An artisan you referred')+' just completed payment and became an active artisan!'+(rewarded?' You just unlocked 7 free days! 🎉':'')});}catch(e2){}
   }catch(e){/* never let a referral hiccup affect the approval action */}
 }
-const ini=n=>String(n||'').split(' ').map(x=>x[0]||'').join('').substring(0,2).toUpperCase()||'?';
+const ini=n=>sn(String(n||'').split(' ').map(x=>x[0]||'').join('').substring(0,2).toUpperCase())||'?';
 
 function toast(m,d=3000){const t=$('T');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d)}
 
@@ -289,7 +302,7 @@ async function renderOverview(){
   </div>
   ${pendingAp>0?`<div style="background:var(--amber2);border:1.5px solid #fde68a;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('approvals')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:#92400e">🕐 ${pendingAp} Pending Approval${pendingAp!==1?'s':''}</div><div style="font-size:12px;color:#b45309;margin-top:2px">Tap to review payment receipts</div></div><span style="font-size:20px">→</span></div></div>`:''}
   ${pendingID>0?`<div style="background:var(--blue3);border:1.5px solid #93c5fd;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('idverify')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:#1e3a8a">🪪 ${pendingID} Artisan${pendingID!==1?'s':''} Awaiting ID Verification</div><div style="font-size:12px;color:#1e40af;margin-top:2px">Paid and waiting to go live — review now</div></div><span style="font-size:20px">→</span></div></div>`:''}
-  ${unclassified.length>0?`<div class="ic" style="border:1.5px solid #fca5a5"><h3>⚠️ ${unclassified.length} Account${unclassified.length!==1?'s':''} With No Type Set</h3><p style="font-size:12px;color:var(--slate3);margin-bottom:10px">This is why "Total Users" doesn't match your customer + artisan counts — these accounts exist in the database but aren't tagged as either. Usually caused by a signup that didn't fully complete.</p>${unclassified.map(u=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px">${sn(u.name||'(no name)')} · ${sn(u.email||'no email')}</div><button class="btn bd bsm" onclick="deleteOrphanUser('${u._id}')">🗑️ Delete</button></div>`).join('')}</div>`:''}
+  ${unclassified.length>0?`<div class="ic" style="border:1.5px solid #fca5a5"><h3>⚠️ ${unclassified.length} Account${unclassified.length!==1?'s':''} With No Type Set</h3><p style="font-size:12px;color:var(--slate3);margin-bottom:10px">This is why "Total Users" doesn't match your customer + artisan counts — these accounts exist in the database but aren't tagged as either. Usually caused by a signup that didn't fully complete.</p>${unclassified.map(u=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px">${sn(u.name||'(no name)')} · ${sn(u.email||'no email')}</div><button class="btn bd bsm" onclick="deleteOrphanUser('${ja(u._id)}')">🗑️ Delete</button></div>`).join('')}</div>`:''}
   ${openTk>0?`<div style="background:var(--red2);border:1.5px solid #fca5a5;border-radius:var(--r2);padding:14px;margin-bottom:12px;cursor:pointer" onclick="aTab('support')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:14px;color:var(--red)">🆘 ${openTk} Open Support Ticket${openTk!==1?'s':''}</div><div style="font-size:12px;color:#b91c1c;margin-top:2px">Tap to respond</div></div><span style="font-size:20px">→</span></div></div>`:''}
   ${expiringSoon.length>0?`<div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:var(--r2);padding:14px;margin-bottom:12px"><div style="font-weight:700;font-size:14px;color:#c2410c;margin-bottom:8px">⏰ ${expiringSoon.length} Artisan${expiringSoon.length!==1?'s':''} Expiring Soon</div>${expiringSoon.map(a=>`<div style="font-size:13px;color:#7c2d12;padding:4px 0;border-bottom:1px solid #fed7aa">${sn(a.name)} — ${sn(a.trade)}</div>`).join('')}</div>`:''}
   <div class="ic"><h3>📊 Platform Summary</h3>
@@ -312,10 +325,10 @@ async function renderApprovals(){
   snap.docs.map(d=>{const p=d.data();return`<div class="pi">
     <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(p.name)}</div>
     <div style="font-size:12px;color:var(--slate3);line-height:1.9">🔧 ${sn(p.trade)} · 📍 ${sn(p.zone)}<br/>Plan: <strong style="color:var(--blue2)">${sn(p.tier)}</strong><br/>Sender: ${sn(p.senderBank)}<br/>Date: ${p.submittedAt?.toDate?p.submittedAt.toDate().toLocaleDateString():'—'}</div>
-    ${p.receiptBase64?`<img src="${p.receiptBase64}" class="ri"/>`:'<div style="background:#f1f5f9;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--slate3);margin:10px 0">🧾 No receipt image</div>'}
+    ${p.receiptBase64?`<img src="${su(p.receiptBase64)}" class="ri"/>`:'<div style="background:#f1f5f9;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--slate3);margin:10px 0">🧾 No receipt image</div>'}
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-      <button class="btn bs bsm" onclick="apArt('${p.artisanUid}','${d.id}','${p.tier}')">✓ Approve & Show Profile</button>
-      <button class="btn bd bsm" onclick="rjArt('${d.id}')">✕ Reject</button>
+      <button class="btn bs bsm" onclick="apArt('${ja(p.artisanUid)}','${ja(d.id)}','${ja(p.tier)}')">✓ Approve & Show Profile</button>
+      <button class="btn bd bsm" onclick="rjArt('${ja(d.id)}')">✕ Reject</button>
     </div>
   </div>`;}).join('');
 }
@@ -328,10 +341,10 @@ async function renderArtisans(filter=''){
   const filtered=filter?arts.filter(a=>(a.name||'').toLowerCase().includes(filter)||(a.trade||'').toLowerCase().includes(filter)||(a.zone||'').toLowerCase().includes(filter)):arts;
   b.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--slate3);margin-bottom:12px">${arts.length} artisan${arts.length!==1?'s':''}</div>
   <div style="margin-bottom:12px"><input class="inp" type="text" id="asrch" placeholder="Search name, trade, zone…" value="${sn(filter)}" oninput="renderArtisans(this.value.toLowerCase())" style="font-size:13px"/></div>
-  <div id="artList">`+filtered.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="artDetail('${a.uid}')">
+  <div id="artList">`+filtered.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #f8fafc;cursor:pointer" onclick="artDetail('${ja(a.uid)}')">
     <div class="avc">${ini(a.name)}</div>
     <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${sn(a.name)}</div><div style="font-size:11px;color:var(--slate3)">${sn(a.trade)} · 📍 ${sn(a.fullLocation||a.zone||a.lga||'—')} · 🎁 ${a.referralCount||0} ref${(a.referralCount||0)!==1?'s':''}</div></div>
-    <span class="sp${a.status==='active'?'a':a.status==='frozen'?'b':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${a.status||'—'}</span>
+    <span class="sp${a.status==='active'?'a':a.status==='frozen'?'b':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}" style="font-size:11px">${sn(a.status||'—')}</span>
   </div>`).join('')+'</div>';
 }
 window.renderArtisans=renderArtisans;
@@ -419,7 +432,7 @@ async function renderAnalytics(){
     const r=tRev[tr]||0;
     return`<div style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-        <span style="font-weight:600">${tr}</span>
+        <span style="font-weight:600">${sn(tr)}</span>
         <div style="text-align:right"><span style="color:var(--slate3)">${ct} artisan${ct!==1?'s':''}</span>${r?` · <span style="color:var(--emerald);font-weight:700">₦${r.toLocaleString()}</span>`:''}
         </div>
       </div>
@@ -465,7 +478,7 @@ async function renderAnalytics(){
       // Area rows
       const areaHTML=Object.entries(ld.areas).sort((a,bx)=>bx[1].revenue-a[1].revenue).map(([ar,ad])=>{
         return`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0 5px 12px;border-bottom:1px solid #f8fafc">
-          <div style="font-size:12px;color:#475569">📍 ${ar}</div>
+          <div style="font-size:12px;color:#475569">📍 ${sn(ar)}</div>
           <div style="text-align:right;flex-shrink:0">
             <div style="font-size:12px;font-weight:700;color:var(--emerald)">${ad.revenue?'₦'+ad.revenue.toLocaleString():'₦0'}</div>
             <div style="font-size:10px;color:var(--slate3)">${ad.artisans} artisan${ad.artisans!==1?'s':''}${ad.premium?` · ${ad.premium}⭐`:''}${ad.standard?` · ${ad.standard} std`:''}</div>
@@ -476,7 +489,7 @@ async function renderAnalytics(){
       return`<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden">
         <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;cursor:pointer">
           <div>
-            <div style="font-size:13px;font-weight:700;color:var(--navy)">${lg}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--navy)">${sn(lg)}</div>
             <div style="font-size:11px;color:var(--slate3);margin-top:1px">${ld.artisans} artisan${ld.artisans!==1?'s':''} · ${lgPct}% of state revenue</div>
           </div>
           <div style="text-align:right">
@@ -491,7 +504,7 @@ async function renderAnalytics(){
     return`<div style="background:var(--white);border-radius:var(--r2);padding:16px;box-shadow:var(--shadow);margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
         <div>
-          <div style="font-size:15px;font-weight:700;color:var(--navy)">🗺️ ${st}</div>
+          <div style="font-size:15px;font-weight:700;color:var(--navy)">🗺️ ${sn(st)}</div>
           <div style="font-size:12px;color:var(--slate3);margin-top:2px">${sd.artisans} active artisans · ${stPct}% of total revenue</div>
           <div style="display:flex;gap:8px;margin-top:4px">
             ${sd.premium?`<span style="background:var(--amber2);color:var(--amber);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">⭐ ${sd.premium} Premium</span>`:''}
@@ -525,8 +538,8 @@ async function renderAnalytics(){
   const areaLeaderboard=topAreas.map((a,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc">
     <div style="width:22px;height:22px;border-radius:50%;background:${i===0?'var(--amber)':i===1?'#94a3b8':i===2?'#b45309':'var(--blue3)'};color:${i<3?'#fff':'var(--blue2)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">${i+1}</div>
     <div style="flex:1;min-width:0">
-      <div style="font-size:13px;font-weight:700;color:var(--navy)">${a.name}</div>
-      <div style="font-size:11px;color:var(--slate3)">${a.lga}${a.state?', '+a.state:''}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy)">${sn(a.name)}</div>
+      <div style="font-size:11px;color:var(--slate3)">${sn(a.lga)}${a.state?', '+sn(a.state):''}</div>
       <div style="height:5px;background:#f1f5f9;border-radius:20px;overflow:hidden;margin-top:4px"><div style="height:100%;width:${Math.round((a.revenue/maxAreaRev)*100)}%;background:var(--emerald);border-radius:20px"></div></div>
     </div>
     <div style="text-align:right;flex-shrink:0">
@@ -610,7 +623,7 @@ async function renderPayments(){
   const states=Object.keys(byState).sort((a,b)=>byState[b].revenue-byState[a].revenue);
   const totalRev=all.reduce((s,p)=>s+p.amount,0);
   const filtered=PAY_STATE_FILTER?all.filter(p=>p.state===PAY_STATE_FILTER):all;
-  const stateCardsHTML=states.map(st=>`<div onclick="filterPayState('${st.replace(/'/g,"\\'")}')" style="cursor:pointer;background:${PAY_STATE_FILTER===st?'var(--blue3)':'#f8fafc'};border:1.5px solid ${PAY_STATE_FILTER===st?'var(--blue2)':'transparent'};border-radius:var(--r);padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+  const stateCardsHTML=states.map(st=>`<div onclick="filterPayState('${ja(st)}')" style="cursor:pointer;background:${PAY_STATE_FILTER===st?'var(--blue3)':'#f8fafc'};border:1.5px solid ${PAY_STATE_FILTER===st?'var(--blue2)':'transparent'};border-radius:var(--r);padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
     <div><div style="font-weight:700;font-size:14px;color:var(--navy)">${sn(st)}</div><div style="font-size:11px;color:var(--slate3)">${byState[st].count} payment${byState[st].count!==1?'s':''}</div></div>
     <div style="font-weight:800;font-size:15px;color:var(--emerald)">₦${byState[st].revenue.toLocaleString()}</div>
   </div>`).join('')||'<div class="es">No payment data yet.</div>';
@@ -649,8 +662,8 @@ async function renderReferralFlags(){
       <strong>Shared IP:</strong> ${sn(f.sharedIP)}
     </div>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn bs bsm" style="flex:1" onclick="grantFlaggedReferral('${d.id}','${f.referrerUid}')">✓ Looks legit — grant 7 days</button>
-      <button class="btn bd bsm" style="flex:1" onclick="dismissReferralFlag('${d.id}')">✕ Dismiss (no reward)</button>
+      <button class="btn bs bsm" style="flex:1" onclick="grantFlaggedReferral('${ja(d.id)}','${ja(f.referrerUid)}')">✓ Looks legit — grant 7 days</button>
+      <button class="btn bd bsm" style="flex:1" onclick="dismissReferralFlag('${ja(d.id)}')">✕ Dismiss (no reward)</button>
     </div></div>`;}).join('')}
   </div>`;
 }
@@ -674,14 +687,16 @@ async function renderIDVerify(){
   const snap=await getDocs(collection(db,'users'));
   const pending=snap.docs.map(d=>({uid:d.id,...d.data()})).filter(u=>u.type==='artisan'&&u.status==='active'&&!u.idVerified);
   if(!pending.length){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No one is waiting on ID verification.</div>`;return;}
+  const _privs=await Promise.all(pending.map(u=>getPrivate(u.uid)));
+  pending.forEach((u,i)=>{u.idDocument=_privs[i].idDocument||u.idDocument||null;});
   b.innerHTML=`<div style="font-size:13px;color:var(--slate3);margin-bottom:12px;font-weight:600">${pending.length} artisan${pending.length!==1?'s':''} paid and waiting to go live</div>`+
   pending.map(u=>`<div class="pi">
     <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(u.name)}</div>
     <div style="font-size:12px;color:var(--slate3);line-height:1.8">🔧 ${sn(u.trade)} · 📍 ${sn(u.fullLocation||u.zone||'—')}<br/>📞 ${sn(u.phone)} · Paid: <strong style="color:var(--emerald)">${sn(u.tier)}</strong></div>
-    ${u.idDocument?`<img src="${u.idDocument}" class="ri" style="cursor:pointer" onclick="window.open(this.src,'_blank')"/>`:'<div style="background:#fef2f2;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--red);margin:10px 0">⚠️ No ID document was uploaded</div>'}
+    ${u.idDocument?`<img src="${su(u.idDocument)}" class="ri" style="cursor:pointer" onclick="window.open(this.src,'_blank')"/>`:'<div style="background:#fef2f2;border-radius:var(--r);padding:12px;text-align:center;font-size:12px;color:var(--red);margin:10px 0">⚠️ No ID document was uploaded</div>'}
     <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn bs bsm" style="flex:1" onclick="approveID('${u.uid}')">✓ Verify ID</button>
-      <button class="btn bd bsm" style="flex:1" onclick="rejectID('${u.uid}')">✕ Reject — ask to re-upload</button>
+      <button class="btn bs bsm" style="flex:1" onclick="approveID('${ja(u.uid)}')">✓ Verify ID</button>
+      <button class="btn bd bsm" style="flex:1" onclick="rejectID('${ja(u.uid)}')">✕ Reject — ask to re-upload</button>
     </div>
   </div>`).join('');
 }
@@ -697,7 +712,8 @@ window.approveID=async function(uid){
 };
 window.rejectID=async function(uid){
   if(!confirm('Reject this ID and ask them to re-upload? They will stay hidden from customers until a new ID is reviewed.'))return;
-  await updateDoc(doc(db,'users',uid),{idDocument:null,idVerified:false});
+  await updateDoc(doc(db,'users',uid),{idDocument:null,idVerified:false,hasIdDoc:false});
+  try{await setDoc(doc(db,'users',uid,'private','info'),{idDocument:null},{merge:true});}catch(e){}
   try{await addDoc(collection(db,'notifications'),{toUid:uid,type:'id_rejected',read:false,createdAt:serverTimestamp(),message:'Your ID document could not be verified. Please re-upload a clear photo of a valid government ID from your profile to go live.'});}catch(e){}
   toast('ID rejected — artisan notified to re-upload.');renderTab();
 };
@@ -717,7 +733,7 @@ async function renderSupport(){
         <span class="sp${tk.resolved?'a':'p'}" style="font-size:11px">${tk.resolved?'Resolved':'Open'}</span>
       </div>
       <div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap">${sn(tk.message)}</div>
-      ${!tk.resolved?`<textarea class="inp" id="rep_${d.id}" placeholder="Type reply to send to this user…" style="min-height:60px;font-size:13px;margin-bottom:8px"></textarea><div style="display:flex;gap:8px"><button class="btn bs bsm" onclick="rsTk('${d.id}')">✓ Resolve</button><button class="btn bp bsm" onclick="rpTk('${d.id}','${sn(tk.userId||'')}','${sn(tk.userName||'')}')">📩 Send Reply</button></div>`:'<div style="font-size:12px;color:var(--emerald);font-weight:600">✓ Resolved</div>'}
+      ${!tk.resolved?`<textarea class="inp" id="rep_${sn(d.id)}" placeholder="Type reply to send to this user…" style="min-height:60px;font-size:13px;margin-bottom:8px"></textarea><div style="display:flex;gap:8px"><button class="btn bs bsm" onclick="rsTk('${ja(d.id)}')">✓ Resolve</button><button class="btn bp bsm" onclick="rpTk('${ja(d.id)}','${ja(tk.userId||'')}','${ja(tk.userName||'')}')">📩 Send Reply</button></div>`:'<div style="font-size:12px;color:var(--emerald);font-weight:600">✓ Resolved</div>'}
     </div>`;
   }).join('');
 }
@@ -832,7 +848,7 @@ async function renderStaff(){
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           <span class="sp${s.active?'a':'b'}" style="font-size:11px">${s.active?'Active':'Deactivated'}</span>
-          <button class="btn ${s.active?'bd':'bs'} bsm" onclick="${s.active?'deactivateStaff':'reactivateStaff'}('${s.uid}','${sn(s.name||s.email).replace(/'/g,"\\'")}')">${s.active?'🔒 Deactivate':'✅ Reactivate'}</button>
+          <button class="btn ${s.active?'bd':'bs'} bsm" onclick="${s.active?'deactivateStaff':'reactivateStaff'}('${ja(s.uid)}','${ja(s.name||s.email)}')">${s.active?'🔒 Deactivate':'✅ Reactivate'}</button>
         </div>
       </div>`;
     }).join('')}
@@ -859,7 +875,7 @@ window.showCreateStaffModal=function(){
       <input class="inp" id="staffEmail" type="email" placeholder="staff@example.com" style="font-size:13px" maxlength="200"/>
     </div>
     <div class="fg"><label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">Temporary Password *</label>
-      <input class="inp" id="staffPass" type="text" placeholder="Min. 6 characters — share with staff securely" style="font-size:13px" maxlength="128"/>
+      <input class="inp" id="staffPass" type="text" placeholder="Min. 8 characters — share with staff securely" style="font-size:13px" maxlength="128"/>
       <div style="font-size:11px;color:var(--slate3);margin-top:4px">Tell your staff to change this after first login (use Forgot Password on staff console... actually staff console has no password reset yet, so choose something they'll remember).</div>
     </div>
     <div id="staffErr" style="display:none;margin-bottom:10px" class="alert aw"></div>
@@ -879,7 +895,7 @@ window.createStaffAccount=async function(){
   if(name.length<2){err.textContent="Please enter the staff member's full name.";err.style.display='block';return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Enter a valid email address.';err.style.display='block';return;}
   if(email===AE){err.textContent='This email is reserved for the main administrator.';err.style.display='block';return;}
-  if(pass.length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+  if(pass.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return;}
   const btn=$('staffCreateBtn');btn.disabled=true;btn.textContent='Creating…';
   try{
     // Use the SECONDARY auth instance so creating this account does not
@@ -913,8 +929,9 @@ window.reactivateStaff=async function(uid,name){
 };
 
 function renderSettings(){
-  setTimeout(loadPromoCard,0);
+  setTimeout(loadPromoCard,0);setTimeout(loadPrivacyCard,0);
   $('content').innerHTML=`<div class="ic" id="promoCard"><h3>🎁 Free Launch Offer</h3><div style="text-align:center;padding:12px"><div class="spinner"></div></div></div>
+  <div class="ic" id="privacyCard"><h3>🔒 Private Data</h3><div style="text-align:center;padding:12px"><div class="spinner"></div></div></div>
   <div class="ic"><h3>⚙️ Platform Settings</h3>
     <div class="ir"><span class="il">Admin Email</span><span style="font-size:13px">${AE}</span></div>
     <div class="ir"><span class="il">Payment Bank</span><span>Moniepoint</span></div>
@@ -923,7 +940,7 @@ function renderSettings(){
     <div class="ir"><span class="il">Standard Plan</span><span style="font-weight:700;color:var(--blue2)">₦5,000 / 30 days</span></div>
     <div class="ir"><span class="il">Premium Plan</span><span style="font-weight:700;color:var(--amber)">₦10,000 / 30 days</span></div>
     <div class="ir"><span class="il">Launch Date</span><span style="font-weight:700;color:var(--emerald)">June 29, 2026</span></div>
-    <div class="ir"><span class="il">Coverage</span><span style="font-size:12px">5 states · 117 LGAs · 538 areas</span></div>
+    <div class="ir"><span class="il">Coverage</span><span style="font-size:12px">10 states · 177 LGAs · 836 areas</span></div>
     <div class="ir"><span class="il">Trade Categories</span><span style="font-size:12px">41 trades</span></div>
   </div>
   <div class="ic"><h3>📧 EmailJS Setup</h3>
@@ -1060,7 +1077,24 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
-    // ---------- config (broadcasts, launchPromo, customTrades, ...) ----------
+    // ---------- private per-user data: users/{uid}/private/info ----------
+    // ID photo + last IP / location / device. Only the user, the owner admin and active staff can read it.
+    function privateKeysOk() {
+      return newData().keys().hasOnly(['idDocument', 'lastAccessIP', 'lastAccessLocation',
+                                       'lastAccessDevice', 'updatedAt', 'movedAt']);
+    }
+    match /users/{uid}/private/{docId} {
+      allow read: if isAdmin() || (signedIn() &amp;&amp; request.auth.uid == uid);
+      allow create: if isOwner()
+        || (signedIn() &amp;&amp; request.auth.uid == uid &amp;&amp; docId == 'info' &amp;&amp; privateKeysOk());
+      allow update: if isOwner()
+        || (signedIn() &amp;&amp; request.auth.uid == uid &amp;&amp; docId == 'info' &amp;&amp; privateKeysOk())
+        // staff may only clear a rejected ID photo
+        || (isStaff() &amp;&amp; changed().hasOnly(['idDocument']) &amp;&amp; newData().idDocument == null);
+      allow delete: if isOwner();
+    }
+
+    // ---------- config (broadcasts, launchPromo, privacy, customTrades, ...) ----------
     match /config/{docId} {
       allow read: if true;            // launchPromo is read before sign-in
       allow write: if isOwner();      // broadcast/settings/customTrades: owner only
@@ -1247,6 +1281,7 @@ service cloud.firestore {
 
 window.artDetail=async function(uid){
   const snap=await getDoc(doc(db,'users',uid));if(!snap.exists())return;const a=snap.data();
+  const _pv=await getPrivate(uid);a.idDocument=_pv.idDocument||a.idDocument||null;
   const ex=a.expiry?.toDate?a.expiry.toDate():a.expiry?new Date(a.expiry):null;
   const dl=ex?Math.max(0,Math.round((ex-Date.now())/86400000)):0;
   $('content').innerHTML=`<button class="btn bo bsm" style="margin-bottom:14px" onclick="aTab('artisans')">← Back to Artisans</button>
@@ -1257,43 +1292,43 @@ window.artDetail=async function(uid){
     <div class="ir"><span class="il">State</span><span>${sn(a.state||'—')}</span></div>
     <div class="ir"><span class="il">LGA / City</span><span>${sn(a.lga||'—')}</span></div>
     <div class="ir"><span class="il">Area / Zone</span><span>📍 ${sn(a.zone||'—')}</span></div>
-    <div class="ir"><span class="il">Status</span><span class="sp${a.status==='active'?'a':a.status==='frozen'?'b':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}">${a.status||'—'}</span></div>
-    <div class="ir"><span class="il">Tier</span><span style="font-weight:700;text-transform:capitalize;color:${a.tier==='premium'?'var(--amber)':'var(--blue2)'}">${a.tier||'None'}</span></div>
-    <div class="ir"><span class="il">Rating</span><span>${a.rating?a.rating.toFixed(1)+' ⭐ ('+a.reviews+' reviews)':'No reviews yet'}</span></div>
+    <div class="ir"><span class="il">Status</span><span class="sp${a.status==='active'?'a':a.status==='frozen'?'b':a.status==='pending'?'p':a.status==='unsubscribed'?'u':'b'}">${sn(a.status||'—')}</span></div>
+    <div class="ir"><span class="il">Tier</span><span style="font-weight:700;text-transform:capitalize;color:${a.tier==='premium'?'var(--amber)':'var(--blue2)'}">${sn(a.tier||'None')}</span></div>
+    <div class="ir"><span class="il">Rating</span><span>${a.rating?a.rating.toFixed(1)+' ⭐ ('+num(a.reviews)+' reviews)':'No reviews yet'}</span></div>
     <div class="ir"><span class="il">Days Left</span><span style="font-weight:700;color:${dl<=5?'var(--red)':'var(--emerald)'}">${a.status==='active'?dl+' days':'—'}</span></div>
     <div class="ir"><span class="il">Booked Today</span><span>${a.daily_booked?'🔴 Yes':'🟢 No'}</span></div>
-    <div class="ir"><span class="il">Missed Views</span><span style="font-weight:700;color:${(a.missedViews||0)>0?'var(--red)':'var(--slate3)'}">${a.missedViews||0} customer${(a.missedViews||0)!==1?'s':''} turned away</span></div>
+    <div class="ir"><span class="il">Missed Views</span><span style="font-weight:700;color:${(a.missedViews||0)>0?'var(--red)':'var(--slate3)'}">${num(a.missedViews)} customer${num(a.missedViews)!==1?'s':''} turned away</span></div>
     <div class="ir"><span class="il">Referrals (this month)</span><span style="font-weight:700;color:var(--blue2)">${(a.referralMonthKey===(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'))?(a.referralMonthCount||0):0)} / 5${a.lastReferralRewardMonth===(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'))?' ✅ reward given':''}</span></div>
     <div class="ir"><span class="il">Referrals (all-time)</span><span>${a.referralCount||0}</span></div>
     <div class="ir"><span class="il">Contract Signed</span><span style="font-size:12px">${a.contract_signed_date?.toDate?a.contract_signed_date.toDate().toLocaleDateString():'—'}</span></div>
     <div class="ir"><span class="il">Joined</span><span style="font-size:12px">${a.createdAt?.toDate?a.createdAt.toDate().toLocaleDateString():'—'}</span></div>
     <div class="ir"><span class="il">ID Verified</span><span class="sp${a.idVerified?'a':'p'}">${a.idVerified?'🪪 Verified':'Pending Review'}</span></div>
-    <div class="ir"><span class="il">Avg Response Time</span><span style="font-weight:700;color:${a.avgResponseMin!==undefined&&a.avgResponseMin<=60?'var(--emerald)':'var(--slate3)'}">${a.avgResponseMin!==undefined?a.avgResponseMin+' min':'No data yet'}</span></div>
+    <div class="ir"><span class="il">Avg Response Time</span><span style="font-weight:700;color:${a.avgResponseMin!==undefined&&a.avgResponseMin<=60?'var(--emerald)':'var(--slate3)'}">${a.avgResponseMin!==undefined?num(a.avgResponseMin)+' min':'No data yet'}</span></div>
   </div>
   ${a.idDocument?`<div class="ic"><h3>🪪 ID Document Review</h3>
-    <img src="${a.idDocument}" style="width:100%;border-radius:var(--r);max-height:220px;object-fit:cover;margin-bottom:12px;border:1px solid var(--border)"/>
-    ${a.idVerified?`<div style="background:var(--emerald2);color:var(--emerald);padding:10px;border-radius:var(--r);font-size:13px;font-weight:600;text-align:center">✅ ID Verified — Trust badge active on profile</div><button class="btn bo bsm" style="margin-top:8px" onclick="revokeIdVerification('${uid}')">Revoke Verification</button>`:`<div style="display:flex;gap:8px"><button class="btn bs" onclick="verifyArtisanId('${uid}')">✅ Approve ID — Grant Trust Badge</button><button class="btn bd bsm" onclick="rejectArtisanId('${uid}')">✕ Reject</button></div>`}
+    <img src="${su(a.idDocument)}" style="width:100%;border-radius:var(--r);max-height:220px;object-fit:cover;margin-bottom:12px;border:1px solid var(--border)"/>
+    ${a.idVerified?`<div style="background:var(--emerald2);color:var(--emerald);padding:10px;border-radius:var(--r);font-size:13px;font-weight:600;text-align:center">✅ ID Verified — Trust badge active on profile</div><button class="btn bo bsm" style="margin-top:8px" onclick="revokeIdVerification('${ja(uid)}')">Revoke Verification</button>`:`<div style="display:flex;gap:8px"><button class="btn bs" onclick="verifyArtisanId('${ja(uid)}')">✅ Approve ID — Grant Trust Badge</button><button class="btn bd bsm" onclick="rejectArtisanId('${ja(uid)}')">✕ Reject</button></div>`}
   </div>`:`<div class="ic"><h3>🪪 ID Document</h3><p style="font-size:13px;color:var(--slate3)">No ID document uploaded by this artisan yet.</p></div>`}
-  ${(a.portfolios||[]).length?`<div class="ic"><h3>📷 Portfolio (${a.portfolios.length})</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${a.portfolios.map(p=>`<img src="${p}" style="width:90px;height:70px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`).join('')}</div></div>`:''}
+  ${(a.portfolios||[]).length?`<div class="ic"><h3>📷 Portfolio (${a.portfolios.length})</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">${a.portfolios.map(p=>`<img src="${su(p)}" style="width:90px;height:70px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`).join('')}</div></div>`:''}
   <div class="ic"><h3>⚡ Actions</h3>
     <div style="background:var(--emerald2);border-radius:var(--r);padding:12px;margin-bottom:12px">
       <div style="font-size:12px;font-weight:700;color:var(--emerald);margin-bottom:8px">🎁 GRANT FREE PLAN (No Payment Required)</div>
-      <button class="btn bs" onclick="grantPlan('${uid}','${sn(a.name).replace(/'/g,"\\'")}')" style="font-size:13px;padding:10px">🎁 Grant Standard or Premium Plan Free</button>
+      <button class="btn bs" onclick="grantPlan('${ja(uid)}','${ja(a.name)}')" style="font-size:13px;padding:10px">🎁 Grant Standard or Premium Plan Free</button>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
-      <button class="btn bs bsm" onclick="fAct('${uid}')">✓ Approve Profile</button>
-      ${!a.timerStarted&&a.status==='active'?`<button class="bsm btn" style="background:#7c3aed;color:#fff;border:none" onclick="startTimer('${uid}')">⏱️ Start Timer</button>`:''}
-      <button class="btn bo bsm" onclick="rBk('${uid}')">🔄 Reset Booking</button>
-      <button class="bsm btn" style="background:var(--amber);color:#fff;border:none" onclick="sPr('${uid}')">⭐ Set Premium</button>
-      <button class="btn bo bsm" onclick="sSt('${uid}')">Set Standard</button>
-      <button class="bsm btn" style="background:var(--red2);color:var(--red);border:none" onclick="sUs('${uid}')">Unsubscribe</button>
-      ${a.status==='frozen'?`<button class="btn bs bsm" onclick="unfreezeArtisan('${uid}')">🔓 Unfreeze</button>`:`<button class="btn bd bsm" onclick="bUser('${uid}')">🚫 Ban</button>`}
+      <button class="btn bs bsm" onclick="fAct('${ja(uid)}')">✓ Approve Profile</button>
+      ${!a.timerStarted&&a.status==='active'?`<button class="bsm btn" style="background:#7c3aed;color:#fff;border:none" onclick="startTimer('${ja(uid)}')">⏱️ Start Timer</button>`:''}
+      <button class="btn bo bsm" onclick="rBk('${ja(uid)}')">🔄 Reset Booking</button>
+      <button class="bsm btn" style="background:var(--amber);color:#fff;border:none" onclick="sPr('${ja(uid)}')">⭐ Set Premium</button>
+      <button class="btn bo bsm" onclick="sSt('${ja(uid)}')">Set Standard</button>
+      <button class="bsm btn" style="background:var(--red2);color:var(--red);border:none" onclick="sUs('${ja(uid)}')">Unsubscribe</button>
+      ${a.status==='frozen'?`<button class="btn bs bsm" onclick="unfreezeArtisan('${ja(uid)}')">🔓 Unfreeze</button>`:`<button class="btn bd bsm" onclick="bUser('${ja(uid)}')">🚫 Ban</button>`}
     </div>
     <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">EXTEND SUBSCRIPTION</label>
-    <div style="display:flex;gap:8px;margin-bottom:14px"><input class="inp" type="number" id="exd" placeholder="Days e.g. 30" style="font-size:13px"/><button class="btn bp bsm" onclick="extS('${uid}')">Extend</button></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px"><input class="inp" type="number" id="exd" placeholder="Days e.g. 30" style="font-size:13px"/><button class="btn bp bsm" onclick="extS('${ja(uid)}')">Extend</button></div>
     <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:6px">SEND NOTE TO ARTISAN</label>
     <textarea class="inp" id="ntxt" placeholder="Message to send to artisan…" style="min-height:70px;margin-bottom:8px"></textarea>
-    <button class="btn bp bsm" onclick="sNote('${uid}','${sn(a.name).replace(/'/g,"\\'")}')">📩 Send Note</button>
+    <button class="btn bp bsm" onclick="sNote('${ja(uid)}','${ja(a.name)}')">📩 Send Note</button>
   </div>`;
 };
 
@@ -1302,6 +1337,7 @@ async function renderDisputes(){
   const b=$('content');
   const snap=await getDocs(query(collection(db,'disputes'),limit(100)));
   if(snap.empty){b.innerHTML=`<div class="es"><div style="font-size:40px;margin-bottom:10px">✅</div>No disputes reported yet.</div>`;return;}
+  const _dpv={};await Promise.all([...new Set(snap.docs.map(d=>d.data()).filter(x=>x.artisanUid&&!x.artisanLastIP).map(x=>x.artisanUid))].map(async u=>{_dpv[u]=await getPrivate(u);}));
   const docs=snap.docs.sort((a,bx)=>{const at=a.data().createdAt?.toDate?a.data().createdAt.toDate():new Date(0);const bt=bx.data().createdAt?.toDate?bx.data().createdAt.toDate():new Date(0);return bt-at;});
   const open=docs.filter(d=>!d.data().resolved).length;
   b.innerHTML=`<div style="display:flex;gap:10px;margin-bottom:14px"><div style="background:var(--red2);color:var(--red);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700">${open} Open</div><div style="background:var(--emerald2);color:var(--emerald);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700">${docs.length-open} Resolved</div></div>`+
@@ -1311,25 +1347,25 @@ async function renderDisputes(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
         <div><div style="font-weight:700;font-size:14px">Against: ${sn(tk.artisanName||'Unknown')}</div>
         <div style="font-size:12px;color:var(--slate3)">By: ${sn(tk.reporterName||'—')} · ${dt}</div>
-        <div style="font-size:12px;color:var(--red);font-weight:600;margin-top:2px">${typeLabels[tk.type]||tk.type||'—'}${tk.amountInvolved?` · ₦${tk.amountInvolved.toLocaleString()}`:''}</div></div>
+        <div style="font-size:12px;color:var(--red);font-weight:600;margin-top:2px">${sn(typeLabels[tk.type]||tk.type||'—')}${tk.amountInvolved?` · ₦${num(tk.amountInvolved).toLocaleString()}`:''}</div></div>
         <span class="sp${tk.resolved?'a':'b'}" style="font-size:11px">${tk.resolved?'Resolved':'Open'}</span>
       </div>
       <div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap">${sn(tk.description)}</div>
       <details style="margin-bottom:10px"><summary style="font-size:12px;color:var(--blue2);font-weight:600;cursor:pointer">🛡️ Safety evidence trail</summary>
         <div style="font-size:11px;color:var(--slate3);line-height:1.9;margin-top:6px;padding:8px;background:#fffbeb;border-radius:8px">
           <strong style="color:var(--navy)">Artisan (${sn(tk.artisanName||'—')}):</strong> ${tk.artisanIdVerified?'🪪 ID verified':'⚠️ ID not verified'} · 📞 ${sn(tk.artisanPhone||'—')}<br/>
-          Last known access: ${sn(tk.artisanLastLocation||'unknown')} · IP ${sn(tk.artisanLastIP||'unknown')} · ${tk.artisanLastAccessAt?.toDate?tk.artisanLastAccessAt.toDate().toLocaleString():'—'}<br/><br/>
+          Last known access: ${sn(tk.artisanLastLocation||(_dpv[tk.artisanUid]?.lastAccessLocation?_dpv[tk.artisanUid].lastAccessLocation+' (now)':'unknown'))} · IP ${sn(tk.artisanLastIP||(_dpv[tk.artisanUid]?.lastAccessIP?_dpv[tk.artisanUid].lastAccessIP+' (now)':'unknown'))} · ${tk.artisanLastAccessAt?.toDate?tk.artisanLastAccessAt.toDate().toLocaleString():'—'}<br/><br/>
           <strong style="color:var(--navy)">Reporter (${sn(tk.reporterName||'—')}) at time of report:</strong><br/>
           ${sn(tk.reporterLocation||'unknown')} · IP ${sn(tk.reporterIP||'unknown')}<br/>
           Device: ${sn((tk.reporterDevice||'unknown').substring(0,80))}
         </div>
       </details>
       ${!tk.resolved?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-        <button class="btn bd bsm" onclick="freezeArtisan('${tk.artisanUid}','${d.id}')">🔒 Freeze Artisan Profile</button>
-        <button class="btn bs bsm" onclick="resolveDispute('${d.id}')">✓ Mark Resolved</button>
-        <button class="btn bo bsm" onclick="warnArtisan('${tk.artisanUid}','${sn(tk.artisanName||'')}','${d.id}')">⚠️ Issue Warning</button>
-      </div><textarea class="inp" id="dnote_${d.id}" placeholder="Admin note (sent to both parties)…" style="min-height:55px;font-size:13px;margin-bottom:6px"></textarea>
-      <button class="btn bp bsm" onclick="sendDisputeNote('${d.id}','${tk.reporterUid||''}','${tk.artisanUid||''}')">📩 Send Note to Both Parties</button>`
+        <button class="btn bd bsm" onclick="freezeArtisan('${ja(tk.artisanUid)}','${ja(d.id)}')">🔒 Freeze Artisan Profile</button>
+        <button class="btn bs bsm" onclick="resolveDispute('${ja(d.id)}')">✓ Mark Resolved</button>
+        <button class="btn bo bsm" onclick="warnArtisan('${ja(tk.artisanUid)}','${ja(tk.artisanName||'')}','${ja(d.id)}')">⚠️ Issue Warning</button>
+      </div><textarea class="inp" id="dnote_${sn(d.id)}" placeholder="Admin note (sent to both parties)…" style="min-height:55px;font-size:13px;margin-bottom:6px"></textarea>
+      <button class="btn bp bsm" onclick="sendDisputeNote('${ja(d.id)}','${ja(tk.reporterUid||'')}','${ja(tk.artisanUid||'')}')">📩 Send Note to Both Parties</button>`
       :`<div style="font-size:12px;color:var(--emerald);font-weight:600">✓ Resolved ${tk.resolvedAt?.toDate?tk.resolvedAt.toDate().toLocaleDateString():''}</div>${tk.adminNote?`<div style="font-size:12px;color:var(--slate3);margin-top:4px">Note: ${sn(tk.adminNote)}</div>`:''}`}
     </div>`;
   }).join('');
@@ -1342,11 +1378,11 @@ async function renderPauses(){
   b.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--slate3);margin-bottom:12px">${snap.docs.length} pending pause request${snap.docs.length!==1?'s':''}</div>`+
   snap.docs.map(d=>{const p=d.data();return`<div class="pi" style="border-left-color:var(--blue2)">
     <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">${sn(p.name)}</div>
-    <div style="font-size:12px;color:var(--slate3);margin-bottom:8px">🔧 ${sn(p.trade)} · Requesting <strong>${p.days} day${p.days!==1?'s':''} pause</strong></div>
+    <div style="font-size:12px;color:var(--slate3);margin-bottom:8px">🔧 ${sn(p.trade)} · Requesting <strong>${num(p.days)} day${num(p.days)!==1?'s':''} pause</strong></div>
     <div style="font-size:13px;color:#334155;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.6">${sn(p.reason)}</div>
     <div style="display:flex;gap:8px">
-      <button class="btn bs bsm" onclick="approvePause('${p.artisanUid}','${d.id}',${p.days})">✓ Approve Pause</button>
-      <button class="btn bd bsm" onclick="rejectPause('${p.artisanUid}','${d.id}')">✕ Reject</button>
+      <button class="btn bs bsm" onclick="approvePause('${ja(p.artisanUid)}','${ja(d.id)}',${num(p.days)})">✓ Approve Pause</button>
+      <button class="btn bd bsm" onclick="rejectPause('${ja(p.artisanUid)}','${ja(d.id)}')">✕ Reject</button>
     </div>
   </div>`;}).join('');
 }
@@ -1379,6 +1415,7 @@ window.sendDisputeNote=async function(id,reporterUid,artisanUid){
   toast('Notes sent to both parties ✅');
 };
 window.approvePause=async function(uid,docId,days){
+  days=num(days);
   const expSnap=await getDoc(doc(db,'users',uid));
   const cur=expSnap.data();
   const curExpiry=cur.expiry?.toDate?cur.expiry.toDate():cur.expiry?new Date(cur.expiry):new Date();
@@ -1429,7 +1466,7 @@ window.grantPlan=async function(uid,name){
       <input class="inp" id="grantReason" type="text" placeholder="e.g. Early adopter reward, Partnership deal..." style="font-size:13px" maxlength="200"/>
     </div>
     <div id="grantErr" style="display:none;margin-bottom:10px" class="alert aw"></div>
-    <button class="btn bs" onclick="confirmGrantPlan('${uid}','${sn(name).replace(/'/g,"\\'")}')">🎁 Grant Free Plan</button>
+    <button class="btn bs" onclick="confirmGrantPlan('${ja(uid)}','${ja(name)}')">🎁 Grant Free Plan</button>
     <button class="btn bo" style="margin-top:8px" onclick="document.getElementById('grantModal').remove()">Cancel</button>
   </div>`;
   document.body.appendChild(el);
@@ -1493,8 +1530,59 @@ window.rjArt=async function(did){if(!confirm('Reject this application?'))return;
   try{const pa=await getDoc(doc(db,'pendingApprovals',did));const d=pa.data();if(d&&d.freeLaunch&&d.artisanUid)await updateDoc(doc(db,'users',d.artisanUid),{freeLaunch:false,status:'unsubscribed'});}catch(e){}
   toast('Rejected.');renderTab();}
 
+// ── PRIVATE DATA CONTROL (config/privacy + users/{uid}/private/info) ──
+window.loadPrivacyCard=async function(){
+  const c=$('privacyCard');if(!c)return;
+  const on=await idDocPrivateOn();
+  c.innerHTML=`<h3>🔒 Private Data</h3>
+    <p style="font-size:12px;color:var(--slate3);line-height:1.7;margin-bottom:10px">Last IP / location / device are now saved in each user's private record (only the user, you and active staff can read it). ID photos move there too when the switch below is ON.</p>
+    <div class="ir"><span class="il">Private ID photos</span><span style="font-weight:700;color:${on?'var(--emerald)':'var(--slate3)'}">${on?'🟢 ON':'⚪ OFF'}</span></div>
+    <div style="background:var(--amber2);border-radius:var(--r);padding:10px 12px;margin:10px 0;font-size:12px;color:#92400e;line-height:1.6">⚠️ Staff console (staff.html) still reads ID photos from the old place. Turn this ON only when you review IDs yourself here, or after staff.html gets the same update.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ${on?'bo':'bs'} bsm" onclick="setIdPrivate(${!on})">${on?'Turn OFF private ID photos':'Turn ON private ID photos'}</button>
+      <button class="btn bp bsm" id="movePrivBtn" onclick="movePrivateData()">📦 Move private data</button>
+    </div>
+    <div id="movePrivResult" style="font-size:12px;color:var(--slate3);margin-top:8px"></div>`;
+};
+window.setIdPrivate=async function(on){
+  if(auth.currentUser?.email?.toLowerCase()!==AE){toast('Only the main admin can change this.');return;}
+  if(on&&!confirm('Store NEW ID photos privately?\n\nStaff using staff.html will not see these ID photos until staff.html is updated.'))return;
+  try{await setDoc(doc(db,'config','privacy'),{idDocPrivate:!!on,updatedAt:serverTimestamp()},{merge:true});toast(on?'🔒 Private ID photos ON':'Private ID photos OFF');loadPrivacyCard();}
+  catch(e){toast('Error: '+e.message);}
+};
+window.movePrivateData=async function(){
+  if(auth.currentUser?.email?.toLowerCase()!==AE){toast('Only the main admin can do this.');return;}
+  const idOn=await idDocPrivateOn();
+  const F=['lastAccessIP','lastAccessLocation','lastAccessDevice'];if(idOn)F.push('idDocument');
+  if(!confirm('Move private data now?\n\n'+(idOn?'Last IP, location, device AND ID photos':'Last IP, location and device')+' will be copied into each user\'s private record and removed from their public profile.'+(idOn?'':'\n\nID photos stay where they are (Private ID photos is OFF).')+'\n\nOnly do this AFTER the new Firestore rules are published.'))return;
+  const btn=$('movePrivBtn'),out=$('movePrivResult');if(btn){btn.disabled=true;btn.textContent='Moving…';}
+  let done=0,pending=0,found=0;
+  try{
+    const snap=await getDocs(collection(db,'users'));
+    const todo=snap.docs.filter(d=>{const x=d.data();return F.some(f=>f in x);});found=todo.length;
+    let batch=writeBatch(db),ops=0,bytes=0;
+    for(const d of todo){
+      const x=d.data();const cur=await getPrivate(d.id);
+      const priv={},del={};
+      F.forEach(f=>{if(f in x){if(x[f]!=null&&cur[f]==null)priv[f]=x[f];del[f]=deleteField();}});
+      if(idOn&&('idDocument' in x))del.hasIdDoc=!!(x.idDocument||cur.idDocument);
+      const sz=JSON.stringify(priv).length;
+      if(ops>0&&(ops+2>400||bytes+sz>5000000)){await batch.commit();done+=pending;pending=0;batch=writeBatch(db);ops=0;bytes=0;if(out)out.textContent='Moved '+done+' of '+found+'…';}
+      if(Object.keys(priv).length){priv.movedAt=serverTimestamp();batch.set(doc(db,'users',d.id,'private','info'),priv,{merge:true});ops++;}
+      batch.update(d.ref,del);ops++;bytes+=sz;pending++;
+    }
+    if(ops){await batch.commit();done+=pending;pending=0;}
+    if(out)out.textContent='✅ Done: '+done+' user record(s) moved'+(found?'':' (nothing left to move)')+'.';
+    alert('Done. '+done+' user record(s) moved to private storage.');
+  }catch(e){
+    if(out)out.textContent='⚠️ Stopped: '+e.message+' — '+done+' of '+found+' moved. Nothing is lost; you can press the button again.';
+    alert('Stopped with an error: '+e.message+'\n'+done+' of '+found+' records were moved. Nothing is lost - each record moves all-or-nothing. Check the rules are published, then press the button again.');
+  }
+  if(btn){btn.disabled=false;btn.textContent='📦 Move private data';}
+};
+
 // ── FREE LAUNCH OFFER CONTROL (config/launchPromo) ──
-const PROMO_STATES=['Lagos State','Ogun State','Edo State','Delta State','Rivers State'];
+const PROMO_STATES=['Lagos State','Ogun State','Edo State','Delta State','Rivers State','FCT Abuja','Oyo State','Enugu State','Anambra State','Akwa Ibom State'];
 window.loadPromoCard=async function(){
   const c=$('promoCard');if(!c)return;
   let active=true,lim=50;
@@ -1533,7 +1621,8 @@ window.verifyArtisanId=async function(uid){
 };
 window.rejectArtisanId=async function(uid){
   if(!confirm('Reject this ID document? The artisan will be asked to resubmit.'))return;
-  await updateDoc(doc(db,'users',uid),{idVerified:false,idDocument:null,idRejectedAt:serverTimestamp()});
+  await updateDoc(doc(db,'users',uid),{idVerified:false,idDocument:null,hasIdDoc:false,idRejectedAt:serverTimestamp()});
+  try{await setDoc(doc(db,'users',uid,'private','info'),{idDocument:null},{merge:true});}catch(e){}
   await addDoc(collection(db,'supportNotes'),{toUid:uid,toName:'',message:'⚠️ Your ID document could not be verified. Please go to your profile settings and upload a clearer photo of your ID.',sentAt:serverTimestamp(),sentBy:'Admin'});
   toast('ID rejected — artisan notified.');artDetail(uid);
 };
